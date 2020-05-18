@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Opaque : MonoBehaviour
-{
+public class Opaque : MonoBehaviour {
+    public static List<Opaque> instances;
     // Start is called before the first frame update
     void Start()
     {
