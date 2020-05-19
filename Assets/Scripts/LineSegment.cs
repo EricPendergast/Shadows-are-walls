@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine; 
 
+[System.Serializable]
 public struct LineSegment : IEnumerable<Vector2> {
     public Vector2 p1;
     public Vector2 p2;

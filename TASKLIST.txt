@@ -3,7 +3,7 @@ Player movement
 Lights
     - Single light
         ✓- Frustrum clipping
-        - mesh drawing
+        ✓- mesh drawing
         - Fix the bug where theres an error every time the number of vertices changes
     - Collision boxes
     - Moving collision boxes

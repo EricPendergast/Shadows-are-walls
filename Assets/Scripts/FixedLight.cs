@@ -18,6 +18,7 @@ public class FixedLight : LightBase {
     private MeshFilter castLightMeshFilter;
     private Mesh castLightMesh;
 
+    [SerializeField]
     private List<Quad> shadows;
 
     public List<Vector2> ViewTriangle() {
@@ -44,9 +45,6 @@ public class FixedLight : LightBase {
 
         castLightMeshFilter.sharedMesh = new Mesh();
         castLightMesh = castLightMeshFilter.sharedMesh;
-        if (shadows == null) {
-            shadows = new List<Quad>();
-        }
     }
 
     void DrawLampshade() {
@@ -59,6 +57,9 @@ public class FixedLight : LightBase {
     }
 
     void DrawShadows() {
+        if (shadows == null) {
+            shadows = new List<Quad>();
+        }
         shadows.Clear();
         List<Vector3> verts = new List<Vector3>();
         var tris = new List<int>();
@@ -95,5 +96,19 @@ public class FixedLight : LightBase {
     void Update() {
         DrawLampshade();
         DrawShadows();
+
+        if (IsInDark(Mouse.WorldPosition())) {
+            Debug.Log("Mouse in dark");
+        }
+    }
+
+    bool IsInDark(Vector2 point) {
+        foreach (var quad in shadows) {
+            if (quad.Contains(point)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
