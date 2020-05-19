@@ -59,4 +59,8 @@ public struct LineSegment : IEnumerable<Vector2> {
     public bool isValid() {
         return p1 != p2;
     }
+
+    public bool OnRightSide(Vector2 point) {
+        return Math.OnRightSide(point, this);
+    }
 }

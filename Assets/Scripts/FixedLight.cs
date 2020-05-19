@@ -18,6 +18,8 @@ public class FixedLight : LightBase {
     private MeshFilter castLightMeshFilter;
     private Mesh castLightMesh;
 
+    private List<Quad> shadows;
+
     public List<Vector2> ViewTriangle() {
         Vector3 v1 = Vector3.zero;
         Vector3 v2 = Quaternion.Euler(0f,0f, angle/2) * gameObject.transform.up;
@@ -42,6 +44,9 @@ public class FixedLight : LightBase {
 
         castLightMeshFilter.sharedMesh = new Mesh();
         castLightMesh = castLightMeshFilter.sharedMesh;
+        if (shadows == null) {
+            shadows = new List<Quad>();
+        }
     }
 
     void DrawLampshade() {
@@ -54,6 +59,7 @@ public class FixedLight : LightBase {
     }
 
     void DrawShadows() {
+        shadows.Clear();
         List<Vector3> verts = new List<Vector3>();
         var tris = new List<int>();
 
@@ -63,14 +69,17 @@ public class FixedLight : LightBase {
             foreach (LineSegment seg in obj.CrossSection(transform.position)) {
                 var inView = seg.TriangleIntersect(viewTriangle[0], viewTriangle[1], viewTriangle[2]);
                 if (inView.isValid()) {
-                    Polygon.DrawQuad(
+                    shadows.Add(new Quad(
                             inView.p1,
                             Math.Extend(transform.position, inView.p1, distance),
                             Math.Extend(transform.position, inView.p2, distance),
-                            inView.p2,
-                            verts, tris);
+                            inView.p2));
                 }
             }
+        }
+
+        foreach (var quad in shadows) {
+            quad.Draw(verts, tris);
         }
 
         for (int i = 0; i < verts.Count; i++) {
