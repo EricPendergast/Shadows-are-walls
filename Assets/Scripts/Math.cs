@@ -40,4 +40,8 @@ public class Math {
         }
         return ret;
     }
+
+    public static Vector3 Extend(Vector2 origin, Vector2 toExtend, float newDistance) {
+        return origin + (toExtend - origin).normalized*newDistance;
+    }
 }

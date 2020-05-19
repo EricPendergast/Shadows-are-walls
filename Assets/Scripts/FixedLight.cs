@@ -55,6 +55,7 @@ public class FixedLight : LightBase {
 
     void DrawShadows() {
         List<Vector3> verts = new List<Vector3>();
+        var tris = new List<int>();
 
         var viewTriangle = ViewTriangle();
 
@@ -62,17 +63,18 @@ public class FixedLight : LightBase {
             foreach (LineSegment seg in obj.CrossSection(transform.position)) {
                 var inView = seg.TriangleIntersect(viewTriangle[0], viewTriangle[1], viewTriangle[2]);
                 if (inView.isValid()) {
-                    verts.Add(inView.p1);
-                    verts.Add(inView.p2);
-                    verts.Add(transform.position);
+                    Polygon.DrawQuad(
+                            inView.p1,
+                            Math.Extend(transform.position, inView.p1, distance),
+                            Math.Extend(transform.position, inView.p2, distance),
+                            inView.p2,
+                            verts, tris);
                 }
             }
         }
 
-        var tris = new List<int>();
         for (int i = 0; i < verts.Count; i++) {
             verts[i] = castLightMeshFilter.transform.InverseTransformPoint(verts[i]);
-            tris.Add(tris.Count);
         }
 
         castLightMesh.vertices = verts.ToArray();

@@ -2,5 +2,7 @@ Player movement
 
 Lights
     - Single light
+        ✓- Frustrum clipping
+        - mesh drawing
     - Collision boxes
     - Moving collision boxes
