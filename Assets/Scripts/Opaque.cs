@@ -20,7 +20,10 @@ public class Opaque : MonoBehaviour {
         var boxCollider = GetComponent<BoxCollider2D>();
 
         if (boxCollider != null) {
-            list.Add(new LineSegment(transform.position + .5f*Vector3.left, transform.position + .5f*Vector3.right));
+            var upRight = (transform.right + transform.up)/2;
+            var downRight = (transform.right - transform.up)/2;
+            list.Add(new LineSegment(transform.position - upRight, transform.position + upRight));
+            list.Add(new LineSegment(transform.position - downRight, transform.position + downRight));
         }
         
         return list;

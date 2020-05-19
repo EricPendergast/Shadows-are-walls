@@ -77,8 +77,10 @@ public class FixedLight : LightBase {
             verts[i] = castLightMeshFilter.transform.InverseTransformPoint(verts[i]);
         }
 
-        castLightMesh.vertices = verts.ToArray();
+        // TODO: An error happens here when the number of vertices changes;
+        // something about the order of these lines
         castLightMesh.triangles = tris.ToArray();
+        castLightMesh.vertices = verts.ToArray();
     }
 
     void Update() {
