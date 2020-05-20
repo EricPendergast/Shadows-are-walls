@@ -87,10 +87,14 @@ public class FixedLight : LightBase {
             verts[i] = castLightMeshFilter.transform.InverseTransformPoint(verts[i]);
         }
 
-        // TODO: An error happens here when the number of vertices changes;
-        // something about the order of these lines
-        castLightMesh.triangles = tris.ToArray();
-        castLightMesh.vertices = verts.ToArray();
+        // TODO: Is this really the way this error is supposed to be fixed?
+        if (castLightMesh.vertexCount < verts.Count) {
+            castLightMesh.vertices = verts.ToArray();
+            castLightMesh.triangles = tris.ToArray();
+        } else {
+            castLightMesh.triangles = tris.ToArray();
+            castLightMesh.vertices = verts.ToArray();
+        }
     }
 
     void Update() {
