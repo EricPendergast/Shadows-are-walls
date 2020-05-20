@@ -13,9 +13,11 @@ public struct LineSegment : IEnumerable<Vector2> {
         this.p2 = p2;
     }
 
-    public Vector2 Intersect(LineSegment other) {
-        LineSegmentLib.LineSegmentsIntersection(p1, p2, other.p1, other.p2, out var intersection);
-        return intersection;
+    public Vector2? Intersect(LineSegment other) {
+        if (LineSegmentLib.LineSegmentsIntersection(p1, p2, other.p1, other.p2, out var intersection)) {
+            return intersection;
+        }
+        return null;
     }
 
     public LineSegment Intersect(Triangle triangle) {
@@ -63,5 +65,17 @@ public struct LineSegment : IEnumerable<Vector2> {
 
     public bool OnRightSide(Vector2 point) {
         return Math.OnRightSide(point, this);
+    }
+
+    public float Length() {
+        return (p2 - p1).magnitude;
+    }
+
+    public float SqrLength() {
+        return (p2 - p1).sqrMagnitude;
+    }
+
+    public float Angle() {
+        return Vector2.SignedAngle(Vector2.right, p2 - p1);
     }
 }

@@ -7,37 +7,26 @@ using UnityEngine;
 //
 // It will have a few kinematic edge colliders, which it uses to detect where
 // it intersects other shadows
-[ExecuteInEditMode]
 public class Shadow : MonoBehaviour {
     [SerializeField]
-    private Quad shape;
-
+    private List<ShadowEdge> edges = new List<ShadowEdge>();
     [SerializeField]
-    private List<EdgeCollider2D> edges = new List<EdgeCollider2D>();
+    public LightBase sourceLight;
 
-    void OnDrawGizmos() {
-        foreach (var seg in shape.GetSides()) {
-            Gizmos.DrawLine((Vector2)transform.position + seg.p1, (Vector2)transform.position + seg.p2);
+    public void Init(Opaque caster, LightBase light) {
+        sourceLight = light;
+        for (int i = 0; i < 4; i++) {
+            var shadowEdgeGo = new GameObject();
+            shadowEdgeGo.transform.parent = transform;
+            var shadowEdge = shadowEdgeGo.AddComponent<ShadowEdge>();
+            edges.Add(shadowEdge);
+            shadowEdge.Init(caster, (ShadowEdge.EdgeType)i, light);
         }
     }
 
-    void Start() {
-        edges.Clear();
-        edges.AddRange(gameObject.GetComponents<EdgeCollider2D>());
-
-        for (int i = edges.Count; i < 4; i++) {
-            edges.Add(gameObject.AddComponent<EdgeCollider2D>());
-        }
-
-    }
-
-    void Update() {
-        var sides = shape.GetSides();
-        for (int i = 0 ; i < 4; i++) {
-            var pt = edges[i].points;
-            pt[0] = sides[i].p1;
-            pt[1] = sides[i].p2;
-            edges[i].points = pt;
+    void OnDestroy() {
+        foreach (var edge in edges) {
+            Destroy(edge);
         }
     }
 }

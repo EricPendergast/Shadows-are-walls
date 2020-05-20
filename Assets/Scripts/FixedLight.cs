@@ -6,7 +6,6 @@ using UnityEngine;
 // the scene, calculates all their shadows,
 // and then does rendering and collisions
 // stuff
-[ExecuteInEditMode]
 [RequireComponent (typeof (PolygonCollider2D))]
 public class FixedLight : LightBase {
     public float angle;
@@ -71,6 +70,22 @@ public class FixedLight : LightBase {
         myMesh.triangles = new []{0,1,2};
     }
 
+
+    // Returns the shape of the shadow of seg, where the first point in the
+    // returned quad is analogous to seg.p1, and the last point is analogous to
+    // seg.p2. This ordering is important to ShadowEdge.GetTarget()
+    public override Quad? GetShadowShape(LineSegment seg) {
+        var inView = seg.Intersect(ViewTriangle());
+        if (inView.isValid()) {
+            return new Quad(
+                    inView.p1,
+                    Math.Extend(transform.position, inView.p1, distance),
+                    Math.Extend(transform.position, inView.p2, distance),
+                    inView.p2);
+        }
+        return null;
+    }
+
     void DrawShadows() {
         if (shadows == null) {
             shadows = new List<Quad>();
@@ -78,30 +93,24 @@ public class FixedLight : LightBase {
         shadows.Clear();
         List<Vector3> verts = new List<Vector3>();
         var tris = new List<int>();
-
+        
         var viewTriangle = ViewTriangle();
-
+        
         foreach (Opaque obj in Opaque.GetAllInstances()) {
-            foreach (LineSegment seg in obj.CrossSection(transform.position)) {
-                var inView = seg.Intersect(viewTriangle);
-                if (inView.isValid()) {
-                    shadows.Add(new Quad(
-                            inView.p1,
-                            Math.Extend(transform.position, inView.p1, distance),
-                            Math.Extend(transform.position, inView.p2, distance),
-                            inView.p2));
-                }
+            Quad? shadowShape = GetShadowShape(obj.CrossSection(transform.position));
+            if (shadowShape is Quad s) {
+                shadows.Add(s);
             }
         }
-
+        
         foreach (var quad in shadows) {
             quad.Draw(verts, tris);
         }
-
+        
         for (int i = 0; i < verts.Count; i++) {
             verts[i] = castLightMeshFilter.transform.InverseTransformPoint(verts[i]);
         }
-
+        
         // TODO: This may not be optimal
         // TODO: Is this really the way this error is supposed to be fixed?
         if (castLightMesh.vertexCount < verts.Count) {
@@ -116,7 +125,7 @@ public class FixedLight : LightBase {
     void Update() {
         visibleCollider.SetPath(0, LocalViewTriangle().AsList());
         DrawLampshade();
-        DrawShadows();
+        //DrawShadows();
 
         if (IsInDark(Mouse.WorldPosition())) {
             Debug.Log("Mouse in dark");
@@ -138,5 +147,17 @@ public class FixedLight : LightBase {
         }
 
         return false;
+    }
+
+    void OnCollisionEnter2D(Collision2D collision) {
+        if (collision.gameObject.TryGetComponent(out Opaque opaque)) {
+            opaque.CreateShadow(this);
+        }
+    }
+
+    void OnCollisionExit2D(Collision2D collision) {
+        if (collision.gameObject.TryGetComponent(out Opaque opaque)) {
+            opaque.DestroyShadow(this);
+        }
     }
 }

@@ -15,21 +15,32 @@ public class Opaque : MonoBehaviour {
         
     }
 
-    public List<LineSegment> CrossSection(Vector2 cameraPos) {
-        var list = new List<LineSegment>();
-        var boxCollider = GetComponent<BoxCollider2D>();
+    public LineSegment CrossSection(Vector2 cameraPos) {
+        //var boxCollider = GetComponent<BoxCollider2D>();
 
-        if (boxCollider != null) {
-            var upRight = (transform.right + transform.up)/2;
-            var downRight = (transform.right - transform.up)/2;
-            list.Add(new LineSegment(transform.position - upRight, transform.position + upRight));
-            list.Add(new LineSegment(transform.position - downRight, transform.position + downRight));
-        }
-        
-        return list;
+        var upRight = (transform.right + transform.up)/2;
+        var downRight = (transform.right - transform.up)/2;
+        return new LineSegment(transform.position - upRight, transform.position + upRight);
     }
 
     public static List<Opaque> GetAllInstances() {
         return new List<Opaque>(FindObjectsOfType<Opaque>());
+    }
+
+    public void CreateShadow(LightBase light) {
+        // TODO: There are better ways to handle this
+        var shadowGameObject = new GameObject();
+        shadowGameObject.transform.SetParent(transform);
+        var shadow = shadowGameObject.AddComponent<Shadow>();
+        shadow.Init(this, light);
+    }
+
+    public void DestroyShadow(LightBase light) {
+        foreach (Transform child in transform) {
+            Debug.Log("Trying to destroy");
+            if (child.TryGetComponent(out Shadow shadow) && shadow.sourceLight == light) {
+                Destroy(child.gameObject);
+            }
+        }
     }
 }

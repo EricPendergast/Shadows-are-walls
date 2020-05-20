@@ -26,7 +26,7 @@ public static class LineSegmentLib
 {
     public static bool LineSegmentsIntersection(Vector2 p1, Vector2 p2, Vector2 p3, Vector2 p4, out Vector2 intersection)
     {
-        intersection = Vector2.zero;
+        intersection = Vector2.positiveInfinity;
 
         var d = (p2.x - p1.x) * (p4.y - p3.y) - (p2.y - p1.y) * (p4.x - p3.x);
 
