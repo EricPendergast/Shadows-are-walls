@@ -18,6 +18,16 @@ public struct LineSegment : IEnumerable<Vector2> {
         return intersection;
     }
 
+    public LineSegment Intersect(Triangle triangle) {
+        foreach (var seg in Split(triangle.GetSides())) {
+            if (triangle.Contains(seg.Midpoint())) {
+                return seg;
+            }
+        }
+
+        return zero;
+    }
+
     public List<LineSegment> Split(LineSegment other) {
         if (LineSegmentLib.LineSegmentsIntersection(p1, p2, other.p1, other.p2, out var intersection)) {
             return new List<LineSegment>{new LineSegment(p1, intersection), new LineSegment(intersection, p2)};
@@ -32,16 +42,6 @@ public struct LineSegment : IEnumerable<Vector2> {
             ret = Math.SplitAll(ret, split);
         }
         return ret;
-    }
-
-    public LineSegment TriangleIntersect(Vector2 p1, Vector2 p2, Vector2 p3) {
-        foreach (var seg in Split(Math.GetTriangleSides(p1, p2, p3))) {
-            if (Math.IsInTriangle(seg.Midpoint(), p1, p2, p3)) {
-                return seg;
-            }
-        }
-
-        return zero;
     }
 
     public Vector2 Midpoint() {

@@ -7,6 +7,7 @@ using UnityEngine;
 // and then does rendering and collisions
 // stuff
 [ExecuteInEditMode]
+[RequireComponent (typeof (PolygonCollider2D))]
 public class FixedLight : LightBase {
     public float angle;
     public float distance;
@@ -19,24 +20,34 @@ public class FixedLight : LightBase {
     private Mesh castLightMesh;
 
     [SerializeField]
+    private PolygonCollider2D visibleCollider;
+
+    [SerializeField]
     private List<Quad> shadows;
 
-    public List<Vector2> ViewTriangle() {
+    public Triangle LocalViewTriangle() {
         Vector3 v1 = Vector3.zero;
-        Vector3 v2 = Quaternion.Euler(0f,0f, angle/2) * gameObject.transform.up;
-        Vector3 v3 = Quaternion.Euler(0f,0f, -angle/2) * gameObject.transform.up;
+        Vector3 v2 = Quaternion.Euler(0f,0f, angle/2) * Vector2.up;
+        Vector3 v3 = Quaternion.Euler(0f,0f, -angle/2) * Vector2.up;
         v2 *= distance;
         v3 *= distance;
-        return new List<Vector2>{v1 + transform.position,
-                                 v2 + transform.position,
-                                 v3 + transform.position};
+
+        return new Triangle(v1, v2, v3);
+    }
+
+    public Triangle ViewTriangle() {
+        Triangle loc = LocalViewTriangle();
+        loc.p1 = transform.TransformPoint(loc.p1);
+        loc.p2 = transform.TransformPoint(loc.p2);
+        loc.p3 = transform.TransformPoint(loc.p3);
+        return loc;
     }
 
     void OnDrawGizmosSelected() {
-        var viewTriangle = ViewTriangle();
-        for (int i = 0; i < 3; i++) {
-            Gizmos.DrawLine(viewTriangle[i], viewTriangle[(i+1)%3]);
-        }
+        //var viewTriangle = ViewTriangle();
+        //foreach (var side in ViewTriangle().GetSides()) {
+        //    Gizmos.DrawLine(side.p1, side.p2);
+        //}
     }
 
     void Start() {
@@ -45,6 +56,10 @@ public class FixedLight : LightBase {
 
         castLightMeshFilter.sharedMesh = new Mesh();
         castLightMesh = castLightMeshFilter.sharedMesh;
+
+        visibleCollider = GetComponent<PolygonCollider2D>();
+
+        visibleCollider.SetPath(0, ViewTriangle().AsList());
     }
 
     void DrawLampshade() {
@@ -68,7 +83,7 @@ public class FixedLight : LightBase {
 
         foreach (Opaque obj in Opaque.GetAllInstances()) {
             foreach (LineSegment seg in obj.CrossSection(transform.position)) {
-                var inView = seg.TriangleIntersect(viewTriangle[0], viewTriangle[1], viewTriangle[2]);
+                var inView = seg.Intersect(viewTriangle);
                 if (inView.isValid()) {
                     shadows.Add(new Quad(
                             inView.p1,
@@ -87,6 +102,7 @@ public class FixedLight : LightBase {
             verts[i] = castLightMeshFilter.transform.InverseTransformPoint(verts[i]);
         }
 
+        // TODO: This may not be optimal
         // TODO: Is this really the way this error is supposed to be fixed?
         if (castLightMesh.vertexCount < verts.Count) {
             castLightMesh.vertices = verts.ToArray();
@@ -98,6 +114,7 @@ public class FixedLight : LightBase {
     }
 
     void Update() {
+        visibleCollider.SetPath(0, LocalViewTriangle().AsList());
         DrawLampshade();
         DrawShadows();
 
@@ -106,7 +123,14 @@ public class FixedLight : LightBase {
         }
     }
 
+    void FixedUpdate() {
+        // talk to Shadows.instance
+        // get the slice points for each shadow boundary
+        // update colliders accordingly
+    }
+
     bool IsInDark(Vector2 point) {
+        // TODO: Check if the point is outside of the view triangle
         foreach (var quad in shadows) {
             if (quad.Contains(point)) {
                 return true;

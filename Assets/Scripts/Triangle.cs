@@ -13,4 +13,16 @@ public struct Triangle {
         this.p2 = p2;
         this.p3 = p3;
     }
+
+    public List<LineSegment> GetSides() {
+        return Math.GetTriangleSides(p1, p2, p3);
+    }
+
+    public bool Contains(Vector2 point) {
+        return Math.IsInTriangle(point, p1, p2, p3);
+    }
+
+    public List<Vector2> AsList() {
+        return new List<Vector2>{p1, p2, p3};
+    }
 }
