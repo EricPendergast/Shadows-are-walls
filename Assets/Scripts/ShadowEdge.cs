@@ -46,20 +46,20 @@ public class ShadowEdge : MonoBehaviour {
     void OnDrawGizmos() {
         Gizmos.DrawLine(target.p1, target.p2);
         foreach (var seg in GetSplitOnIntersections()) {
-            //foreach (var point in new List<Vector2>{seg.GetRightSide(), seg.GetLeftSide()}) {
-            //    if (LightBase.IsInDarkAllLights(point)) {
-            //        Gizmos.color = Color.black;
-            //    } else {
-            //        Gizmos.color = Color.white;
-            //    }
-            //
-            //    Gizmos.DrawSphere(point, .1f);
-            //}
+            foreach (var point in new List<Vector2>{seg.GetRightSide(), seg.GetLeftSide()}) {
+                if (LightBase.IsInDarkAllLights(point)) {
+                    Gizmos.color = Color.black;
+                } else {
+                    Gizmos.color = Color.white;
+                }
+            
+                Gizmos.DrawSphere(point, .1f);
+            }
         }
 
-        foreach (var i in GetIntersections()) {
-            Gizmos.DrawSphere(i, .1f);
-        }
+        //foreach (var i in GetIntersections()) {
+        //    Gizmos.DrawSphere(i, .1f);
+        //}
         Gizmos.color = Color.white;
         //Gizmos.DrawSphere(target.p1, .1f);
     }
@@ -113,6 +113,8 @@ public class ShadowEdge : MonoBehaviour {
     }
 
     void FixedUpdate() {
+        transform.position = target.p1;
+        transform.rotation = Quaternion.Euler(0, 0, target.Angle());
         UpdateTarget();
         UpdateColliders();
     }
@@ -144,6 +146,17 @@ public class ShadowEdge : MonoBehaviour {
                 intersections.Add(intersec);
             }
         }
+
+        foreach (var l in LightBase.GetLights()) {
+            if (l is FixedLight light) {
+                foreach (var seg in light.ViewTriangle().GetSides()) {
+                    if (target.Intersect(seg) is Vector2 intersec) {
+                        intersections.Add(intersec);
+                    }
+                }
+            }
+        }
+
         return intersections;
     }
 

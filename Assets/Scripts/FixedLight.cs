@@ -103,23 +103,23 @@ public class FixedLight : LightBase {
             }
         }
         
-        foreach (var quad in shadows) {
-            quad.Draw(verts, tris);
-        }
+        //foreach (var quad in shadows) {
+        //    quad.Draw(verts, tris);
+        //}
         
-        for (int i = 0; i < verts.Count; i++) {
-            verts[i] = castLightMeshFilter.transform.InverseTransformPoint(verts[i]);
-        }
+        //for (int i = 0; i < verts.Count; i++) {
+        //    verts[i] = castLightMeshFilter.transform.InverseTransformPoint(verts[i]);
+        //}
         
         // TODO: This may not be optimal
         // TODO: Is this really the way this error is supposed to be fixed?
-        if (castLightMesh.vertexCount < verts.Count) {
-            castLightMesh.vertices = verts.ToArray();
-            castLightMesh.triangles = tris.ToArray();
-        } else {
-            castLightMesh.triangles = tris.ToArray();
-            castLightMesh.vertices = verts.ToArray();
-        }
+        //if (castLightMesh.vertexCount < verts.Count) {
+        //    castLightMesh.vertices = verts.ToArray();
+        //    castLightMesh.triangles = tris.ToArray();
+        //} else {
+        //    castLightMesh.triangles = tris.ToArray();
+        //    castLightMesh.vertices = verts.ToArray();
+        //}
     }
 
     void Update() {
