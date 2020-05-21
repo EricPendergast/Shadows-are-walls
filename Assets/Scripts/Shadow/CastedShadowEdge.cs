@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.Assertions;
 
+// This is probably obsolete now
 public class CastedShadowEdge : ShadowEdge {
     public enum EdgeType {
         front=0,
