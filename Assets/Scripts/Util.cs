@@ -5,9 +5,11 @@ public class Util {
         var meshFilter = go.GetComponent<MeshFilter>();
         if (meshFilter == null) {
             meshFilter = go.AddComponent<MeshFilter>();
-            meshFilter.mesh = new Mesh();
         }
 
+        if (meshFilter.mesh == null) {
+            meshFilter.mesh = new Mesh();
+        }
         return meshFilter.mesh;
     }
 

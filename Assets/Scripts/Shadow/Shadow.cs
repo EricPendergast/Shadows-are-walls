@@ -12,10 +12,10 @@ public class Shadow : MonoBehaviour {
     private List<CustomShadowEdge> edges = new List<CustomShadowEdge>();
     [SerializeField]
     public LightBase sourceLight;
-    [SerializeField]
-    public Quad currentShape;
+    public Opaque caster;
 
     public void Init(Opaque caster, LightBase light) {
+        this.caster = caster;
         sourceLight = light;
 
         for (int i = 0; i < 4; i++) {
@@ -24,14 +24,18 @@ public class Shadow : MonoBehaviour {
 
             int iCaptured = i;
             edge.Init(() => {
-                LineSegment section = caster.CrossSection(sourceLight.transform.position);
-                if (sourceLight.GetShadowShape(section) is Quad s) {
+                if (GetCurrentShape() is Quad s) {
                     return s.GetSides()[iCaptured];
                 } else {
                     return LineSegment.zero;
                 }
             });
         }
+    }
+
+    public Quad? GetCurrentShape() {
+        LineSegment section = caster.CrossSection(sourceLight.transform.position);
+        return sourceLight.GetShadowShape(section);
     }
 
     void OnDestroy() {
