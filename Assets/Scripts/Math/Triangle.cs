@@ -25,4 +25,8 @@ public struct Triangle {
     public List<Vector2> AsList() {
         return new List<Vector2>{p1, p2, p3};
     }
+
+    public override string ToString() {
+        return "Triangle(" + p1 + ", " + p2 + ", " + p3 + ")";
+    }
 }

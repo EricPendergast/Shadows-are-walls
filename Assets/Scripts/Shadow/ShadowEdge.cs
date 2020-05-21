@@ -1,7 +1,5 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Assertions;
 
 public abstract class ShadowEdge : MonoBehaviour {
     private static Dictionary<int, ShadowEdge> allEdges = new Dictionary<int, ShadowEdge>();

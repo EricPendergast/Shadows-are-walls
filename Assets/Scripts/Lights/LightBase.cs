@@ -17,11 +17,11 @@ public abstract class LightBase : MonoBehaviour {
         return true;
     }
 
-    void Awake() {
+    public virtual void Awake() {
         allLights.Add(gameObject.GetInstanceID(), this);
     }
     
-    void OnDestroy() {
+    public virtual void OnDestroy() {
         allLights.Remove(gameObject.GetInstanceID());
     }
 

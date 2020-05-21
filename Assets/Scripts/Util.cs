@@ -10,4 +10,10 @@ public class Util {
 
         return meshFilter.mesh;
     }
+
+    public static T CreateChild<T>(Transform parent) where T : Component {
+        var go = new GameObject();
+        go.transform.parent = parent;
+        return go.AddComponent<T>();
+    }
 }

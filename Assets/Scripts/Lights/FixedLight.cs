@@ -49,6 +49,16 @@ public class FixedLight : LightBase {
         }
     }
 
+    public override void Awake() {
+        base.Awake();
+        for (int i = 0; i < 3; i++) {
+            int capturedI = i;
+            Util.CreateChild<CustomShadowEdge>(transform).Init(() => {
+                return ViewTriangle().GetSides()[capturedI];
+            });
+        }
+    }
+
     void Start() {
         myMeshFilter.sharedMesh = new Mesh();
         myMesh = myMeshFilter.sharedMesh;
@@ -127,11 +137,11 @@ public class FixedLight : LightBase {
         DrawLampshade();
         DrawShadows();
 
-        if (IsInDark(Mouse.WorldPosition())) {
-            Debug.Log("Mouse in dark");
-        } else {
-            Debug.Log("Mouse in light");
-        }
+        //if (IsInDark(Mouse.WorldPosition())) {
+        //    Debug.Log("Mouse in dark");
+        //} else {
+        //    Debug.Log("Mouse in light");
+        //}
     }
 
     void FixedUpdate() {

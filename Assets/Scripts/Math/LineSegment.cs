@@ -88,4 +88,8 @@ public struct LineSegment : IEnumerable<Vector2> {
         Vector2 dir = (p2-p1).normalized*.001f;
         return Midpoint() + new Vector2(-dir.y, dir.x);
     }
+
+    public override string ToString() {
+        return "LineSegment(" + p1 + ", " + p2 + ")";
+    }
 }
