@@ -42,11 +42,11 @@ public class FixedLight : LightBase {
         return loc;
     }
 
-    void OnDrawGizmosSelected() {
-        //var viewTriangle = ViewTriangle();
-        //foreach (var side in ViewTriangle().GetSides()) {
-        //    Gizmos.DrawLine(side.p1, side.p2);
-        //}
+    void OnDrawGizmos() {
+        var viewTriangle = ViewTriangle();
+        foreach (var side in ViewTriangle().GetSides()) {
+            Gizmos.DrawLine(side.p1, side.p2);
+        }
     }
 
     void Start() {
@@ -125,10 +125,12 @@ public class FixedLight : LightBase {
     void Update() {
         visibleCollider.SetPath(0, LocalViewTriangle().AsList());
         DrawLampshade();
-        //DrawShadows();
+        DrawShadows();
 
         if (IsInDark(Mouse.WorldPosition())) {
             Debug.Log("Mouse in dark");
+        } else {
+            Debug.Log("Mouse in light");
         }
     }
 
@@ -138,7 +140,10 @@ public class FixedLight : LightBase {
         // update colliders accordingly
     }
 
-    bool IsInDark(Vector2 point) {
+    public override bool IsInDark(Vector2 point) {
+        if (!this.visibleCollider.OverlapPoint(point)) {
+            return true;
+        }
         // TODO: Check if the point is outside of the view triangle
         foreach (var quad in shadows) {
             if (quad.Contains(point)) {

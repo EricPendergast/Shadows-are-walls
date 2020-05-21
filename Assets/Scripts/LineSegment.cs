@@ -78,4 +78,14 @@ public struct LineSegment : IEnumerable<Vector2> {
     public float Angle() {
         return Vector2.SignedAngle(Vector2.right, p2 - p1);
     }
+
+    public Vector2 GetRightSide() {
+        Vector2 dir = (p2-p1).normalized*.001f;
+        return Midpoint() + new Vector2(dir.y, -dir.x);
+    }
+
+    public Vector2 GetLeftSide() {
+        Vector2 dir = (p2-p1).normalized*.001f;
+        return Midpoint() + new Vector2(-dir.y, dir.x);
+    }
 }

@@ -45,33 +45,47 @@ public class ShadowEdge : MonoBehaviour {
 
     void OnDrawGizmos() {
         Gizmos.DrawLine(target.p1, target.p2);
-        foreach (var i in GetIntersections()) {
-            //Gizmos.DrawSphere(i, .1f);
+        foreach (var seg in GetSplitOnIntersections()) {
+            //foreach (var point in new List<Vector2>{seg.GetRightSide(), seg.GetLeftSide()}) {
+            //    if (LightBase.IsInDarkAllLights(point)) {
+            //        Gizmos.color = Color.black;
+            //    } else {
+            //        Gizmos.color = Color.white;
+            //    }
+            //
+            //    Gizmos.DrawSphere(point, .1f);
+            //}
         }
+
+        foreach (var i in GetIntersections()) {
+            Gizmos.DrawSphere(i, .1f);
+        }
+        Gizmos.color = Color.white;
         //Gizmos.DrawSphere(target.p1, .1f);
     }
 
     void UpdateColliders() {
-        var splits = GetIntersections();
+        List<LineSegment> pieces = GetSplitOnIntersections();
+
         var colliders = new List<BoxCollider2D>(GetComponents<BoxCollider2D>());
-        for (int i = colliders.Count; i < splits.Count + 1; i++) {
+
+        for (int i = pieces.Count; i < colliders.Count; i++) {
+            colliders[i].enabled = false;
+        }
+        for (int i = colliders.Count; i < pieces.Count + 1; i++) {
             colliders.Add(gameObject.AddComponent<BoxCollider2D>());
         }
 
-        float totalLength = target.Length();
-        System.Func<Vector2, float> dist = v => (target.p1 - v).magnitude;
-        splits.Sort((v1, v2) => dist(v1).CompareTo(dist(v2)));
-
-        splits.Add(target.p2);
-        float prevDist = 0;
-
-        for (int i = 0; i < colliders.Count; i++) {
-            float currDist = dist(splits[i]);
-            float width = currDist - prevDist;
-            colliders[i].offset = new Vector2(prevDist+width/2, 0);
+        for (int i = 0; i < pieces.Count; i++) {
+            float width = pieces[i].Length();
+            colliders[i].offset = new Vector2((pieces[i].p1 - target.p1).magnitude + width/2, 0);
             colliders[i].size = new Vector2(width, .1f);
-            prevDist = currDist;
+            colliders[i].enabled = SegmentDividesLightAndDark(pieces[i]);
         }
+    }
+
+    bool SegmentDividesLightAndDark(LineSegment seg) {
+        return LightBase.IsInDarkAllLights(seg.GetRightSide()) != LightBase.IsInDarkAllLights(seg.GetLeftSide());
     }
 
     void UpdateTarget() {
@@ -103,10 +117,27 @@ public class ShadowEdge : MonoBehaviour {
         UpdateColliders();
     }
 
+    List<LineSegment> GetSplitOnIntersections() {
+        var ret = new List<LineSegment>();
+        List<Vector2> splits = GetIntersections();
+
+        float totalLength = target.Length();
+        System.Func<Vector2, float> dist = v => (target.p1 - v).magnitude;
+        splits.Insert(0, target.p1);
+        splits.Add(target.p2);
+        splits.Sort((v1, v2) => dist(v1).CompareTo(dist(v2)));
+
+        for (int i = 1; i < splits.Count; i++) {
+            ret.Add(new LineSegment(splits[i-1], splits[i]));
+        }
+
+        return ret;
+    }
+
     List<Vector2> GetIntersections() {
         var intersections = new List<Vector2>();
         foreach (ShadowEdge edge in allEdges.Values) {
-            if (edge == this || edge.caster == this.caster) {
+            if (edge == this || (edge.caster == this.caster && edge.sourceLight == this.sourceLight)) {
                 continue;
             }
             if (target.Intersect(edge.target) is Vector2 intersec) {
