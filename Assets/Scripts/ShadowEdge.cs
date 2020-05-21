@@ -3,45 +3,26 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
 
-public class ShadowEdge : MonoBehaviour {
+public abstract class ShadowEdge : MonoBehaviour {
     private static Dictionary<int, ShadowEdge> allEdges = new Dictionary<int, ShadowEdge>();
 
-    public enum EdgeType {
-        front=0,
-        p1=1,
-        p2=2,
-        back=3
-    }
-    [SerializeField]
-    private EdgeType edgeType;
-    [SerializeField]
-    private Shadow shadow;
-    [SerializeField]
-    private Opaque caster;
-    [SerializeField]
-    private LightBase sourceLight;
-
+    // Used to cache the target, which is recalculated every FixedUpdate.
     [SerializeField]
     private LineSegment target;
-    bool initialized = false;
 
-    public void Init(Opaque caster, EdgeType edgeType, LightBase light) {
-        Assert.IsFalse(initialized);
-        initialized = true;
-        this.caster = caster;
-        this.edgeType = edgeType;
-        this.sourceLight = light;
+    protected abstract LineSegment CalculateTarget();
+
+    void Awake() {
         allEdges.Add(gameObject.GetInstanceID(), this);
-        UpdateTarget();
+        gameObject.layer = LayerMask.NameToLayer("ShadowEdge");
     }
 
     void Start() {
-        gameObject.layer = LayerMask.NameToLayer("ShadowEdge");
         Debug.Log(target.p1);
+        UpdateTarget();
         transform.position = target.p1;
         transform.rotation = Quaternion.Euler(0, 0, target.Angle());
     }
-
 
     void OnDrawGizmos() {
         Gizmos.DrawLine(target.p1, target.p2);
@@ -92,26 +73,6 @@ public class ShadowEdge : MonoBehaviour {
         target = CalculateTarget();
     }
 
-    LineSegment CalculateTarget() {
-        LineSegment sec = caster.CrossSection(sourceLight.transform.position);
-        if (sourceLight.GetShadowShape(sec) is Quad s) {
-            switch (edgeType) {
-                case EdgeType.front:
-                    return new LineSegment(s.p1, s.p4);
-                case EdgeType.back:
-                    return new LineSegment(s.p2, s.p3);;
-                case EdgeType.p1:
-                    return new LineSegment(s.p1, s.p2);;
-                case EdgeType.p2:
-                    return new LineSegment(s.p4, s.p3);;
-                default:
-                    return LineSegment.zero;
-            }
-        } else {
-            return LineSegment.zero;
-        }
-    }
-
     void FixedUpdate() {
         transform.position = target.p1;
         transform.rotation = Quaternion.Euler(0, 0, target.Angle());
@@ -139,7 +100,7 @@ public class ShadowEdge : MonoBehaviour {
     List<Vector2> GetIntersections() {
         var intersections = new List<Vector2>();
         foreach (ShadowEdge edge in allEdges.Values) {
-            if (edge == this || (edge.caster == this.caster && edge.sourceLight == this.sourceLight)) {
+            if (edge == this) {
                 continue;
             }
             if (target.Intersect(edge.target) is Vector2 intersec) {

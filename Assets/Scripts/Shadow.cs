@@ -18,9 +18,9 @@ public class Shadow : MonoBehaviour {
         for (int i = 0; i < 4; i++) {
             var shadowEdgeGo = new GameObject();
             shadowEdgeGo.transform.parent = transform;
-            var shadowEdge = shadowEdgeGo.AddComponent<ShadowEdge>();
+            var shadowEdge = shadowEdgeGo.AddComponent<CastedShadowEdge>();
             edges.Add(shadowEdge);
-            shadowEdge.Init(caster, (ShadowEdge.EdgeType)i, light);
+            shadowEdge.Init(caster, (CastedShadowEdge.EdgeType)i, light);
         }
     }
 
