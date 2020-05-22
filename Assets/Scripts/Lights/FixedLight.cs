@@ -133,7 +133,6 @@ public class FixedLight : LightBase {
     void Update() {
         visibleCollider.SetPath(0, LocalViewTriangle().AsList());
 
-        //DrawShadows();
         DrawCastedLight();
 
         var allShadows = new List<LineSegment>();
@@ -156,19 +155,17 @@ public class FixedLight : LightBase {
         // update colliders accordingly
     }
 
-    // TODO: This can use the new generated light mesh
     public override bool IsInDark(Vector2 point) {
         if (!this.visibleCollider.OverlapPoint(point)) {
             return true;
         }
-        // TODO: this is now broken (and is also really important)
-        //foreach (var quad in shadows) {
-        //    if (quad.Contains(point)) {
-        //        return true;
-        //    }
-        //}
 
-        return false;
+        foreach (LineSegment seg in trimmedShadows) {
+            if (Math.IsInTriangle(point, seg.p1, seg.p2, transform.position)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     // TODO: create the shadow, and keep track of which opaque object it is from.
