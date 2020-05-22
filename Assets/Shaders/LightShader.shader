@@ -54,11 +54,11 @@
                 /*return col;*/
                 /*if (mask == (0x3<<0)) {*/
                 /*if ((colorToBitField(col) & mask) != 0) {// || colorToBitField(col) == 2) {*/
-                if ((getMask(lightId) & bf) != 0) {
+                /*if ((getMask(lightId) & bf) != 0) {*/
                     return fixed4(1,1,1,1);
-                } else {
-                    return fixed4(0,0,0,0);
-                }
+                /*} else {*/
+                /*    return fixed4(0,0,0,0);*/
+                /*}*/
                 /*uint mask = 0;*/
                 /*for (int i = 0; i < lightIdMultiplier; i++) {*/
                 /*    mask += 1 << (lightId*lightIdMultiplier+i);*/

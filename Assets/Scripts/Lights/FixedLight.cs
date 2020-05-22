@@ -121,13 +121,31 @@ public class FixedLight : LightBase {
         //return null;
     }
 
-    // TODO: This should draw the actual casted light (the whole view triangle
-    // with shadows subtracted)
     void DrawCastedLight() {
-        var t = LocalViewTriangle();
-        this.castLightMesh.vertices = new Vector3[]{t.p1, t.p2, t.p3};
-        //this.castLightMesh.colors = new Color[]{0, 0, 0};
-        this.castLightMesh.triangles = new int[]{0, 1, 2};
+
+        var vertices = new List<Vector3>();
+        var triangles = new List<int>();
+        vertices.Add(transform.position);
+
+        foreach (LineSegment shadow in trimmedShadows) {
+            triangles.Add(vertices.Count);
+            vertices.Add(shadow.p1);
+            triangles.Add(vertices.Count);
+            vertices.Add(shadow.p2);
+            triangles.Add(0);
+        }
+
+        for (int i = 0; i < vertices.Count; i++) {
+            vertices[i] = transform.InverseTransformPoint(vertices[i]);
+        }
+
+        if (castLightMesh.vertexCount < vertices.Count) {
+            castLightMesh.vertices = vertices.ToArray();
+            castLightMesh.triangles = triangles.ToArray();
+        } else {
+            castLightMesh.triangles = triangles.ToArray();
+            castLightMesh.vertices = vertices.ToArray();
+        }
     }
 
     void Update() {
@@ -168,7 +186,6 @@ public class FixedLight : LightBase {
         return true;
     }
 
-    // TODO: create the shadow, and keep track of which opaque object it is from.
     void OnCollisionEnter2D(Collision2D collision) {
         if (collision.gameObject.TryGetComponent(out Opaque opaque)) {
             Shadow s = Util.CreateChild<Shadow>(transform);
@@ -177,7 +194,6 @@ public class FixedLight : LightBase {
         }
     }
 
-    // TODO: do the right things so that above still works
     void OnCollisionExit2D(Collision2D collision) {
         if (collision.gameObject.TryGetComponent(out Opaque opaque)) {
             Shadow s = shadows[opaque.GetInstanceID()];
