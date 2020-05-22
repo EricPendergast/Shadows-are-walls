@@ -16,7 +16,6 @@ public abstract class ShadowEdge : MonoBehaviour {
     }
 
     void Start() {
-        Debug.Log(target.p1);
         UpdateTarget();
         transform.position = target.p1;
         transform.rotation = Quaternion.Euler(0, 0, target.Angle());

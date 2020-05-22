@@ -6,19 +6,13 @@ using UnityEngine;
 // the scene, calculates all their shadows,
 // and then does rendering and collisions
 // stuff
-[RequireComponent (typeof (PolygonCollider2D))]
 public class FixedLight : LightBase {
     public float angle;
     public float distance;
 
-    [SerializeField]
-    private MeshFilter myMeshFilter;
-    private Mesh myMesh;
-    [SerializeField]
-    private MeshFilter castLightMeshFilter;
     private Mesh castLightMesh;
+    private Mesh shadowMesh;
 
-    [SerializeField]
     private PolygonCollider2D visibleCollider;
 
     [SerializeField]
@@ -57,28 +51,30 @@ public class FixedLight : LightBase {
                 return ViewTriangle().GetSides()[capturedI];
             });
         }
-    }
 
-    void Start() {
-        myMeshFilter.sharedMesh = new Mesh();
-        myMesh = myMeshFilter.sharedMesh;
+        Refs.instance.lightMaterial.SetInt("lightId", lightCounter);
+        Refs.instance.shadowMaterial.SetInt("lightId", lightCounter);
+        lightCounter++;
 
-        castLightMeshFilter.sharedMesh = new Mesh();
-        castLightMesh = castLightMeshFilter.sharedMesh;
+        castLightMesh = Util.CreateMeshWithNewMaterial(gameObject, Refs.instance.lightMaterial);
 
-        visibleCollider = GetComponent<PolygonCollider2D>();
+        GameObject c = Util.CreateChild(transform);
+        c.transform.localPosition = Vector3.zero;
+        c.transform.localRotation = Quaternion.identity;
+        shadowMesh = Util.CreateMeshWithNewMaterial(c, Refs.instance.shadowMaterial);
 
+        visibleCollider = gameObject.AddComponent<PolygonCollider2D>();
         visibleCollider.SetPath(0, ViewTriangle().AsList());
     }
 
-    void DrawLampshade() {
-        Vector3 v1 = Vector3.zero;
-        Vector3 v2 = Quaternion.Euler(0f,0f, angle/2) * Vector2.up;
-        Vector3 v3 = Quaternion.Euler(0f,0f, -angle/2) * Vector2.up;
-
-        myMesh.vertices = new []{v1, v2, v3};
-        myMesh.triangles = new []{0,1,2};
-    }
+    //void DrawLampshade() {
+    //    Vector3 v1 = Vector3.zero;
+    //    Vector3 v2 = Quaternion.Euler(0f,0f, angle/2) * Vector2.up;
+    //    Vector3 v3 = Quaternion.Euler(0f,0f, -angle/2) * Vector2.up;
+    //
+    //    myMesh.vertices = new []{v1, v2, v3};
+    //    myMesh.triangles = new []{0,1,2};
+    //}
 
 
     // Returns the shape of the shadow of seg, where the first point in the
@@ -96,13 +92,11 @@ public class FixedLight : LightBase {
         return null;
     }
 
-    void DrawShadows() {
+    void GetShadows() {
         if (shadows == null) {
             shadows = new List<Quad>();
         }
         shadows.Clear();
-        List<Vector3> verts = new List<Vector3>();
-        var tris = new List<int>();
         
         var viewTriangle = ViewTriangle();
         
@@ -112,30 +106,44 @@ public class FixedLight : LightBase {
                 shadows.Add(s);
             }
         }
+    }
+
+    void DrawShadows() {
+        GetShadows();
+
+        List<Vector3> verts = new List<Vector3>();
+        var tris = new List<int>();
         
-        //foreach (var quad in shadows) {
-        //    quad.Draw(verts, tris);
-        //}
+        foreach (var quad in shadows) {
+            quad.Draw(verts, tris);
+        }
         
-        //for (int i = 0; i < verts.Count; i++) {
-        //    verts[i] = castLightMeshFilter.transform.InverseTransformPoint(verts[i]);
-        //}
+        for (int i = 0; i < verts.Count; i++) {
+            verts[i] = transform.InverseTransformPoint(verts[i]);
+        }
         
         // TODO: This may not be optimal
         // TODO: Is this really the way this error is supposed to be fixed?
-        //if (castLightMesh.vertexCount < verts.Count) {
-        //    castLightMesh.vertices = verts.ToArray();
-        //    castLightMesh.triangles = tris.ToArray();
-        //} else {
-        //    castLightMesh.triangles = tris.ToArray();
-        //    castLightMesh.vertices = verts.ToArray();
-        //}
+        if (shadowMesh.vertexCount < verts.Count) {
+            shadowMesh.vertices = verts.ToArray();
+            shadowMesh.triangles = tris.ToArray();
+        } else {
+            shadowMesh.triangles = tris.ToArray();
+            shadowMesh.vertices = verts.ToArray();
+        }
+    }
+
+    void DrawCastedLight() {
+        var t = LocalViewTriangle();
+        this.castLightMesh.vertices = new Vector3[]{t.p1, t.p2, t.p3};
+        //this.castLightMesh.colors = new Color[]{0, 0, 0};
+        this.castLightMesh.triangles = new int[]{0, 1, 2};
     }
 
     void Update() {
         visibleCollider.SetPath(0, LocalViewTriangle().AsList());
-        DrawLampshade();
         DrawShadows();
+        DrawCastedLight();
 
         //if (IsInDark(Mouse.WorldPosition())) {
         //    Debug.Log("Mouse in dark");

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public abstract class LightBase : MonoBehaviour {
+    protected static int lightCounter = 0;
     private static Dictionary<int, LightBase> allLights = new Dictionary<int, LightBase>();
 
     public abstract Quad? GetShadowShape(LineSegment seg);

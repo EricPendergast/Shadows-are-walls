@@ -2,13 +2,20 @@
 {
     Properties
     {
-        MainTex ("Texture", 2D) = "black" {}
+        lightId ("Light ID", Int) = 0
     }
     SubShader
     {
-        Tags { "RenderType"="Opaque" }
+
+        Tags { "RenderType"="Opaque" "Queue" = "Geometry" }
         LOD 100
         Cull off
+        Blend off
+        /*BlendOp LogicalOr*/
+        Blend One One
+
+        /*GrabPass { }*/
+
         Pass
         {
             CGPROGRAM
@@ -16,34 +23,36 @@
             #pragma fragment frag
 
             #include "UnityCG.cginc"
+            #include "Assets/Shaders/helpers.glsl"
+
+            int lightId;
+            sampler2D _GrabTexture;
 
             struct appdata
             {
                 float4 vertex : POSITION;
-                float2 uv : TEXCOORD0;
             };
 
             struct v2f
             {
-                float2 uv : TEXCOORD0;
                 float4 vertex : SV_POSITION;
+                float4 grabPos : TEXCOORD0;
             };
-
-            sampler2D _MainTex;
-            float4 _MainTex_ST;
 
             v2f vert (appdata v)
             {
                 v2f o;
                 o.vertex = UnityObjectToClipPos(v.vertex);
-                o.uv = TRANSFORM_TEX(v.uv, _MainTex);
+                o.grabPos = ComputeGrabScreenPos(o.vertex);
                 return o;
             }
 
             fixed4 frag (v2f i) : SV_Target
             {
-                fixed4 col = tex2D(_MainTex, i.uv);
-                return col;
+                /*fixed4 prev = tex2D(_GrabTexture, i.grabPos);*/
+                /*return bitFieldToColor(colorToBitField(prev) + (1 << lightId));*/
+                /*return fixed4((1 << lightId*lightIdMultiplier)/256.0, 0,0,0);*/
+                return bitFieldToColor(1 << mult(lightId));
             }
             ENDCG
         }
