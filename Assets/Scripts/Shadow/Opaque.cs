@@ -21,9 +21,11 @@ public class Opaque : MonoBehaviour {
 
     public LineSegment CrossSection(Vector2 cameraPos) {
         //var boxCollider = GetComponent<BoxCollider2D>();
+        var right = transform.right*transform.lossyScale.x;
+        var up = transform.up*transform.lossyScale.y;
 
-        var upRight = (transform.right + transform.up)/2;
-        var downRight = (transform.right - transform.up)/2;
+        var upRight = (right + up)/2;
+        var downRight = (right - up)/2;
         return new LineSegment(transform.position - upRight, transform.position + upRight);
     }
 }

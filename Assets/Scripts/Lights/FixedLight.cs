@@ -60,6 +60,7 @@ public class FixedLight : LightBase {
         foreach (var side in ViewTriangle().GetSides()) {
             Gizmos.DrawLine(side.p1, side.p2);
         }
+        OnDrawGizmosSelected();
     }
 
     void OnDrawGizmosSelected() {
@@ -171,54 +172,6 @@ public class FixedLight : LightBase {
         this.castLightMesh.triangles = new int[]{0, 1, 2};
     }
 
-    List<LineSegment> MinimalUnion(IEnumerable<LineSegment> shadowsIn, Vector2 convergencePoint) {
-        var rightEdge = RightEdge();
-        System.Func<Vector2, float> metric = (Vector2 p) => {
-            return rightEdge.Angle(p);
-        };
-
-        var allShadows = new List<Cup>();
-
-        System.Action<LineSegment> addShadow = (LineSegment s) => {
-            if (metric(s.p1) > metric(s.p2)) {
-                s.Swap();
-            }
-            allShadows.Add(new Cup(s, convergencePoint));
-        };
-
-        foreach (var shadow in shadows.Values) {
-            addShadow(shadow.caster.CrossSection(convergencePoint));
-        }
-        addShadow(FarEdge());
-
-        allShadows.Sort((s1, s2) => metric(s1.p1).CompareTo(metric(s2.p1)));
-
-        var minimalUnion = new List<LineSegment>();
-
-        var toTrim = new Queue<Cup>();
-        toTrim.Enqueue(allShadows[0]);
-        
-        for (int i = 1; i < allShadows.Count; i++) {
-            var nextShadow = allShadows[i];
-            int toTrimCount = toTrim.Count;
-            for (int j = 0; j < toTrimCount; j++) {
-                Cup c = toTrim.Dequeue();
-                if (metric(c.p2) < metric(nextShadow.p1)) {
-                    minimalUnion.Add(c.Base());
-                } else {
-                    toTrim.Enqueue(c);
-                }
-            }
-            Math.MinimalUnion(toTrim, nextShadow);
-        }
-
-        foreach (Cup c in toTrim) {
-            minimalUnion.Add(c.Base());
-        }
-
-        return minimalUnion;
-    }
-
     void Update() {
         visibleCollider.SetPath(0, LocalViewTriangle().AsList());
 
@@ -229,7 +182,8 @@ public class FixedLight : LightBase {
         foreach (Shadow s in shadows.Values) {
             allShadows.Add(s.caster.CrossSection(transform.position));
         }
-        trimmedShadows = MinimalUnion(allShadows, transform.position);
+        allShadows.Add(FarEdge());
+        trimmedShadows = Math.MinimalUnion(allShadows, transform.position, RightEdge());
 
         //if (IsInDark(Mouse.WorldPosition())) {
         //    Debug.Log("Mouse in dark");
