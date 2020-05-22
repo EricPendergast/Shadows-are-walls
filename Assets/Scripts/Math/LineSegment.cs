@@ -20,14 +20,33 @@ public struct LineSegment : IEnumerable<Vector2> {
         return null;
     }
 
-    public LineSegment Intersect(Triangle triangle) {
+    public LineSegment? Intersect(Triangle triangle) {
         foreach (var seg in Split(triangle.GetSides())) {
             if (triangle.Contains(seg.Midpoint())) {
                 return seg;
             }
         }
 
-        return zero;
+        return null;
+    }
+
+    public LineSegment? Intersect(Cup cup) {
+        foreach (var seg in Split(cup.GetSides())) {
+            if (cup.Contains(seg.Midpoint())) {
+                return seg;
+            }
+        }
+        return null;
+    }
+
+    public List<LineSegment> Subtract(Cup cup) {
+        var ret = new List<LineSegment>();
+        foreach (var seg in Split(cup.GetSides())) {
+            if (!cup.Contains(seg.Midpoint())) {
+                ret.Add(seg);
+            }
+        }
+        return ret;
     }
 
     public List<LineSegment> Split(LineSegment other) {
@@ -79,6 +98,17 @@ public struct LineSegment : IEnumerable<Vector2> {
         return Vector2.SignedAngle(Vector2.right, p2 - p1);
     }
 
+    // Measures the angle between the vectors pointing from p1 to p2 in this
+    // and other
+    public float Angle(LineSegment other) {
+        return Vector2.SignedAngle(p2 - p1, other.p2 - other.p1);
+    }
+
+    // The point around which the angle is measured is p1
+    public float Angle(Vector2 point) {
+        return Vector2.SignedAngle(p2 - p1, point - p1);
+    }
+
     public Vector2 GetRightSide() {
         Vector2 dir = (p2-p1).normalized*.001f;
         return Midpoint() + new Vector2(dir.y, -dir.x);
@@ -91,5 +121,16 @@ public struct LineSegment : IEnumerable<Vector2> {
 
     public override string ToString() {
         return "LineSegment(" + p1 + ", " + p2 + ")";
+    }
+
+    // Swaps the endpoints of the line segment
+    public void Swap() {
+        var tmp = p1;
+        p1 = p2;
+        p2 = tmp;
+    }
+
+    public LineSegment Swapped() {
+        return new LineSegment(p2, p1);
     }
 }

@@ -33,6 +33,7 @@ public class Math {
         return IsInTriangle(point, leftExtended, middle, rightExtended);
     }
 
+    // TODO: This can be very optimized
     public static List<LineSegment> SplitAll(List<LineSegment> all, LineSegment split) {
         var ret = new List<LineSegment>();
         foreach (var seg in all) {
@@ -43,5 +44,38 @@ public class Math {
 
     public static Vector3 Extend(Vector2 origin, Vector2 toExtend, float newDistance) {
         return origin + (toExtend - origin).normalized*newDistance;
+    }
+
+    // TODO: This is a garbage collection nightmare
+    public static IEnumerable<Cup> Subtract(Cup takeFrom, IEnumerable<Cup> cups) {
+        var subtracted = new Queue<Cup>();
+        subtracted.Enqueue(takeFrom);
+        foreach (Cup cup in cups) {
+            int subtractedCount = subtracted.Count;
+            for (int i = 0; i < subtractedCount; i++) {
+                foreach (Cup cup2 in subtracted.Dequeue().Subtract(cup)) {
+                    subtracted.Enqueue(cup2);
+                }
+            }
+        }
+        return subtracted;
+    }
+
+    // TODO: This is a garbage collection nightmare
+    // Assumes that every Cup passed in has the same convergence point
+    public static void MinimalUnion(Queue<Cup> current, Cup newSeg) {
+        var newSegParts = Subtract(newSeg, current);
+
+        int currentCount = current.Count;
+        for (int j = 0; j < currentCount; j++) {
+            var cupToCull = current.Dequeue();
+            foreach (var cup in Subtract(cupToCull, newSegParts)) {
+                current.Enqueue(cup);
+            }
+        }
+
+        foreach (var segPart in newSegParts) {
+            current.Enqueue(segPart);
+        }
     }
 }

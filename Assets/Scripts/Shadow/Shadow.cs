@@ -10,13 +10,16 @@ using UnityEngine;
 public class Shadow : MonoBehaviour {
     [SerializeField]
     private List<CustomShadowEdge> edges = new List<CustomShadowEdge>();
+
     [SerializeField]
-    public LightBase sourceLight;
     public Opaque caster;
 
-    public void Init(Opaque caster, LightBase light) {
+    // TODO: Figure out what we need here
+    [SerializeField]
+    public Quad? currentShape;
+
+    public void Init(Opaque caster) {
         this.caster = caster;
-        sourceLight = light;
 
         for (int i = 0; i < 4; i++) {
             var edge = Util.CreateChild<CustomShadowEdge>(transform);
@@ -24,7 +27,7 @@ public class Shadow : MonoBehaviour {
 
             int iCaptured = i;
             edge.Init(() => {
-                if (GetCurrentShape() is Quad s) {
+                if (currentShape is Quad s) {
                     return s.GetSides()[iCaptured];
                 } else {
                     return LineSegment.zero;
@@ -33,9 +36,8 @@ public class Shadow : MonoBehaviour {
         }
     }
 
-    public Quad? GetCurrentShape() {
-        LineSegment section = caster.CrossSection(sourceLight.transform.position);
-        return sourceLight.GetShadowShape(section);
+    public void SetShape(Quad? shape) {
+        currentShape = shape;
     }
 
     void OnDestroy() {
