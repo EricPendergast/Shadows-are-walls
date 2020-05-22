@@ -121,48 +121,6 @@ public class FixedLight : LightBase {
         //return null;
     }
 
-    //void GetShadows() {
-    //    if (shadows == null) {
-    //        shadows = new List<Quad>();
-    //    }
-    //    shadows.Clear();
-    //    
-    //    var viewTriangle = ViewTriangle();
-    //    
-    //    foreach (Opaque obj in Opaque.GetAllInstances()) {
-    //        Quad? shadowShape = GetShadowShape(obj.CrossSection(transform.position));
-    //        if (shadowShape is Quad s) {
-    //            shadows.Add(s);
-    //        }
-    //    }
-    //}
-
-    // TODO: DrawShadows is no longer what we want
-    //void DrawShadows() {
-    //    GetShadows();
-    //
-    //    List<Vector3> verts = new List<Vector3>();
-    //    var tris = new List<int>();
-    //    
-    //    foreach (var quad in shadows) {
-    //        quad.Draw(verts, tris);
-    //    }
-    //    
-    //    for (int i = 0; i < verts.Count; i++) {
-    //        verts[i] = transform.InverseTransformPoint(verts[i]);
-    //    }
-    //    
-    //    // TODO: This may not be optimal
-    //    // TODO: Is this really the way this error is supposed to be fixed?
-    //    if (shadowMesh.vertexCount < verts.Count) {
-    //        shadowMesh.vertices = verts.ToArray();
-    //        shadowMesh.triangles = tris.ToArray();
-    //    } else {
-    //        shadowMesh.triangles = tris.ToArray();
-    //        shadowMesh.vertices = verts.ToArray();
-    //    }
-    //}
-
     // TODO: This should draw the actual casted light (the whole view triangle
     // with shadows subtracted)
     void DrawCastedLight() {
