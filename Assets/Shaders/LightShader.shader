@@ -6,11 +6,11 @@
     }
     SubShader
     {
-        Tags { "RenderType"="Transparent" "Queue" = "Geometry" }
+        Tags { "RenderType"="Transparent" "Queue" = "Geometry+1" }
         LOD 100
         Cull off
-
-        Blend One One
+        BlendOp Max
+        GrabPass { "shadows" }
 
         Pass
         {
@@ -21,6 +21,7 @@
             #include "UnityCG.cginc"
             #include "Assets/Shaders/helpers.glsl"
 
+            sampler2D shadows;
             int lightId;
 
             struct appdata
@@ -44,22 +45,29 @@
 
             fixed4 frag (v2f i) : SV_Target
             {
+                fixed4 col = tex2D(shadows, i.grabPos);
+                uint bf = colorToBitField(col);
                 /*uint mask = 1 << mult(lightId);*/
                 /*mask += 2*mask;*/
                 /*mask += 2*mask;*/
                 /*mask = ~mask;*/
-                /*[>return col;<]*/
-                /*[>if (mask == (0x3<<0)) {<]*/
+                /*return col;*/
+                /*if (mask == (0x3<<0)) {*/
                 /*if ((colorToBitField(col) & mask) != 0) {// || colorToBitField(col) == 2) {*/
-                /*    return fixed4(1,0,0,1);*/
-                /*} else {*/
-                /*    return fixed4(.5,.5,.5,1);*/
-                /*}*/
+                if ((getMask(lightId) & bf) != 0) {
+                    return fixed4(1,0,0,1);
+                } else {
+                    return fixed4(0,1,0,0);
+                }
                 /*uint mask = 0;*/
                 /*for (int i = 0; i < lightIdMultiplier; i++) {*/
                 /*    mask += 1 << (lightId*lightIdMultiplier+i);*/
                 /*}*/
-                return bitFieldToColor(1 << lightId);
+                /*if ((mask & colorToBitField(col)) == 0) {*/
+                /*    return fixed4(0,0,0,1);*/
+                /*} else {*/
+                /*    return fixed4(1,1,1,1);*/
+                /*}*/
             }
             ENDCG
         }

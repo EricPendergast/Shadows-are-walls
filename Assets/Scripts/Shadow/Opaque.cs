@@ -15,6 +15,10 @@ public class Opaque : MonoBehaviour {
         
     }
 
+    void OnDrawGizmos() {
+        Gizmos.DrawLine(CrossSection(Vector2.zero).p1, CrossSection(Vector2.zero).p2);
+    }
+
     public LineSegment CrossSection(Vector2 cameraPos) {
         //var boxCollider = GetComponent<BoxCollider2D>();
 

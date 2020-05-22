@@ -13,6 +13,20 @@
 //    for (int i = 0; i < maxOverlapPow
 //}
 
+uint mult() {
+    return 3;
+}
+
+uint getBit(uint lightId) {
+    return 1 << (lightId * mult());
+}
+
+uint getMask(uint lightId) {
+    uint low = 1 << (lightId * mult());
+    uint high = low << mult();
+    return (high - 1) - (low - 1);
+}
+
 fixed4 bitFieldToColor(uint bitField) {
     uint b1 = bitField % 256;
     uint b2 = (bitField / 256) % 256;
@@ -31,8 +45,5 @@ uint colorToBitField(fixed4 color) {
     return b1 + (b2 + (b3 + b4*256)*256)*256;
 }
 
-uint mult(uint lightId) {
-    return lightId * 3;
-}
 
 #endif
