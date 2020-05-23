@@ -11,8 +11,6 @@ public class FixedLight : LightBase {
     public float distance;
 
     private Mesh castLightMesh;
-    // TODO: Don't do anything with this anymore
-    //private Mesh shadowMesh;
 
     private PolygonCollider2D visibleCollider;
 
@@ -22,16 +20,18 @@ public class FixedLight : LightBase {
     // sometimes shadows get split into multiple line segments
     private List<LineSegment> trimmedShadows = new List<LineSegment>();
 
+    private Triangle viewTriangle;
+
     public LineSegment FarEdge() {
-        return new LineSegment(ViewTriangle().p2, ViewTriangle().p3);
+        return new LineSegment(viewTriangle.p2, viewTriangle.p3);
     }
 
     public LineSegment RightEdge() {
-        return new LineSegment(ViewTriangle().p1, ViewTriangle().p3);
+        return new LineSegment(viewTriangle.p1, viewTriangle.p3);
     }
 
     public LineSegment LeftEdge() {
-        return new LineSegment(ViewTriangle().p1, ViewTriangle().p2);
+        return new LineSegment(viewTriangle.p1, viewTriangle.p2);
     }
 
     public Triangle LocalViewTriangle() {
@@ -44,7 +44,7 @@ public class FixedLight : LightBase {
         return new Triangle(v1, v2, v3);
     }
 
-    public Triangle ViewTriangle() {
+    public Triangle CalculateViewTriangle() {
         Triangle loc = LocalViewTriangle();
         loc.p1 = transform.TransformPoint(loc.p1);
         loc.p2 = transform.TransformPoint(loc.p2);
@@ -53,8 +53,7 @@ public class FixedLight : LightBase {
     }
 
     void OnDrawGizmos() {
-        var viewTriangle = ViewTriangle();
-        foreach (var side in ViewTriangle().GetSides()) {
+        foreach (var side in viewTriangle.GetSides()) {
             Gizmos.DrawLine(side.p1, side.p2);
         }
         OnDrawGizmosSelected();
@@ -70,8 +69,9 @@ public class FixedLight : LightBase {
 
     public override void Awake() {
         base.Awake();
+        viewTriangle = CalculateViewTriangle();
 
-        foreach (var side in ViewTriangle().GetSides()) {
+        foreach (var side in viewTriangle.GetSides()) {
             var sideCaptured = side;
             Util.CreateChild<CustomShadowEdge>(transform).Init(() => {
                 return sideCaptured;
@@ -84,13 +84,8 @@ public class FixedLight : LightBase {
 
         castLightMesh = Util.CreateMeshWithNewMaterial(gameObject, Refs.instance.lightMaterial);
 
-        //GameObject c = Util.CreateChild(transform);
-        //c.transform.localPosition = Vector3.zero;
-        //c.transform.localRotation = Quaternion.identity;
-        //shadowMesh = Util.CreateMeshWithNewMaterial(c, Refs.instance.shadowMaterial);
-
         visibleCollider = gameObject.AddComponent<PolygonCollider2D>();
-        visibleCollider.SetPath(0, ViewTriangle().AsList());
+        visibleCollider.SetPath(0, viewTriangle.AsList());
     }
 
     //void DrawLampshade() {
@@ -107,7 +102,7 @@ public class FixedLight : LightBase {
     // returned quad is analogous to seg.p1, and the last point is analogous to
     // seg.p2. This ordering is important to ShadowEdge.GetTarget()
     public override Quad? GetShadowShape(LineSegment seg) {
-        if (seg.Intersect(ViewTriangle()) is LineSegment inView) {
+        if (seg.Intersect(viewTriangle) is LineSegment inView) {
             return new Quad(
                     inView.p1,
                     Math.Extend(transform.position, inView.p1, distance),
@@ -145,11 +140,12 @@ public class FixedLight : LightBase {
     }
 
     void Update() {
+        viewTriangle = CalculateViewTriangle();
+
         visibleCollider.SetPath(0, LocalViewTriangle().AsList());
 
         DrawCastedLight();
 
-        var viewTriangle = ViewTriangle();
         var allShadows = new List<LineSegment>();
         foreach (Shadow s in shadows.Values) {
             if (s.caster.CrossSection(transform.position).Intersect(viewTriangle) is LineSegment seg) {
@@ -158,7 +154,7 @@ public class FixedLight : LightBase {
             }
         }
         allShadows.Add(FarEdge());
-        trimmedShadows = Math.MinimalUnion(allShadows, transform.position, RightEdge());
+        trimmedShadows = Math.MinimalUnion(allShadows, transform.position, Angle);
 
         //if (IsInDark(Mouse.WorldPosition())) {
         //    Debug.Log("Mouse in dark");

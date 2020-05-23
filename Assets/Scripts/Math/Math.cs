@@ -67,11 +67,7 @@ public class Math {
         }
     }
 
-    public static List<LineSegment> MinimalUnion(IEnumerable<LineSegment> shadowsIn, Vector2 convergencePoint, LineSegment rightEdge) {
-        System.Func<Vector2, float> metric = (Vector2 p) => {
-            return rightEdge.Angle(p);
-        };
-
+    public static List<LineSegment> MinimalUnion(IEnumerable<LineSegment> shadowsIn, Vector2 convergencePoint, System.Func<Vector2, float> metric) {
         var allShadows = new List<Cup>();
 
         System.Action<LineSegment> addShadow = (LineSegment s) => {

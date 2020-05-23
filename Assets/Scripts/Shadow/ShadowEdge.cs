@@ -105,16 +105,6 @@ public abstract class ShadowEdge : MonoBehaviour {
             }
         }
 
-        foreach (var l in LightBase.GetLights()) {
-            if (l is FixedLight light) {
-                foreach (var seg in light.ViewTriangle().GetSides()) {
-                    if (target.Intersect(seg) is Vector2 intersec) {
-                        intersections.Add(intersec);
-                    }
-                }
-            }
-        }
-
         return intersections;
     }
 
