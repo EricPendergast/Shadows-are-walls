@@ -12,13 +12,10 @@ public class FixedLight : LightBase {
 
     private Mesh castLightMesh;
     // TODO: Don't do anything with this anymore
-    private Mesh shadowMesh;
+    //private Mesh shadowMesh;
 
     private PolygonCollider2D visibleCollider;
 
-    //[SerializeField]
-    //private List<Quad> shadows;
-    
     private Dictionary<int, Shadow> shadows = new Dictionary<int, Shadow>();
 
     // All visible shadows. This does not contain Shadow objects because
@@ -86,10 +83,10 @@ public class FixedLight : LightBase {
 
         castLightMesh = Util.CreateMeshWithNewMaterial(gameObject, Refs.instance.lightMaterial);
 
-        GameObject c = Util.CreateChild(transform);
-        c.transform.localPosition = Vector3.zero;
-        c.transform.localRotation = Quaternion.identity;
-        shadowMesh = Util.CreateMeshWithNewMaterial(c, Refs.instance.shadowMaterial);
+        //GameObject c = Util.CreateChild(transform);
+        //c.transform.localPosition = Vector3.zero;
+        //c.transform.localRotation = Quaternion.identity;
+        //shadowMesh = Util.CreateMeshWithNewMaterial(c, Refs.instance.shadowMaterial);
 
         visibleCollider = gameObject.AddComponent<PolygonCollider2D>();
         visibleCollider.SetPath(0, ViewTriangle().AsList());
@@ -109,16 +106,14 @@ public class FixedLight : LightBase {
     // returned quad is analogous to seg.p1, and the last point is analogous to
     // seg.p2. This ordering is important to ShadowEdge.GetTarget()
     public override Quad? GetShadowShape(LineSegment seg) {
+        if (seg.Intersect(ViewTriangle()) is LineSegment inView) {
+            return new Quad(
+                    inView.p1,
+                    Math.Extend(transform.position, inView.p1, distance),
+                    Math.Extend(transform.position, inView.p2, distance),
+                    inView.p2);
+        }
         return null;
-        //var inView = seg.Intersect(ViewTriangle());
-        //if (inView.isValid()) {
-        //    return new Quad(
-        //            inView.p1,
-        //            Math.Extend(transform.position, inView.p1, distance),
-        //            Math.Extend(transform.position, inView.p2, distance),
-        //            inView.p2);
-        //}
-        //return null;
     }
 
     void DrawCastedLight() {
@@ -153,9 +148,13 @@ public class FixedLight : LightBase {
 
         DrawCastedLight();
 
+        var viewTriangle = ViewTriangle();
         var allShadows = new List<LineSegment>();
         foreach (Shadow s in shadows.Values) {
-            allShadows.Add(s.caster.CrossSection(transform.position));
+            if (s.caster.CrossSection(transform.position).Intersect(viewTriangle) is LineSegment seg) {
+                s.SetShape(GetShadowShape(seg));
+                allShadows.Add(seg);
+            }
         }
         allShadows.Add(FarEdge());
         trimmedShadows = Math.MinimalUnion(allShadows, transform.position, RightEdge());
@@ -171,6 +170,10 @@ public class FixedLight : LightBase {
         // talk to Shadows.instance
         // get the slice points for each shadow boundary
         // update colliders accordingly
+    }
+
+    float Angle(Vector2 p) {
+        return RightEdge().Angle(p);
     }
 
     public override bool IsInDark(Vector2 point) {
