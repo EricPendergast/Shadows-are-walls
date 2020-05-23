@@ -70,10 +70,11 @@ public class FixedLight : LightBase {
 
     public override void Awake() {
         base.Awake();
-        for (int i = 0; i < 3; i++) {
-            int capturedI = i;
+
+        foreach (var side in ViewTriangle().GetSides()) {
+            var sideCaptured = side;
             Util.CreateChild<CustomShadowEdge>(transform).Init(() => {
-                return ViewTriangle().GetSides()[capturedI];
+                return sideCaptured;
             });
         }
 
@@ -182,7 +183,7 @@ public class FixedLight : LightBase {
         }
 
         foreach (LineSegment seg in trimmedShadows) {
-            if (Math.IsInTriangle(point, seg.p1, seg.p2, transform.position)) {
+            if (new Triangle(transform.position, seg.p1, seg.p2).Contains(point)) {
                 return false;
             }
         }

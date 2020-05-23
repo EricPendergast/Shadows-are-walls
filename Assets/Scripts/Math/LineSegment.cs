@@ -57,7 +57,7 @@ public struct LineSegment : IEnumerable<Vector2> {
         }
     }
 
-    public List<LineSegment> Split(List<LineSegment> splits) {
+    public List<LineSegment> Split(IEnumerable<LineSegment> splits) {
         var ret = new List<LineSegment>{this};
         foreach(var split in splits) {
             ret = Math.SplitAll(ret, split);
