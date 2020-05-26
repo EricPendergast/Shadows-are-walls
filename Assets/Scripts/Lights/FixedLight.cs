@@ -22,6 +22,10 @@ public class FixedLight : LightBase {
 
     private Triangle viewTriangle;
 
+    public Vector2 Position() {
+        return transform.position;
+    }
+
     public LineSegment FarEdge() {
         return new LineSegment(viewTriangle.p2, viewTriangle.p3);
     }
@@ -97,21 +101,6 @@ public class FixedLight : LightBase {
     //    myMesh.triangles = new []{0,1,2};
     //}
 
-
-    // Returns the shape of the shadow of seg, where the first point in the
-    // returned quad is analogous to seg.p1, and the last point is analogous to
-    // seg.p2. This ordering is important to ShadowEdge.GetTarget()
-    public override Quad? GetShadowShape(LineSegment seg) {
-        if (seg.Intersect(viewTriangle) is LineSegment inView) {
-            return new Quad(
-                    inView.p1,
-                    Math.Extend(transform.position, inView.p1, distance),
-                    Math.Extend(transform.position, inView.p2, distance),
-                    inView.p2);
-        }
-        return null;
-    }
-
     void DrawCastedLight() {
 
         var vertices = new List<Vector3>();
@@ -169,6 +158,8 @@ public class FixedLight : LightBase {
 
         Math.MinimalUnion(ref shadowCorrespondences, transform.position, Angle);
 
+        shadowCorrespondences.Sort((s1, s2) => Angle(s1.Item1.Midpoint()).CompareTo(Angle(s2.Item1.Midpoint())));
+
         trimmedShadows.Clear();
         foreach (var tuple in shadowCorrespondences) {
             trimmedShadows.Add(tuple.Item1);
@@ -179,21 +170,42 @@ public class FixedLight : LightBase {
 
     void SendDataToShadows(List<System.Tuple<LineSegment, Shadow>> shadowData) {
         var frontFacing = new Dictionary<Shadow, List<LineSegment>>();
+        var leftFacing = new Dictionary<Shadow, LineSegment>();
+        var rightFacing = new Dictionary<Shadow, LineSegment>();
 
-        foreach (var tuple in shadowData) {
-            LineSegment seg = tuple.Item1;
-            Shadow shadow = tuple.Item2;
+        for (int i = 0; i < shadowData.Count; i++) {
+            LineSegment? prevSeg = i == 0 ? (LineSegment?)null : shadowData[i-1].Item1;
+            LineSegment? nextSeg = i == shadowData.Count-1 ? (LineSegment?)null : shadowData[i+1].Item1;
+            LineSegment seg = shadowData[i].Item1;
+            Shadow shadow = shadowData[i].Item2;
             if (shadow != null) {
                 if (!frontFacing.ContainsKey(shadow)) {
                     frontFacing.Add(shadow, new List<LineSegment>());
                 }
                 frontFacing[shadow].Add(seg);
+                if (prevSeg is LineSegment prev) {
+                    LineSegment right = new LineSegment(prev.p2, seg.p1);
+                    if (right.IsInLineWith(Position()) && !right.GoesAwayFrom(Position())) {
+                        rightFacing[shadow] = right;
+                    }
+                }
+                if (nextSeg is LineSegment next) {
+                    LineSegment left = new LineSegment(seg.p2, next.p1);
+                    if (left.IsInLineWith(Position()) && left.GoesAwayFrom(Position())) {
+                        leftFacing[shadow] = left;
+                    }
+                }
             }
         }
 
         foreach (var entry in frontFacing) {
-            var shadow = entry.Key;
-            shadow.SetEdges(entry.Value);
+            entry.Key.SetFrontEdges(entry.Value);
+        }
+        foreach (var entry in rightFacing) {
+            entry.Key.SetRightEdge(entry.Value);
+        }
+        foreach (var entry in leftFacing) {
+            entry.Key.SetLeftEdge(entry.Value);
         }
     }
 

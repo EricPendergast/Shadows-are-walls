@@ -114,6 +114,11 @@ public struct LineSegment : IEnumerable<Vector2> {
         return angle < .00001 || angle > 180 - .00001;
     }
 
+    // Does the ray from p1 to p2 point away from 'point'?
+    public bool GoesAwayFrom(Vector2 point) {
+        return (p1 - point).sqrMagnitude < (p2 - point).sqrMagnitude;
+    }
+
     public Vector2 GetRightSide() {
         Vector2 dir = (p2-p1).normalized*.001f;
         return Midpoint() + new Vector2(dir.y, -dir.x);

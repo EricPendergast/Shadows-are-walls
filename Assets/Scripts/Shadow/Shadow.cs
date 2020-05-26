@@ -20,36 +20,15 @@ public class Shadow : MonoBehaviour {
         this.lightSource = lightSource;
     }
 
-    // This method takes a list of edges in order by angle, and deduces whether
-    // that list includes the right and/or left facing edges.
-    public void SetEdges(List<LineSegment> newEdges) {
-        int frontFacingStart = 0;
-        int frontFacingEnd = newEdges.Count;
-
-        if (newEdges[0].IsInLineWith(lightSource.transform.position)) {
-            SetTarget(ref leftEdge, newEdges[0]);
-            frontFacingStart++;
-        } else {
-            SetTarget(ref leftEdge, null);
-        }
-
-        if (newEdges[newEdges.Count-1].IsInLineWith(lightSource.transform.position)) {
-            SetTarget(ref rightEdge, newEdges[newEdges.Count-1]);
-            frontFacingEnd--;
-        } else {
-            SetTarget(ref rightEdge, null);
-        }
-        
-        IEnumerable<LineSegment> getFrontSegments() {
-            for (int i = frontFacingStart; i < frontFacingEnd; i++) {
-                yield return newEdges[i];
-            }
-        }
-
-        SetFrontEdges(getFrontSegments());
+    public void SetRightEdge(LineSegment? right) {
+        SetTarget(ref rightEdge, right);
     }
 
-    private void SetFrontEdges(IEnumerable<LineSegment> frontSegs) {
+    public void SetLeftEdge(LineSegment? left) {
+        SetTarget(ref leftEdge, left);
+    }
+
+    public void SetFrontEdges(IEnumerable<LineSegment> frontSegs) {
         int count = 0;
         foreach (var seg in frontSegs) {
             if (count >= frontEdges.Count) {

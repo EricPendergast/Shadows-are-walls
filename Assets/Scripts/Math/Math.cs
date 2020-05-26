@@ -91,6 +91,8 @@ public class Math {
     }
 
     // Assumes that every Cup passed in has the same convergence point
+    // Input does not need to be sorted
+    // Output may not be sorted
     public static void MinimalUnion<T>(ref List<System.Tuple<LineSegment, T>> shadowsIn, Vector2 convergencePoint, System.Func<Vector2, float> metric) {
         var allShadows = new List<CupWrapper<T>>();
 

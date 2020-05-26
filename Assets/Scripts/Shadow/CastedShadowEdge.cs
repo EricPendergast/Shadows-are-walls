@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.Assertions;
 
-// This is probably obsolete now
+// This is definitely obsolete now
 public class CastedShadowEdge : ShadowEdge {
     public enum EdgeType {
         front=0,
@@ -27,22 +27,6 @@ public class CastedShadowEdge : ShadowEdge {
     }
 
     protected LineSegment CalculateTarget() {
-        LineSegment sec = caster.CrossSection(sourceLight.transform.position);
-        if (sourceLight.GetShadowShape(sec) is Quad s) {
-            switch (edgeType) {
-                case EdgeType.front:
-                    return new LineSegment(s.p1, s.p4);
-                case EdgeType.back:
-                    return new LineSegment(s.p2, s.p3);;
-                case EdgeType.p1:
-                    return new LineSegment(s.p1, s.p2);;
-                case EdgeType.p2:
-                    return new LineSegment(s.p4, s.p3);;
-                default:
-                    return LineSegment.zero;
-            }
-        } else {
-            return LineSegment.zero;
-        }
+        return LineSegment.zero;
     }
 }

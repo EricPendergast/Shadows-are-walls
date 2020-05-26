@@ -6,7 +6,6 @@ public abstract class LightBase : MonoBehaviour {
     protected static int lightCounter = 0;
     private static Dictionary<int, LightBase> allLights = new Dictionary<int, LightBase>();
 
-    public abstract Quad? GetShadowShape(LineSegment seg);
     public abstract bool IsInDark(Vector2 point);
 
     public static bool IsInDarkAllLights(Vector2 point) {
