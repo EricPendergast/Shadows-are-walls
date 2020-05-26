@@ -34,14 +34,35 @@ public class Math {
         return origin + (toExtend - origin).normalized*newDistance;
     }
 
+
+    public struct CupWrapper<T> {
+        public Cup v;
+        public T obj;
+        public CupWrapper(Cup c, T obj) { 
+            v = c;
+            this.obj = obj;
+        }
+        public static implicit operator Cup(CupWrapper<T> c) => c.v;
+        public List<CupWrapper<T>> Subtract(Cup other) {
+            var ret = new List<CupWrapper<T>>();
+            foreach (Cup c in v.Subtract(other)) {
+                ret.Add(new CupWrapper<T>(c, obj));
+            }
+            return ret;
+        }
+    }
+
     // TODO: This is a garbage collection nightmare
-    public static IEnumerable<Cup> Subtract(Cup takeFrom, IEnumerable<Cup> cups) {
-        var subtracted = new Queue<Cup>();
+    // Subtracts each cup in 'cups' from 'takeFrom', one by one. The reason
+    // this looks complicated is that cup subtraction can yield 0, 1, or 2
+    // cups.
+    public static IEnumerable<CupWrapper<T>> Subtract<T>(CupWrapper<T> takeFrom, IEnumerable<CupWrapper<T>> cups) {
+        var subtracted = new Queue<CupWrapper<T>>();
         subtracted.Enqueue(takeFrom);
-        foreach (Cup cup in cups) {
+        foreach (var cup in cups) {
             int subtractedCount = subtracted.Count;
             for (int i = 0; i < subtractedCount; i++) {
-                foreach (Cup cup2 in subtracted.Dequeue().Subtract(cup)) {
+                foreach (var cup2 in subtracted.Dequeue().Subtract(cup)) {
                     subtracted.Enqueue(cup2);
                 }
             }
@@ -50,8 +71,10 @@ public class Math {
     }
 
     // TODO: This is a garbage collection nightmare
+    // A simplified version of the main MinimalUnion function.
+    // Assumes 'current' is already minimal
     // Assumes that every Cup passed in has the same convergence point
-    public static void MinimalUnion(Queue<Cup> current, Cup newSeg) {
+    private static void MinimalUnion<T>(Queue<CupWrapper<T>> current, CupWrapper<T> newSeg) {
         var newSegParts = Subtract(newSeg, current);
 
         int currentCount = current.Count;
@@ -67,45 +90,48 @@ public class Math {
         }
     }
 
-    public static List<LineSegment> MinimalUnion(IEnumerable<LineSegment> shadowsIn, Vector2 convergencePoint, System.Func<Vector2, float> metric) {
-        var allShadows = new List<Cup>();
+    // Assumes that every Cup passed in has the same convergence point
+    public static void MinimalUnion<T>(ref List<System.Tuple<LineSegment, T>> shadowsIn, Vector2 convergencePoint, System.Func<Vector2, float> metric) {
+        var allShadows = new List<CupWrapper<T>>();
 
-        System.Action<LineSegment> addShadow = (LineSegment s) => {
-            if (metric(s.p1) > metric(s.p2)) {
-                s.Swap();
+        for (int i = 0; i < shadowsIn.Count; i++) {
+            var seg = shadowsIn[i].Item1;
+            var obj = shadowsIn[i].Item2;
+            if (metric(seg.p1) > metric(seg.p2)) {
+                seg.Swap();
             }
-            allShadows.Add(new Cup(s, convergencePoint));
-        };
-
-        foreach (var shadow in shadowsIn) {
-            addShadow(shadow);
+            allShadows.Add(new CupWrapper<T>(new Cup(seg, convergencePoint), obj));
         }
 
-        allShadows.Sort((s1, s2) => metric(s1.p1).CompareTo(metric(s2.p1)));
+        allShadows.Sort((s1, s2) => metric(s1.v.p1).CompareTo(metric(s2.v.p1)));
 
-        var minimalUnion = new List<LineSegment>();
+        var minimalUnion = new List<CupWrapper<T>>();
 
-        var toTrim = new Queue<Cup>();
+        var toTrim = new Queue<CupWrapper<T>>();
         toTrim.Enqueue(allShadows[0]);
         
         for (int i = 1; i < allShadows.Count; i++) {
             var nextShadow = allShadows[i];
             int toTrimCount = toTrim.Count;
             for (int j = 0; j < toTrimCount; j++) {
-                Cup c = toTrim.Dequeue();
-                if (metric(c.p2) < metric(nextShadow.p1)) {
-                    minimalUnion.Add(c.Base());
+                var cup = toTrim.Dequeue();
+                if (metric(cup.v.p2) < metric(nextShadow.v.p1)) {
+                    minimalUnion.Add(cup);
                 } else {
-                    toTrim.Enqueue(c);
+                    toTrim.Enqueue(cup);
                 }
             }
             Math.MinimalUnion(toTrim, nextShadow);
         }
 
-        foreach (Cup c in toTrim) {
-            minimalUnion.Add(c.Base());
+        foreach (var cup in toTrim) {
+            minimalUnion.Add(cup);
         }
 
-        return minimalUnion;
+        shadowsIn.Clear();
+
+        foreach (CupWrapper<T> cup in minimalUnion) {
+            shadowsIn.Add(System.Tuple.Create(cup.v.Base(), cup.obj));
+        }
     }
 }

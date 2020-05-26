@@ -1,22 +1,20 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class ShadowEdge : MonoBehaviour {
+public class ShadowEdge : MonoBehaviour {
     private static Dictionary<int, ShadowEdge> allEdges = new Dictionary<int, ShadowEdge>();
 
     // Used to cache the target, which is recalculated every FixedUpdate.
     [SerializeField]
-    private LineSegment target;
+    private LineSegment target = LineSegment.zero;
 
-    protected abstract LineSegment CalculateTarget();
-
-    void Awake() {
+    protected void Awake() {
         allEdges.Add(gameObject.GetInstanceID(), this);
         gameObject.layer = LayerMask.NameToLayer("ShadowEdge");
     }
 
-    void Start() {
-        UpdateTarget();
+    public void SetTarget(LineSegment target) {
+        this.target = target;
         transform.position = target.p1;
         transform.rotation = Quaternion.Euler(0, 0, target.Angle());
     }
@@ -50,7 +48,7 @@ public abstract class ShadowEdge : MonoBehaviour {
         for (int i = pieces.Count; i < colliders.Count; i++) {
             colliders[i].enabled = false;
         }
-        for (int i = colliders.Count; i < pieces.Count + 1; i++) {
+        for (int i = colliders.Count; i < pieces.Count; i++) {
             colliders.Add(gameObject.AddComponent<BoxCollider2D>());
         }
 
@@ -66,14 +64,7 @@ public abstract class ShadowEdge : MonoBehaviour {
         return LightBase.IsInDarkAllLights(seg.GetRightSide()) != LightBase.IsInDarkAllLights(seg.GetLeftSide());
     }
 
-    void UpdateTarget() {
-        target = CalculateTarget();
-    }
-
-    void FixedUpdate() {
-        transform.position = target.p1;
-        transform.rotation = Quaternion.Euler(0, 0, target.Angle());
-        UpdateTarget();
+    protected virtual void FixedUpdate() {
         UpdateColliders();
     }
 
@@ -108,7 +99,7 @@ public abstract class ShadowEdge : MonoBehaviour {
         return intersections;
     }
 
-    void OnDestroy() {
+    protected void OnDestroy() {
         allEdges.Remove(gameObject.GetInstanceID());
     }
 }

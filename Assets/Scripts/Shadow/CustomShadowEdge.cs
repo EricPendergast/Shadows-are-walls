@@ -7,7 +7,8 @@ public class CustomShadowEdge : ShadowEdge {
         this.calculateTarget = calculateTarget;
     }
 
-    protected override LineSegment CalculateTarget() {
-        return calculateTarget();
+    protected override void FixedUpdate() {
+        SetTarget(calculateTarget());
+        base.FixedUpdate();
     }
 }

@@ -9,7 +9,11 @@ Lights
         ✓- Make a Shadow class, which is created whenever an opaque line segment enters the view of a light
         ~- Make a centralized class to calculate shadow intersections
         - Make opaque objects only generate one shadow each
-        - Make it so shadow edges can be created by anything, not just opaque objects
+        ✓- Make it so shadow edges can be created by anything, not just opaque objects
+    - Update ShadowEdge
+        ✓- Make Math.MinimalUnion retain the correspondence between trimmedShadows and shadowsIn
+        - Make it so shadow edges are only created if they survive trimming
+            - 
     ✓- Make shadows (kind of) render with pure gizmos
     - Collision boxes
     - Moving collision boxes

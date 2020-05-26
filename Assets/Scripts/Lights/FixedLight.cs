@@ -53,7 +53,7 @@ public class FixedLight : LightBase {
     }
 
     void OnDrawGizmos() {
-        foreach (var side in viewTriangle.GetSides()) {
+        foreach (var side in CalculateViewTriangle().GetSides()) {
             Gizmos.DrawLine(side.p1, side.p2);
         }
         OnDrawGizmosSelected();
@@ -139,22 +139,14 @@ public class FixedLight : LightBase {
         }
     }
 
-    void Update() {
+    void FixedUpdate() {
         viewTriangle = CalculateViewTriangle();
 
         visibleCollider.SetPath(0, LocalViewTriangle().AsList());
 
+        DoShadows();
         DrawCastedLight();
 
-        var allShadows = new List<LineSegment>();
-        foreach (Shadow s in shadows.Values) {
-            if (s.caster.CrossSection(transform.position).Intersect(viewTriangle) is LineSegment seg) {
-                s.SetShape(GetShadowShape(seg));
-                allShadows.Add(seg);
-            }
-        }
-        allShadows.Add(FarEdge());
-        trimmedShadows = Math.MinimalUnion(allShadows, transform.position, Angle);
 
         //if (IsInDark(Mouse.WorldPosition())) {
         //    Debug.Log("Mouse in dark");
@@ -163,10 +155,46 @@ public class FixedLight : LightBase {
         //}
     }
 
-    void FixedUpdate() {
-        // talk to Shadows.instance
-        // get the slice points for each shadow boundary
-        // update colliders accordingly
+    void DoShadows() {
+        var shadowCorrespondences = new List<System.Tuple<LineSegment, Shadow>>();
+
+        foreach (Shadow s in shadows.Values) {
+            // This if statement will should only be false in some rare edge
+            // cases, due to float precision
+            if (s.caster.CrossSection(transform.position).Intersect(viewTriangle) is LineSegment seg) {
+                shadowCorrespondences.Add(System.Tuple.Create(seg, s));
+            }
+        }
+        shadowCorrespondences.Add(System.Tuple.Create(FarEdge(), (Shadow)null));
+
+        Math.MinimalUnion(ref shadowCorrespondences, transform.position, Angle);
+
+        trimmedShadows.Clear();
+        foreach (var tuple in shadowCorrespondences) {
+            trimmedShadows.Add(tuple.Item1);
+        }
+
+        SendDataToShadows(shadowCorrespondences);
+    }
+
+    void SendDataToShadows(List<System.Tuple<LineSegment, Shadow>> shadowData) {
+        var frontFacing = new Dictionary<Shadow, List<LineSegment>>();
+
+        foreach (var tuple in shadowData) {
+            LineSegment seg = tuple.Item1;
+            Shadow shadow = tuple.Item2;
+            if (shadow != null) {
+                if (!frontFacing.ContainsKey(shadow)) {
+                    frontFacing.Add(shadow, new List<LineSegment>());
+                }
+                frontFacing[shadow].Add(seg);
+            }
+        }
+
+        foreach (var entry in frontFacing) {
+            var shadow = entry.Key;
+            shadow.SetEdges(entry.Value);
+        }
     }
 
     float Angle(Vector2 p) {
@@ -189,7 +217,7 @@ public class FixedLight : LightBase {
     void OnCollisionEnter2D(Collision2D collision) {
         if (collision.gameObject.TryGetComponent(out Opaque opaque)) {
             Shadow s = Util.CreateChild<Shadow>(transform);
-            s.Init(opaque);
+            s.Init(opaque, this);
             shadows.Add(opaque.GetInstanceID(), s);
         }
     }

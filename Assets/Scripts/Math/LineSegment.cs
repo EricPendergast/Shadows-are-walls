@@ -109,6 +109,11 @@ public struct LineSegment : IEnumerable<Vector2> {
         return Vector2.SignedAngle(p2 - p1, point - p1);
     }
 
+    public bool IsInLineWith(Vector2 point) {
+        float angle = Vector2.Angle(p2 - p1, point - p1);
+        return angle < .00001 || angle > 180 - .00001;
+    }
+
     public Vector2 GetRightSide() {
         Vector2 dir = (p2-p1).normalized*.001f;
         return Midpoint() + new Vector2(dir.y, -dir.x);

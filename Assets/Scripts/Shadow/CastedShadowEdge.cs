@@ -26,7 +26,7 @@ public class CastedShadowEdge : ShadowEdge {
         this.sourceLight = light;
     }
 
-    protected override LineSegment CalculateTarget() {
+    protected LineSegment CalculateTarget() {
         LineSegment sec = caster.CrossSection(sourceLight.transform.position);
         if (sourceLight.GetShadowShape(sec) is Quad s) {
             switch (edgeType) {

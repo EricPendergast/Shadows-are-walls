@@ -2,47 +2,99 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-// One of these will be created for each shadow (or equivalently, for each
-// opaque object in view of a light).
-//
-// It will have a few kinematic edge colliders, which it uses to detect where
-// it intersects other shadows
 public class Shadow : MonoBehaviour {
     [SerializeField]
-    private List<CustomShadowEdge> edges = new List<CustomShadowEdge>();
+    private List<ShadowEdge> frontEdges = new List<ShadowEdge>();
+    [SerializeField]
+    private ShadowEdge rightEdge;
+    [SerializeField]
+    private ShadowEdge leftEdge;
 
     [SerializeField]
     public Opaque caster;
 
-    // TODO: Figure out what we need here
-    [SerializeField]
-    public Quad? currentShape;
+    public LightBase lightSource;
 
-    public void Init(Opaque caster) {
+    public void Init(Opaque caster, LightBase lightSource) {
         this.caster = caster;
-
-        for (int i = 0; i < 4; i++) {
-            var edge = Util.CreateChild<CustomShadowEdge>(transform);
-            edges.Add(edge);
-
-            int iCaptured = i;
-            edge.Init(() => {
-                if (currentShape is Quad s) {
-                    return s.GetSides()[iCaptured];
-                } else {
-                    return LineSegment.zero;
-                }
-            });
-        }
+        this.lightSource = lightSource;
     }
 
-    public void SetShape(Quad? shape) {
-        currentShape = shape;
+    // This method takes a list of edges in order by angle, and deduces whether
+    // that list includes the right and/or left facing edges.
+    public void SetEdges(List<LineSegment> newEdges) {
+        int frontFacingStart = 0;
+        int frontFacingEnd = newEdges.Count;
+
+        if (newEdges[0].IsInLineWith(lightSource.transform.position)) {
+            SetTarget(ref leftEdge, newEdges[0]);
+            frontFacingStart++;
+        } else {
+            SetTarget(ref leftEdge, null);
+        }
+
+        if (newEdges[newEdges.Count-1].IsInLineWith(lightSource.transform.position)) {
+            SetTarget(ref rightEdge, newEdges[newEdges.Count-1]);
+            frontFacingEnd--;
+        } else {
+            SetTarget(ref rightEdge, null);
+        }
+        
+        IEnumerable<LineSegment> getFrontSegments() {
+            for (int i = frontFacingStart; i < frontFacingEnd; i++) {
+                yield return newEdges[i];
+            }
+        }
+
+        SetFrontEdges(getFrontSegments());
+    }
+
+    private void SetFrontEdges(IEnumerable<LineSegment> frontSegs) {
+        int count = 0;
+        foreach (var seg in frontSegs) {
+            if (count >= frontEdges.Count) {
+                frontEdges.Add(null);
+            }
+            var edge = frontEdges[count];
+            SetTarget(ref edge, seg);
+            frontEdges[count] = edge;
+            count++;
+        }
+
+        for (int i = count; i < frontEdges.Count; i++) {
+            DestroyShadowEdge(frontEdges[i]);
+        }
+        frontEdges.RemoveRange(count, frontEdges.Count - count);
+    }
+
+    private void SetTarget(ref ShadowEdge edge, LineSegment? target) {
+        if (edge == null && target != null) {
+            edge = Util.CreateChild<ShadowEdge>(transform);
+        }
+    
+        if (edge != null && target == null) {
+            DestroyShadowEdge(edge);
+        }
+    
+        if (target is LineSegment t) {
+            edge.SetTarget(t);
+        }
     }
 
     void OnDestroy() {
-        foreach (var edge in edges) {
-            Destroy(edge.gameObject);
+        DestroyShadowEdge(rightEdge);
+        DestroyShadowEdge(leftEdge);
+        foreach (var frontEdge in frontEdges) {
+            DestroyShadowEdge(frontEdge);
         }
     }
+
+    private void DestroyShadowEdge(ShadowEdge shadowEdge) {
+        if (shadowEdge != null) {
+            var g = shadowEdge.gameObject;
+            Destroy(shadowEdge);
+            Destroy(g);
+        }
+    }
+
 }
