@@ -10,11 +10,17 @@ Lights
         ~- Make a centralized class to calculate shadow intersections
         - Make opaque objects only generate one shadow each
         ✓- Make it so shadow edges can be created by anything, not just opaque objects
-    - Update ShadowEdge
+    ✓- Update ShadowEdge
         ✓- Make Math.MinimalUnion retain the correspondence between trimmedShadows and shadowsIn
-        - Make it so shadow edges are only created if they survive trimming
-            - Pass in left and right edges
+        ✓- Make it so shadow edges are only created if they survive trimming
+            ✓- Pass in left and right edges
     ✓- Make shadows (kind of) render with pure gizmos
     - Find a way to draw the triangles with borders, because in some cases there is a 1 pixel gap between them
     - Collision boxes
     - Moving collision boxes
+
+
+Optimizations
+    - Put everything on the stack
+    - For each shadow edge, only check for intersections with other lights
+          which intersect its own light

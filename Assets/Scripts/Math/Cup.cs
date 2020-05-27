@@ -17,6 +17,7 @@ public struct Cup {
     public Vector2 p1;
     public Vector2 p2;
     public Vector2 convergencePoint;
+    public static ListPool<LineSegment> pool = new ListPool<LineSegment>();
 
     public Cup(LineSegment seg, Vector2 conv) {
         p1 = seg.p1;
@@ -40,8 +41,10 @@ public struct Cup {
         return new LineSegment(p1, p2);
     }
 
-    public List<LineSegment> GetSides() {
-        return new List<LineSegment>{LeftRay(), RightRay(), Base()};
+    public IEnumerable<LineSegment> GetSides() {
+        yield return LeftRay();
+        yield return RightRay();
+        yield return Base();
     }
 
     public bool Contains(Vector2 point) {
@@ -51,23 +54,22 @@ public struct Cup {
         return side1 == side2 && side2 == side3;
     }
 
-    // This isn't actually a true subtraction, it it more like
+    // This isn't actually a true subtraction, it is more like
     // this.Base() - other
-    public List<Cup> Subtract(Cup other) {
+    public List<Cup> Subtract(Cup other, in List<Cup> output) {
         Assert.AreEqual(convergencePoint, other.convergencePoint);
-        var ret = new List<Cup>();
-
-        foreach (var seg in Base().Subtract(other)) {
-            ret.Add(new Cup(seg, convergencePoint));
+        using (var tmp = pool.TakeTemporary()) {
+            foreach (var seg in Base().Subtract(other, tmp.val)) {
+                output.Add(new Cup(seg, convergencePoint));
+            }
         }
-
-        return ret;
+        return output;
     }
 
-    public static List<Cup> GetDisjoint(Cup c1, Cup c2) {
-        var ret = new List<Cup>();
-        ret.AddRange(c1.Subtract(c2));
-        ret.AddRange(c2.Subtract(c1));
-        return ret;
-    }
+    //public static List<Cup> GetDisjoint(Cup c1, Cup c2) {
+    //    var ret = new List<Cup>();
+    //    ret.AddRange(c1.Subtract(c2))
+    //    ret.AddRange(c2.Subtract(c1));
+    //    return ret;
+    //}
 }

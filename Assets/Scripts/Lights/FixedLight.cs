@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 // Idea: Light finds all opaque objects in
@@ -22,7 +21,7 @@ public class FixedLight : LightBase {
 
     private Triangle viewTriangle;
 
-    public Vector2 Position() {
+    public override Vector2 Position() {
         return transform.position;
     }
 
@@ -50,10 +49,10 @@ public class FixedLight : LightBase {
 
     public Triangle CalculateViewTriangle() {
         Triangle loc = LocalViewTriangle();
-        loc.p1 = transform.TransformPoint(loc.p1);
-        loc.p2 = transform.TransformPoint(loc.p2);
-        loc.p3 = transform.TransformPoint(loc.p3);
-        return loc;
+        return new Triangle(
+                transform.TransformPoint(loc.p1),
+                transform.TransformPoint(loc.p2),
+                transform.TransformPoint(loc.p3));
     }
 
     void OnDrawGizmos() {
@@ -156,7 +155,7 @@ public class FixedLight : LightBase {
         }
         shadowCorrespondences.Add(System.Tuple.Create(FarEdge(), (Shadow)null));
 
-        Math.MinimalUnion(ref shadowCorrespondences, transform.position, Angle);
+        MinimalUnion<Shadow>.Calculate(ref shadowCorrespondences, transform.position, Angle);
 
         shadowCorrespondences.Sort((s1, s2) => Angle(s1.Item1.Midpoint()).CompareTo(Angle(s2.Item1.Midpoint())));
 
@@ -185,13 +184,13 @@ public class FixedLight : LightBase {
                 frontFacing[shadow].Add(seg);
                 if (prevSeg is LineSegment prev) {
                     LineSegment right = new LineSegment(prev.p2, seg.p1);
-                    if (right.IsInLineWith(Position()) && !right.GoesAwayFrom(Position())) {
+                    if (right.Length() > .0001 && !right.GoesAwayFrom(Position())) {
                         rightFacing[shadow] = right;
                     }
                 }
                 if (nextSeg is LineSegment next) {
                     LineSegment left = new LineSegment(seg.p2, next.p1);
-                    if (left.IsInLineWith(Position()) && left.GoesAwayFrom(Position())) {
+                    if (left.Length() > .0001 && left.GoesAwayFrom(Position())) {
                         leftFacing[shadow] = left;
                     }
                 }
@@ -227,7 +226,7 @@ public class FixedLight : LightBase {
     }
 
     void OnCollisionEnter2D(Collision2D collision) {
-        if (collision.gameObject.TryGetComponent(out Opaque opaque)) {
+        foreach (Opaque opaque in collision.gameObject.GetComponents<Opaque>()) {
             Shadow s = Util.CreateChild<Shadow>(transform);
             s.Init(opaque, this);
             shadows.Add(opaque.GetInstanceID(), s);
@@ -235,9 +234,9 @@ public class FixedLight : LightBase {
     }
 
     void OnCollisionExit2D(Collision2D collision) {
-        if (collision.gameObject.TryGetComponent(out Opaque opaque)) {
+        foreach (Opaque opaque in collision.gameObject.GetComponents<Opaque>()) {
             Shadow s = shadows[opaque.GetInstanceID()];
-            Destroy(s);
+            Destroy(s.gameObject);
             shadows.Remove(opaque.GetInstanceID());
         }
     }

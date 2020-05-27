@@ -4,36 +4,52 @@ using UnityEngine;
 public class ShadowEdge : MonoBehaviour {
     private static Dictionary<int, ShadowEdge> allEdges = new Dictionary<int, ShadowEdge>();
 
+    private List<LineSegment> pieces = new List<LineSegment>();
+    private List<Vector2> intersections = new List<Vector2>();
     // Used to cache the target, which is recalculated every FixedUpdate.
     [SerializeField]
     private LineSegment target = LineSegment.zero;
+    private Rigidbody2D rb;
 
     protected void Awake() {
         allEdges.Add(gameObject.GetInstanceID(), this);
         gameObject.layer = LayerMask.NameToLayer("ShadowEdge");
+        rb = gameObject.AddComponent<Rigidbody2D>();
+        rb.gravityScale = 0;
+        rb.mass = 1000000;
     }
 
     public void SetTarget(LineSegment target) {
         this.target = target;
-        transform.position = target.p1;
-        transform.rotation = Quaternion.Euler(0, 0, target.Angle());
+        rb.transform.position = target.p1;
+        rb.transform.rotation = Quaternion.Euler(0, 0, target.Angle());
     }
 
     void OnDrawGizmos() {
-        Gizmos.DrawLine(target.p1, target.p2);
-        foreach (var seg in GetSplitOnIntersections()) {
-            foreach (var point in new List<Vector2>{seg.GetRightSide(), seg.GetLeftSide()}) {
-                if (LightBase.IsInDarkAllLights(point)) {
-                    Gizmos.color = Color.black;
-                } else {
-                    Gizmos.color = Color.white;
-                }
-            
-                Gizmos.DrawSphere(point, .1f);
-            }
-        }
+        Gizmos.color = Color.blue;
+        //Draw();
+    }
 
-        //foreach (var i in GetIntersections()) {
+    void OnDrawGizmosSelected() {
+        Gizmos.color = Color.green;
+        DrawGizmos();
+    }
+
+    public void DrawGizmos() {
+        Gizmos.DrawLine(target.p1, target.p2);
+        //foreach (var seg in GetSplitOnIntersections(new List<LineSegment>())) {
+        //    foreach (var point in new List<Vector2>{seg.GetRightSide(), seg.GetLeftSide()}) {
+        //        if (LightBase.IsInDarkAllLights(point)) {
+        //            Gizmos.color = Color.black;
+        //        } else {
+        //            Gizmos.color = Color.white;
+        //        }
+        //    
+        //        Gizmos.DrawSphere(point, .1f);
+        //    }
+        //}
+
+        //foreach (var i in GetIntersections(new List<Vector2>())) {
         //    Gizmos.DrawSphere(i, .1f);
         //}
         Gizmos.color = Color.white;
@@ -41,7 +57,7 @@ public class ShadowEdge : MonoBehaviour {
     }
 
     void UpdateColliders() {
-        List<LineSegment> pieces = GetSplitOnIntersections();
+        GetSplitOnIntersections(in pieces);
 
         var colliders = new List<BoxCollider2D>(GetComponents<BoxCollider2D>());
 
@@ -68,25 +84,27 @@ public class ShadowEdge : MonoBehaviour {
         UpdateColliders();
     }
 
-    List<LineSegment> GetSplitOnIntersections() {
-        var ret = new List<LineSegment>();
-        List<Vector2> splits = GetIntersections();
+    List<LineSegment> GetSplitOnIntersections(in List<LineSegment> splits) {
+        splits.Clear();
+        GetIntersections(in intersections);
 
         float totalLength = target.Length();
-        System.Func<Vector2, float> dist = v => (target.p1 - v).magnitude;
-        splits.Insert(0, target.p1);
-        splits.Add(target.p2);
-        splits.Sort((v1, v2) => dist(v1).CompareTo(dist(v2)));
+        intersections.Insert(0, target.p1);
+        intersections.Add(target.p2);
+        intersections.Sort((v1, v2) => DistAlongTarget(v1).CompareTo(DistAlongTarget(v2)));
 
-        for (int i = 1; i < splits.Count; i++) {
-            ret.Add(new LineSegment(splits[i-1], splits[i]));
+        for (int i = 1; i < intersections.Count; i++) {
+            splits.Add(new LineSegment(intersections[i-1], intersections[i]));
         }
-
-        return ret;
+        return splits;
     }
 
-    List<Vector2> GetIntersections() {
-        var intersections = new List<Vector2>();
+    float DistAlongTarget(Vector2 point) {
+        return (target.p1 - point).sqrMagnitude;
+    }
+
+    List<Vector2> GetIntersections(in List<Vector2> intersections) {
+        intersections.Clear();
         foreach (ShadowEdge edge in allEdges.Values) {
             if (edge == this) {
                 continue;
@@ -95,7 +113,6 @@ public class ShadowEdge : MonoBehaviour {
                 intersections.Add(intersec);
             }
         }
-
         return intersections;
     }
 

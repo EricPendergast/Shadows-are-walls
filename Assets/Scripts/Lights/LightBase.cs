@@ -28,4 +28,6 @@ public abstract class LightBase : MonoBehaviour {
     public static Dictionary<int, LightBase>.ValueCollection GetLights() {
         return allLights.Values;
     }
+
+    public abstract Vector2 Position();
 }

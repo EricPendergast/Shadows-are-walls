@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using UnityEngine; 
 
 [System.Serializable]
-public struct LineSegment : IEnumerable<Vector2> {
-    public Vector2 p1;
-    public Vector2 p2;
+public readonly struct LineSegment : IEnumerable<Vector2> {
+    public readonly Vector2 p1;
+    public readonly Vector2 p2;
     public static readonly LineSegment zero = new LineSegment(Vector2.zero, Vector2.zero);
+    private static ListPool<LineSegment> LSPool = new ListPool<LineSegment>();
+    private static ListPool<Vector2> V2Pool = new ListPool<Vector2>();
 
     public LineSegment(Vector2 p1, Vector2 p2) {
         this.p1 = p1;
@@ -21,9 +23,11 @@ public struct LineSegment : IEnumerable<Vector2> {
     }
 
     public LineSegment? Intersect(Triangle triangle) {
-        foreach (var seg in Split(triangle.GetSides())) {
-            if (triangle.Contains(seg.Midpoint())) {
-                return seg;
+        using (var tmp = LSPool.TakeTemporary()) {
+            foreach (var seg in Split(triangle.GetSides(), tmp.val)) {
+                if (triangle.Contains(seg.Midpoint())) {
+                    return seg;
+                }
             }
         }
 
@@ -31,38 +35,38 @@ public struct LineSegment : IEnumerable<Vector2> {
     }
 
     public LineSegment? Intersect(Cup cup) {
-        foreach (var seg in Split(cup.GetSides())) {
-            if (cup.Contains(seg.Midpoint())) {
-                return seg;
+        using (var tmp = LSPool.TakeTemporary()) {
+            foreach (var seg in Split(cup.GetSides(), tmp.val)) {
+                if (cup.Contains(seg.Midpoint())) {
+                    return seg;
+                }
             }
         }
         return null;
     }
 
-    public List<LineSegment> Subtract(Cup cup) {
-        var ret = new List<LineSegment>();
-        foreach (var seg in Split(cup.GetSides())) {
-            if (!cup.Contains(seg.Midpoint())) {
-                ret.Add(seg);
+    public List<LineSegment> Subtract(Cup cup, in List<LineSegment> output) {
+        output.Clear();
+        using (var tmp = LSPool.TakeTemporary()) {
+            // TODO: We can do this without a temporary variable, decide if that would be useful
+            foreach (var seg in Split(cup.GetSides(), tmp.val)) {
+                if (!cup.Contains(seg.Midpoint())) {
+                    output.Add(seg);
+                }
             }
         }
-        return ret;
+        return output;
     }
 
-    public List<LineSegment> Split(LineSegment other) {
+    public List<LineSegment> Split(LineSegment other, in List<LineSegment> output) {
+        output.Clear();
         if (LineSegmentLib.LineSegmentsIntersection(p1, p2, other.p1, other.p2, out var intersection)) {
-            return new List<LineSegment>{new LineSegment(p1, intersection), new LineSegment(intersection, p2)};
+            output.Add(new LineSegment(p1, intersection));
+            output.Add(new LineSegment(intersection, p2));
         } else {
-            return new List<LineSegment>{this};
+            output.Add(this);
         }
-    }
-
-    public List<LineSegment> Split(IEnumerable<LineSegment> splits) {
-        var ret = new List<LineSegment>{this};
-        foreach(var split in splits) {
-            ret = Math.SplitAll(ret, split);
-        }
-        return ret;
+        return output;
     }
 
     public Vector2 Midpoint() {
@@ -109,11 +113,6 @@ public struct LineSegment : IEnumerable<Vector2> {
         return Vector2.SignedAngle(p2 - p1, point - p1);
     }
 
-    public bool IsInLineWith(Vector2 point) {
-        float angle = Vector2.Angle(p2 - p1, point - p1);
-        return angle < .00001 || angle > 180 - .00001;
-    }
-
     // Does the ray from p1 to p2 point away from 'point'?
     public bool GoesAwayFrom(Vector2 point) {
         return (p1 - point).sqrMagnitude < (p2 - point).sqrMagnitude;
@@ -133,14 +132,38 @@ public struct LineSegment : IEnumerable<Vector2> {
         return "LineSegment(" + p1 + ", " + p2 + ")";
     }
 
-    // Swaps the endpoints of the line segment
-    public void Swap() {
-        var tmp = p1;
-        p1 = p2;
-        p2 = tmp;
-    }
-
     public LineSegment Swapped() {
         return new LineSegment(p2, p1);
+    }
+
+    public List<LineSegment> Split(IEnumerable<LineSegment> splits, in List<LineSegment> output) {
+        output.Clear();
+
+        using (var intersections = V2Pool.TakeTemporary()) {
+            GetIntersections(splits, intersections.val);
+
+            float totalLength = this.Length();
+            intersections.val.Insert(0, this.p1);
+            intersections.val.Add(this.p2);
+
+            // Because of lambda capture on value types
+            var p1 = this.p1;
+            intersections.val.Sort((v1, v2) => (p1 - v1).sqrMagnitude.CompareTo((p1 - v2).sqrMagnitude));
+
+            for (int i = 1; i < intersections.val.Count; i++) {
+                output.Add(new LineSegment(intersections.val[i-1], intersections.val[i]));
+            }
+        }
+        return output;
+    }
+
+    List<Vector2> GetIntersections(IEnumerable<LineSegment> segs, in List<Vector2> output) {
+        output.Clear();
+        foreach (var seg in segs) {
+            if (this.Intersect(seg) is Vector2 intersec) {
+                output.Add(intersec);
+            }
+        }
+        return output;
     }
 }

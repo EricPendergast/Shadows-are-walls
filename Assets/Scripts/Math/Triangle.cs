@@ -3,26 +3,23 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [System.Serializable]
-public struct Triangle {
-    private Vector2 _p1;
+public readonly struct Triangle {
+    readonly private Vector2 _p1;
     public Vector2 p1 {
         get { return _p1; }
-        set { _p1 = side0.p1 = side2.p2 = value; }
     }
-    private Vector2 _p2;
+    readonly private Vector2 _p2;
     public Vector2 p2 {
         get { return _p2; }
-        set { _p2 = side0.p2 = side1.p1 = value; }
     }
-    private Vector2 _p3;
+    readonly private Vector2 _p3;
     public Vector2 p3 {
         get { return _p3; }
-        set { _p3 = side1.p2 = side2.p1 = value; }
     }
 
-    private LineSegment side0;
-    private LineSegment side1;
-    private LineSegment side2;
+    readonly private LineSegment side0;
+    readonly private LineSegment side1;
+    readonly private LineSegment side2;
 
     public Triangle(Vector2 p1, Vector2 p2, Vector2 p3) {
         side0 = new LineSegment(p1, p2);
