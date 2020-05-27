@@ -5,6 +5,7 @@ using UnityEngine;
 // the scene, calculates all their shadows,
 // and then does rendering and collisions
 // stuff
+[RequireComponent(typeof(Rigidbody2D))]
 public class FixedLight : LightBase {
     public float angle;
     public float distance;

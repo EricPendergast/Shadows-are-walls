@@ -19,6 +19,7 @@ public abstract class LightBase : MonoBehaviour {
 
     public virtual void Awake() {
         allLights.Add(gameObject.GetInstanceID(), this);
+        gameObject.layer = LayerMask.NameToLayer("Light");
     }
     
     public virtual void OnDestroy() {
