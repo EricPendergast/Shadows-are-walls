@@ -32,4 +32,4 @@ Bugs
     - Setting the scale of an opaque object to 0 and then back to a nonzero
       value causes an error in FixedLight.OnCollisionEnter()
     - Lights are a bit buggy on the first frame
-    - Lights special shadow edges don't move with the light properly
+    ✓- Lights special shadow edges don't move with the light properly

@@ -71,7 +71,7 @@ public class ShadowEdge : MonoBehaviour {
         for (int i = 0; i < pieces.Count; i++) {
             float width = pieces[i].Length();
             colliders[i].offset = new Vector2((pieces[i].p1 - target.p1).magnitude + width/2, 0);
-            colliders[i].size = new Vector2(width, .1f);
+            colliders[i].size = new Vector2(width, .02f);
             colliders[i].enabled = SegmentDividesLightAndDark(pieces[i]);
         }
     }

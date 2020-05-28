@@ -1,15 +1,20 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 public class Player : MonoBehaviour {
     Rigidbody2D rb;
     [SerializeField]
-    private float accel;
+    private float airAccel;
+    [SerializeField]
+    private float airFriction;
+    [SerializeField]
+    private float groundAccel;
+    [SerializeField]
+    private float groundFriction;
     [SerializeField]
     private float maxSpeed;
     [SerializeField]
-    private Detector groundDetector;
+    private Collider2D groundDetector;
     [SerializeField]
     private Collider2D mainCollider;
     [SerializeField]
@@ -17,22 +22,36 @@ public class Player : MonoBehaviour {
 
     void Start() {
         rb = GetComponent<Rigidbody2D>();
-        Physics2D.IgnoreCollision(mainCollider, groundDetector.GetComponent<Collider2D>());
     }
 
     void FixedUpdate() {
-        var force = Vector3.right*accel*Input.GetAxis("Horizontal");
+        int lr = (Input.GetKey(KeyCode.A) ? -1 : 0) + (Input.GetKey(KeyCode.D) ? 1 : 0);
+        bool onGround = IsOnGround();
+        var inputForce = (onGround ? groundAccel : airAccel) * Vector3.right * lr;
 
-        if (force != Vector3.zero) {
-            force = PhysicsHelper.TruncateForce(rb, maxSpeed, force);
+        if (Input.GetKey(KeyCode.Space) && onGround) {
+            rb.AddForce(PhysicsHelper.GetNeededForce(rb, Vector2.up*jumpSpeed));
         }
 
-        rb.AddForce(force);
+        if (inputForce != Vector3.zero) {
+            inputForce = PhysicsHelper.TruncateForce(rb, maxSpeed, inputForce);
+            rb.AddForce(inputForce);
+        }
+        if (inputForce.x * rb.velocity.x <= 0) {
+            var frictionForce = -(onGround ? groundFriction : airFriction) * Vector3.right * rb.mass * rb.velocity.x;
+            rb.AddForce(frictionForce);
+        }
+    }
 
-        if (Input.GetKey(KeyCode.Space)) {
-            if (groundDetector.Overlaps()) {
-                rb.AddForce(PhysicsHelper.GetNeededForce(rb, Vector2.up*jumpSpeed));
+    bool IsOnGround() {
+        var colliders = new List<Collider2D>();
+        groundDetector.GetContacts(colliders);
+        Debug.Log(colliders);
+        foreach (var col in colliders) {
+            if (col != mainCollider && !Physics2D.GetIgnoreCollision(col, mainCollider)) {
+                return true;
             }
         }
+        return false;
     }
 }
