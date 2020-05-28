@@ -75,12 +75,15 @@ public class FixedLight : LightBase {
         base.Awake();
         viewTriangle = CalculateViewTriangle();
 
-        foreach (var side in viewTriangle.GetSides()) {
-            var sideCaptured = side;
-            Util.CreateChild<CustomShadowEdge>(transform).Init(() => {
-                return sideCaptured;
-            });
-        }
+        Util.CreateChild<CustomShadowEdge>(transform).Init(() => {
+            return RightEdge();
+        });
+        Util.CreateChild<CustomShadowEdge>(transform).Init(() => {
+            return LeftEdge();
+        });
+        Util.CreateChild<CustomShadowEdge>(transform).Init(() => {
+            return FarEdge();
+        });
 
         Refs.instance.lightMaterial.SetInt("lightId", lightCounter);
         Refs.instance.shadowMaterial.SetInt("lightId", lightCounter);
