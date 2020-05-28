@@ -1,5 +1,7 @@
 Player movement
-    - Implement player with basic right/left/jump
+    ✓- Implement player with basic right/left/jump
+    - Make player jump height more predictable
+    - Make player jump height depend on how long the spacebar is pressed
 
 Lights
     - Single light

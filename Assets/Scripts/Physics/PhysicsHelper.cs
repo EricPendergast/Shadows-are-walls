@@ -1,6 +1,14 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 class PhysicsHelper {
+
+    public static int shadowEdgeLayer = LayerMask.NameToLayer("ShadowEdge");
+    public static int lightLayer = LayerMask.NameToLayer("Light");
+    public static int opaqueLayer = LayerMask.NameToLayer("Opaque");
+    public static int freeObjectLayer = LayerMask.NameToLayer("FreeObject");
+    public static int interactableLayer = LayerMask.NameToLayer("Interactable");
+
     // Truncates 'force' so that when applied to 'body', it will no go over
     // maxSpeed in the next tick
     public static Vector3 TruncateForce(Rigidbody2D body, float maxSpeed, Vector3 force) {

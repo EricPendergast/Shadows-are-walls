@@ -13,7 +13,7 @@ public class ShadowEdge : MonoBehaviour {
 
     protected void Awake() {
         allEdges.Add(gameObject.GetInstanceID(), this);
-        gameObject.layer = LayerMask.NameToLayer("ShadowEdge");
+        gameObject.layer = PhysicsHelper.shadowEdgeLayer;
         rb = gameObject.AddComponent<Rigidbody2D>();
         rb.gravityScale = 0;
         rb.mass = 1000000;

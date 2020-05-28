@@ -16,6 +16,8 @@ public class Player : MonoBehaviour {
     [SerializeField]
     private Collider2D groundDetector;
     [SerializeField]
+    private Collider2D interactableDetector;
+    [SerializeField]
     private Collider2D mainCollider;
     [SerializeField]
     private float jumpSpeed;
@@ -41,14 +43,31 @@ public class Player : MonoBehaviour {
             var frictionForce = -(onGround ? groundFriction : airFriction) * Vector3.right * rb.mass * rb.velocity.x;
             rb.AddForce(frictionForce);
         }
+
+        float interaction = (Input.GetKey(KeyCode.Q) ? -1 : 0) + (Input.GetKey(KeyCode.E) ? 1 : 0);
+        if (interaction != 0) {
+            foreach (var lever in GetInteractable()) {
+                lever.MovePosition(interaction * .01f);
+            }
+        }
+    }
+
+    IEnumerable<AngleLever> GetInteractable() {
+        var colliders = new List<Collider2D>();
+        interactableDetector.GetContacts(colliders);
+    
+        foreach (var col in colliders) {
+            if (col.TryGetComponent(out AngleLever lever)) {
+                yield return lever;
+            }
+        }
     }
 
     bool IsOnGround() {
         var colliders = new List<Collider2D>();
         groundDetector.GetContacts(colliders);
-        Debug.Log(colliders);
         foreach (var col in colliders) {
-            if (col != mainCollider && !Physics2D.GetIgnoreCollision(col, mainCollider)) {
+            if (col != mainCollider && col != interactableDetector) {
                 return true;
             }
         }

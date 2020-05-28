@@ -22,6 +22,22 @@ public class FixedLight : LightBase {
 
     private Triangle viewTriangle;
 
+    public void SetApertureAngle(float v) {
+        angle = v;
+    }
+
+    public float GetApertureAngle() {
+        return angle;
+    }
+
+    public float GetAngle() {
+        return transform.localRotation.eulerAngles.z;
+    }
+
+    public void SetTargetAngle(float v) {
+        transform.localRotation = Quaternion.Euler(0, 0, v);
+    }
+
     public override Vector2 Position() {
         return transform.position;
     }
