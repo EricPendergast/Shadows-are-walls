@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine; 
+using UnityEngine.Assertions; 
 
 [System.Serializable]
 public readonly struct LineSegment : IEnumerable<Vector2> {
@@ -10,55 +11,89 @@ public readonly struct LineSegment : IEnumerable<Vector2> {
     private static ListPool<LineSegment> LSPool = new ListPool<LineSegment>();
     private static ListPool<Vector2> V2Pool = new ListPool<Vector2>();
 
-    public LineSegment(Vector2 p1, Vector2 p2) {
+    public LineSegment(in Vector2 p1, in Vector2 p2) {
         this.p1 = p1;
         this.p2 = p2;
     }
 
-    public Vector2? Intersect(LineSegment other) {
+    public Vector2? Intersect(in LineSegment other) {
         if (LineSegmentLib.LineSegmentsIntersection(p1, p2, other.p1, other.p2, out var intersection)) {
             return intersection;
         }
         return null;
     }
 
-    public LineSegment? Intersect(Triangle triangle) {
-        using (var tmp = LSPool.TakeTemporary()) {
-            foreach (var seg in Split(triangle.GetSides(), tmp.val)) {
-                if (triangle.Contains(seg.Midpoint())) {
-                    return seg;
-                }
+    public LineSegment? Intersect(in Convex convex) {
+
+        convex.IntersectEdge(this, out Vector2? i1, out Vector2? i2);
+        
+        // There are no intersections in this case
+        if (i1 == null) {
+            if (convex.Contains(Midpoint())) {
+                return this;
             }
+            return null;
+        }
+        // There is one intersection in this case
+        if (i2 == null) {
+            LineSegment split1 = new LineSegment(p1, (Vector2)i1);
+            if (split1.p1 != split1.p2 && convex.Contains(split1.Midpoint())) {
+                return split1;
+            }
+            LineSegment split2 = new LineSegment((Vector2)i1, p2);
+            if (split2.p1 != split2.p2 && convex.Contains(split2.Midpoint())) {
+                return split2;
+            }
+            return null;
         }
 
-        return null;
+        // There are two intersections otherwise, so the intersection must be
+        // between the two intersection points
+        return new LineSegment((Vector2)i1, (Vector2)i2);
     }
 
-    public LineSegment? Intersect(Cup cup) {
-        using (var tmp = LSPool.TakeTemporary()) {
-            foreach (var seg in Split(cup.GetSides(), tmp.val)) {
-                if (cup.Contains(seg.Midpoint())) {
-                    return seg;
-                }
+    public void Subtract(in Convex convex, out LineSegment? seg1, out LineSegment? seg2) {
+        seg1 = null;
+        seg2 = null;
+        if (Intersect(convex) is LineSegment intersection) {
+            // Make it so intersection.p1 is closest to this.p1
+            if ((p1 - intersection.p1).sqrMagnitude > (p1 - intersection.p2).sqrMagnitude) {
+                intersection = intersection.Swapped();
             }
-        }
-        return null;
-    }
+            var part1 = new LineSegment(p1, intersection.p1);
+            var part2 = new LineSegment(intersection.p2, p2);
 
-    public List<LineSegment> Subtract(Cup cup, in List<LineSegment> output) {
+            if (part1.p1 != part1.p2 && !convex.Contains(part1.Midpoint())) {
+                seg1 = part1;
+            }
+            if (part2.p1 != part2.p2 && !convex.Contains(part2.Midpoint())) {
+                seg2 = part2;
+            }
+            if (seg1 == null) {
+                seg1 = seg2;
+                seg2 = null;
+            }
+            return;
+        } else {
+            if (!convex.Contains(Midpoint())) {
+                seg1 = this;
+            }
+            return;
+        }
+    }
+    public List<LineSegment> Subtract(in Convex convex, in List<LineSegment> output) {
         output.Clear();
-        using (var tmp = LSPool.TakeTemporary()) {
-            // TODO: We can do this without a temporary variable, decide if that would be useful
-            foreach (var seg in Split(cup.GetSides(), tmp.val)) {
-                if (!cup.Contains(seg.Midpoint())) {
-                    output.Add(seg);
-                }
-            }
+        Subtract(convex, out var seg1, out var seg2);
+        if (seg1 is LineSegment s1) {
+            output.Add(s1);
+        }
+        if (seg2 is LineSegment s2) {
+            output.Add(s2);
         }
         return output;
     }
 
-    public List<LineSegment> Split(LineSegment other, in List<LineSegment> output) {
+    public List<LineSegment> Split(in LineSegment other, in List<LineSegment> output) {
         output.Clear();
         if (LineSegmentLib.LineSegmentsIntersection(p1, p2, other.p1, other.p2, out var intersection)) {
             output.Add(new LineSegment(p1, intersection));
@@ -86,7 +121,7 @@ public readonly struct LineSegment : IEnumerable<Vector2> {
         return p1 != p2;
     }
 
-    public bool OnRightSide(Vector2 point) {
+    public bool OnRightSide(in Vector2 point) {
         return Math.OnRightSide(point, this);
     }
 
@@ -104,17 +139,17 @@ public readonly struct LineSegment : IEnumerable<Vector2> {
 
     // Measures the angle between the vectors pointing from p1 to p2 in this
     // and other
-    public float Angle(LineSegment other) {
+    public float Angle(in LineSegment other) {
         return Vector2.SignedAngle(p2 - p1, other.p2 - other.p1);
     }
 
     // The point around which the angle is measured is p1
-    public float Angle(Vector2 point) {
+    public float Angle(in Vector2 point) {
         return Vector2.SignedAngle(p2 - p1, point - p1);
     }
 
     // Does the ray from p1 to p2 point away from 'point'?
-    public bool GoesAwayFrom(Vector2 point) {
+    public bool GoesAwayFrom(in Vector2 point) {
         return (p1 - point).sqrMagnitude < (p2 - point).sqrMagnitude;
     }
 
@@ -136,7 +171,7 @@ public readonly struct LineSegment : IEnumerable<Vector2> {
         return new LineSegment(p2, p1);
     }
 
-    public List<LineSegment> Split(IEnumerable<LineSegment> splits, in List<LineSegment> output) {
+    public List<LineSegment> Split(in IEnumerable<LineSegment> splits, in List<LineSegment> output) {
         output.Clear();
 
         using (var intersections = V2Pool.TakeTemporary()) {

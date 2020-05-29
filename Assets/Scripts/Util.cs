@@ -34,4 +34,25 @@ public class Util {
         go.transform.parent = parent;
         return go.AddComponent<T>();
     }
+
+    public static void SlideDown<T>(ref T? v1, ref T? v2, ref T? v3) where T : struct {
+        if (v2 == null) {
+            v2 = v3;
+            v3 = null;
+        }
+        if (v1 == null) {
+            v1 = v2;
+            v2 = v3;
+            v3 = null;
+        }
+    }
+
+    public static void RemoveDuplicates(ref Vector2? v1, ref Vector2? v2, ref Vector2? v3) {
+        if (v1 == v2 || v1 == v3) {
+            v1 = null;
+        }
+        if (v2 == v3) {
+            v2 = null;
+        }
+    }
 }

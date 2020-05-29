@@ -14,7 +14,7 @@ public class FixedLight : LightBase {
 
     private PolygonCollider2D visibleCollider;
 
-    private Dictionary<int, Shadow> shadows = new Dictionary<int, Shadow>();
+    private Dictionary<Opaque, Shadow> shadows = new Dictionary<Opaque, Shadow>();
 
     // All visible shadows. This does not contain Shadow objects because
     // sometimes shadows get split into multiple line segments
@@ -149,7 +149,6 @@ public class FixedLight : LightBase {
 
     void FixedUpdate() {
         viewTriangle = CalculateViewTriangle();
-
         visibleCollider.SetPath(0, LocalViewTriangle().AsList());
 
         DoShadows();
@@ -161,6 +160,11 @@ public class FixedLight : LightBase {
         //} else {
         //    Debug.Log("Mouse in light");
         //}
+    }
+
+    void Update() {
+        DoShadows();
+        DrawCastedLight();
     }
 
     void DoShadows() {
@@ -245,19 +249,49 @@ public class FixedLight : LightBase {
         return true;
     }
 
+    // I thought this function would get the colliders sooner than waiting for
+    // the events, but I was wrong.
+    //void UpdateKnownShadows() {
+    //    var colliders = new List<Collider2D>();
+    //    visibleCollider.GetContacts(colliders);
+    //    
+    //    var opaqueSet = new HashSet<Opaque>();
+    //    foreach (var collider in colliders) {
+    //        foreach (var opaque in collider.GetComponents<Opaque>()) {
+    //            opaqueSet.Add(opaque);
+    //        }
+    //    }
+    //
+    //    foreach (var opaque in opaqueSet) {
+    //        if (!shadows.ContainsKey(opaque)) {
+    //            Shadow s = Util.CreateChild<Shadow>(transform);
+    //            s.Init(opaque, this);
+    //            shadows.Add(opaque, s);
+    //        }
+    //    }
+    //
+    //    foreach (var opaque in shadows.Keys) {
+    //        if (!opaqueSet.Contains(opaque)) {
+    //            Shadow s = shadows[opaque];
+    //            Destroy(s.gameObject);
+    //            shadows.Remove(opaque);
+    //        }
+    //    }
+    //}
+
     void OnCollisionEnter2D(Collision2D collision) {
         foreach (Opaque opaque in collision.gameObject.GetComponents<Opaque>()) {
             Shadow s = Util.CreateChild<Shadow>(transform);
             s.Init(opaque, this);
-            shadows.Add(opaque.GetInstanceID(), s);
+            shadows.Add(opaque, s);
         }
     }
-
+    
     void OnCollisionExit2D(Collision2D collision) {
         foreach (Opaque opaque in collision.gameObject.GetComponents<Opaque>()) {
-            Shadow s = shadows[opaque.GetInstanceID()];
+            Shadow s = shadows[opaque];
             Destroy(s.gameObject);
-            shadows.Remove(opaque.GetInstanceID());
+            shadows.Remove(opaque);
         }
     }
 }
