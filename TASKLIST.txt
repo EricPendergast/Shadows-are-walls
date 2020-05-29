@@ -29,6 +29,8 @@ Optimizations
     - Put everything on the stack
     - For each shadow edge, only check for intersections with other lights
           which intersect its own light
+    - For each shadow edge, you only need to check if one of the sides is in
+          light, since you know one side is always in light
 
 Bugs
     - Setting the scale of an opaque object to 0 and then back to a nonzero

@@ -201,4 +201,12 @@ public readonly struct LineSegment : IEnumerable<Vector2> {
         }
         return output;
     }
+
+    public static bool operator==(LineSegment lhs, LineSegment rhs) {
+        return lhs.p1 == rhs.p1 && lhs.p2 == rhs.p2;
+    }
+
+    public static bool operator!=(LineSegment lhs, LineSegment rhs) {
+        return !(lhs == rhs);
+    }
 }
