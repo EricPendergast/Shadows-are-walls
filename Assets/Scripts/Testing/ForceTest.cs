@@ -12,7 +12,7 @@ public class ForceTest : MonoBehaviour {
 
     void FixedUpdate() {
         var body = GetComponent<Rigidbody2D>();
-        var force = PhysicsHelper.GetMoveToForce(body, position)/2;
+        var force = PhysicsHelper.GetMoveToForce(body, position);
         Debug.Log(force);
         body.AddForce(force);
 

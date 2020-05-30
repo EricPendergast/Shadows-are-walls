@@ -37,5 +37,4 @@ public class TorqueTest : MonoBehaviour {
         projectedRotation = body.rotation + body.angularVelocity*Time.deltaTime + .5f*(torque/body.inertia)*Time.deltaTime*Time.deltaTime;
         body.AddTorque(torque);
     }
-
 }
