@@ -6,7 +6,7 @@
     }
     SubShader
     {
-        Tags { "RenderType"="Transparent" "Queue" = "Geometry+1" }
+        Tags { "RenderType"="Transparent" "Queue" = "Geometry-1" }
         LOD 100
         Cull off
         BlendOp Max

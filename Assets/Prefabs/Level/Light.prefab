@@ -44,8 +44,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 034cc4912f88eb426b27d36c1b9322be, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  angle: 60
+  targetAngle: 60
   distance: 19.28
+  shadowParent: {fileID: 0}
 --- !u!50 &7909692603331570575
 Rigidbody2D:
   serializedVersion: 4

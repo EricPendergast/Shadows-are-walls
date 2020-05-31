@@ -24,6 +24,8 @@ Lights
     - Collision boxes
     - Moving collision boxes
 
+    - Lights need to have their data (position & rotation)  depend on their special shadow edges
+
 
 Optimizations
     - Put everything on the stack

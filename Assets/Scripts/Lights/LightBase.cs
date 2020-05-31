@@ -30,5 +30,5 @@ public abstract class LightBase : MonoBehaviour {
         return allLights.Values;
     }
 
-    public abstract Vector2 Position();
+    public abstract Vector2 GetTargetPosition();
 }

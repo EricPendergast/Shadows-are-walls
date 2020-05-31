@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 public class ShadowEdge : MonoBehaviour {
     private static Dictionary<int, ShadowEdge> allEdges = new Dictionary<int, ShadowEdge>();
@@ -9,27 +10,64 @@ public class ShadowEdge : MonoBehaviour {
     [SerializeField]
     private LineSegment target = LineSegment.zero;
     private Rigidbody2D rb;
+    [SerializeField]
+    private Opaque caster;
+    [SerializeField]
+    private LightBase lightSource;
 
     protected void Awake() {
         allEdges.Add(gameObject.GetInstanceID(), this);
         gameObject.layer = PhysicsHelper.shadowEdgeLayer;
         rb = gameObject.AddComponent<Rigidbody2D>();
         rb.gravityScale = 0;
-        rb.mass = 1000;
+        rb.mass = 10;
+        rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
+    }
+
+    private bool initialized = false;
+    void Start() {
+        Assert.IsTrue(initialized);
+    }
+
+    public void Init(Opaque caster, LightBase lightSource) {
+        Assert.IsFalse(initialized);
+        initialized = true;
+        this.caster = caster;
+        this.lightSource = lightSource;
     }
 
     public void SetTarget(LineSegment target) {
         if (this.target == LineSegment.zero) {
-            rb.transform.position = target.p1;
-            rb.transform.rotation = Quaternion.Euler(0, 0, target.Angle());
+            rb.position = target.p1;
+            rb.rotation = target.Angle();
         }
         this.target = target;
     }
+
+    // Where the collider wants to be
     public LineSegment GetTarget() {
         return target;
     }
 
+    // Where the collider actually is
+    public LineSegment GetActual() {
+        var targetUnrotated = Vector2.right*target.Length();
+        var targetRotated = (Vector2)(Quaternion.Euler(0,0,target.Angle())*targetUnrotated);
+        return new LineSegment(rb.position, rb.position + targetRotated);
+    }
+
+    // Where the collider reports its position as
+    private LineSegment GetReported() {
+        // caster being null indicates this is a light edge, which means its
+        // actual position is the edge of the light
+        if (caster == null) {
+            return GetActual();
+        }
+        return GetTarget();
+    }
+
     protected virtual void FixedUpdate() {
+        //Debug.Log("ShadowEdge FixedUpdate");
         UpdateColliders();
         AddForces();
     }
@@ -45,7 +83,14 @@ public class ShadowEdge : MonoBehaviour {
     }
 
     public void DrawGizmos() {
+        Gizmos.color = Color.red;
         Gizmos.DrawLine(target.p1, target.p2);
+        //Gizmos.DrawSphere(target.p1, .1f);
+        //Gizmos.DrawSphere(target.p2, .1f);
+        Gizmos.color = Color.cyan;
+        Gizmos.DrawLine(target.p1, GetActual().p1);
+        Gizmos.DrawLine(target.p2, GetActual().p2);
+        //Gizmos.DrawSphere(transform.position, .1f);
         //foreach (var seg in GetSplitOnIntersections(new List<LineSegment>())) {
         //    foreach (var point in new List<Vector2>{seg.GetRightSide(), seg.GetLeftSide()}) {
         //        if (LightBase.IsInDarkAllLights(point)) {
@@ -66,6 +111,9 @@ public class ShadowEdge : MonoBehaviour {
     }
 
     void AddForces() {
+        if (target == LineSegment.zero) {
+            return;
+        }
         Vector2 force = PhysicsHelper.GetMoveToForce(rb, target.p1);
         float torque = PhysicsHelper.GetRotateToTorque(rb, target.Angle());
 
@@ -74,7 +122,7 @@ public class ShadowEdge : MonoBehaviour {
     }
 
     void UpdateColliders() {
-        target.Split(GetIntersectionCandidates(), in pieces);
+        GetReported().Split(GetIntersectionCandidates(), in pieces);
 
         var colliders = new List<BoxCollider2D>(GetComponents<BoxCollider2D>());
 
@@ -87,8 +135,9 @@ public class ShadowEdge : MonoBehaviour {
 
         for (int i = 0; i < pieces.Count; i++) {
             float width = pieces[i].Length();
+            // TODO: Maybe we shouldn't use the target here
             colliders[i].offset = new Vector2((pieces[i].p1 - target.p1).magnitude + width/2, 0);
-            colliders[i].size = new Vector2(width, .02f);
+            colliders[i].size = new Vector2(width, .1f);
             colliders[i].enabled = SegmentDividesLightAndDark(pieces[i]);
         }
     }
@@ -102,7 +151,7 @@ public class ShadowEdge : MonoBehaviour {
             if (edge == this) {
                 continue;
             }
-            yield return edge.target;
+            yield return edge.GetReported();
         }
     }
 

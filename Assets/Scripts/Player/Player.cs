@@ -47,17 +47,17 @@ public class Player : MonoBehaviour {
         float interaction = (Input.GetKey(KeyCode.Q) ? -1 : 0) + (Input.GetKey(KeyCode.E) ? 1 : 0);
         if (interaction != 0) {
             foreach (var lever in GetInteractable()) {
-                lever.MovePosition(interaction * .01f);
+                lever.MovePosition(interaction * .005f);
             }
         }
     }
 
-    IEnumerable<AngleLever> GetInteractable() {
+    IEnumerable<Lever> GetInteractable() {
         var colliders = new List<Collider2D>();
         interactableDetector.GetContacts(colliders);
     
         foreach (var col in colliders) {
-            if (col.TryGetComponent(out AngleLever lever)) {
+            if (col.TryGetComponent(out Lever lever)) {
                 yield return lever;
             }
         }

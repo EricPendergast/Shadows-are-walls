@@ -29,8 +29,8 @@ public class Shadow : MonoBehaviour {
     }
 
     void OnDrawGizmosSelected() {
-        var p1 = caster.CrossSection(lightSource.Position()).p1;
-        var p2 = caster.CrossSection(lightSource.Position()).p2;
+        var p1 = caster.CrossSection(lightSource.GetTargetPosition()).p1;
+        var p2 = caster.CrossSection(lightSource.GetTargetPosition()).p2;
         //Gizmos.DrawLine(p1, p2);
         Gizmos.DrawSphere(p1, .1f);
         Gizmos.DrawSphere(p2, .1f);
@@ -83,6 +83,7 @@ public class Shadow : MonoBehaviour {
     private void SetTarget(ref ShadowEdge edge, LineSegment? target) {
         if (edge == null && target != null) {
             edge = Util.CreateChild<ShadowEdge>(transform);
+            edge.Init(caster, lightSource);
         }
     
         if (edge != null && target == null) {

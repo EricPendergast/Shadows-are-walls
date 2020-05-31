@@ -143,6 +143,10 @@ public readonly struct LineSegment : IEnumerable<Vector2> {
         return Vector2.SignedAngle(p2 - p1, other.p2 - other.p1);
     }
 
+    public float UnsignedAngle(in LineSegment other) {
+        return Vector2.Angle(p2 - p1, other.p2 - other.p1);
+    }
+
     // The point around which the angle is measured is p1
     public float Angle(in Vector2 point) {
         return Vector2.SignedAngle(p2 - p1, point - p1);

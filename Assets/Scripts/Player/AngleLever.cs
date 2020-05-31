@@ -13,7 +13,7 @@ public class AngleLever : Lever {
     private FixedLight controled;
 
     public void Update() {
-        position = (controled.GetAngle() - angleLeft)/(angleRight - angleLeft);
+        position = (controled.GetActualAngle() - angleLeft)/(angleRight - angleLeft);
     }
 
     public override float GetPosition() {

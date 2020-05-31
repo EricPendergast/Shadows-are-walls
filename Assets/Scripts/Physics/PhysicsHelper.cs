@@ -66,7 +66,7 @@ class PhysicsHelper {
     }
 
     public static Vector2 GetMoveToForce(Rigidbody2D body, Vector2 endPosition) {
-        Vector2 startPosition = body.transform.position;
+        Vector2 startPosition = body.position;
         Vector2 startVelocity = body.velocity;
         float time = Time.deltaTime == 0 ? Time.fixedDeltaTime : Time.deltaTime;
         // Solving for acceleration using

@@ -7,7 +7,7 @@ using UnityEngine;
 // stuff
 [RequireComponent(typeof(Rigidbody2D))]
 public class FixedLight : LightBase {
-    public float angle;
+    public float targetAngle;
     public float distance;
 
     private Mesh castLightMesh;
@@ -16,99 +16,152 @@ public class FixedLight : LightBase {
 
     private Dictionary<Opaque, Shadow> shadows = new Dictionary<Opaque, Shadow>();
 
+    private ShadowEdge rightShadowEdge;
+    private ShadowEdge leftShadowEdge;
+    private ShadowEdge farShadowEdge;
+
     // All visible shadows. This does not contain Shadow objects because
     // sometimes shadows get split into multiple line segments
     private List<LineSegment> trimmedShadows = new List<LineSegment>();
 
-    private Triangle viewTriangle;
+    private Triangle actualViewTriangle;
+    private Triangle targetViewTriangle;
 
-    public void SetApertureAngle(float v) {
-        angle = v;
+    [SerializeField]
+    private GameObject shadowParent;
+
+    public void SetTargetApertureAngle(float v) {
+        targetAngle = v;
     }
 
-    public float GetApertureAngle() {
-        return angle;
+    public float GetActualApertureAngle() {
+        return ActualLeftEdge().UnsignedAngle(ActualRightEdge());
     }
 
-    public float GetAngle() {
-        return transform.localRotation.eulerAngles.z;
+    public float GetActualAngle() {
+        var left = ActualLeftEdge();
+        var right = ActualRightEdge();
+        return new LineSegment((left.p1 + right.p1)/2, (left.p2 + right.p2)/2).Angle();
     }
 
     public void SetTargetAngle(float v) {
         transform.localRotation = Quaternion.Euler(0, 0, v);
     }
 
-    public override Vector2 Position() {
+    public void SetTargetPosition(Vector2 p) {
+        transform.position = p;
+    }
+
+    public override Vector2 GetTargetPosition() {
         return transform.position;
     }
 
-    public LineSegment FarEdge() {
-        return new LineSegment(viewTriangle.p2, viewTriangle.p3);
+    public Vector2 GetActualPosition() {
+        return (ActualLeftEdge().p1 + ActualRightEdge().p1)/2;
     }
 
-    public LineSegment RightEdge() {
-        return new LineSegment(viewTriangle.p1, viewTriangle.p3);
+    public LineSegment ActualFarEdge() {
+        return new LineSegment(actualViewTriangle.p2, actualViewTriangle.p3);
     }
 
-    public LineSegment LeftEdge() {
-        return new LineSegment(viewTriangle.p1, viewTriangle.p2);
+    public LineSegment ActualRightEdge() {
+        return new LineSegment(actualViewTriangle.p1, actualViewTriangle.p3);
     }
 
-    public Triangle LocalViewTriangle() {
+    public LineSegment ActualLeftEdge() {
+        return new LineSegment(actualViewTriangle.p1, actualViewTriangle.p2);
+    }
+
+    public LineSegment TargetFarEdge() {
+        return new LineSegment(targetViewTriangle.p2, targetViewTriangle.p3);
+    }
+
+    public LineSegment TargetRightEdge() {
+        return new LineSegment(targetViewTriangle.p1, targetViewTriangle.p3);
+    }
+
+    public LineSegment TargetLeftEdge() {
+        return new LineSegment(targetViewTriangle.p1, targetViewTriangle.p2);
+    }
+
+    void CacheViewTriangles() {
+        targetViewTriangle = CalculateTargetViewTriangle();
+        actualViewTriangle = CalculateActualViewTriangle();
+    }
+
+    public Triangle CalculateTargetLocalViewTriangle() {
         Vector3 v1 = Vector3.zero;
-        Vector3 v2 = Quaternion.Euler(0f,0f, angle/2) * Vector2.up;
-        Vector3 v3 = Quaternion.Euler(0f,0f, -angle/2) * Vector2.up;
+        Vector3 v2 = Quaternion.Euler(0f,0f, targetAngle/2) * Vector2.up;
+        Vector3 v3 = Quaternion.Euler(0f,0f, -targetAngle/2) * Vector2.up;
         v2 *= distance;
         v3 *= distance;
-
+        
         return new Triangle(v1, v2, v3);
     }
 
-    public Triangle CalculateViewTriangle() {
-        Triangle loc = LocalViewTriangle();
+    public Triangle CalculateTargetViewTriangle() {
+        Triangle loc = CalculateTargetLocalViewTriangle();
         return new Triangle(
                 transform.TransformPoint(loc.p1),
                 transform.TransformPoint(loc.p2),
                 transform.TransformPoint(loc.p3));
     }
 
-    void OnDrawGizmos() {
-        foreach (var side in CalculateViewTriangle().GetSides()) {
-            Gizmos.DrawLine(side.p1, side.p2);
-        }
-        OnDrawGizmosSelected();
+    public Triangle CalculateActualViewTriangle() {
+        var leftSeg = leftShadowEdge.GetActual();
+        var rightSeg = rightShadowEdge.GetActual();
+        return new Triangle(leftSeg.p1, leftSeg.p2, rightSeg.p2);
     }
 
-    void OnDrawGizmosSelected() {
-        Gizmos.color = Color.green;
-        foreach (var seg in trimmedShadows) {
-            Gizmos.DrawLine(seg.p1, seg.p2);
-        }
-        Gizmos.color = Color.white;
+    public Triangle CalculateActualLocalViewTriangle() {
+        Triangle loc = CalculateActualViewTriangle();
+        return new Triangle(
+                transform.InverseTransformPoint(loc.p1),
+                transform.InverseTransformPoint(loc.p2),
+                transform.InverseTransformPoint(loc.p3));
     }
+
+    void OnDrawGizmos() {
+        if (rightShadowEdge != null) {
+            Gizmos.color = Color.magenta;
+            foreach (var side in CalculateActualViewTriangle().GetSides()) {
+                Gizmos.DrawLine(side.p1, side.p2);
+            }
+        }
+        //foreach (var side in CalculateTargetViewTriangle().GetSides()) {
+        //    Gizmos.DrawLine(side.p1, side.p2);
+        //}
+        //OnDrawGizmosSelected();
+    }
+
+    //void OnDrawGizmosSelected() {
+    //    Gizmos.color = Color.green;
+    //    foreach (var seg in trimmedShadows) {
+    //        Gizmos.DrawLine(seg.p1, seg.p2);
+    //    }
+    //    Gizmos.color = Color.white;
+    //}
 
     public override void Awake() {
         base.Awake();
-        viewTriangle = CalculateViewTriangle();
 
-        Util.CreateChild<CustomShadowEdge>(transform).Init(() => {
-            return RightEdge();
-        });
-        Util.CreateChild<CustomShadowEdge>(transform).Init(() => {
-            return LeftEdge();
-        });
-        Util.CreateChild<CustomShadowEdge>(transform).Init(() => {
-            return FarEdge();
-        });
+        shadowParent = new GameObject(gameObject.name + " shadows");
 
-        Refs.instance.lightMaterial.SetInt("lightId", lightCounter);
-        Refs.instance.shadowMaterial.SetInt("lightId", lightCounter);
-        lightCounter++;
+        rightShadowEdge = CreateLightEdge();
+        leftShadowEdge = CreateLightEdge();
+        farShadowEdge = CreateLightEdge();
+
+        CacheViewTriangles();
 
         castLightMesh = Util.CreateMeshWithNewMaterial(gameObject, Refs.instance.lightMaterial);
 
         visibleCollider = gameObject.AddComponent<PolygonCollider2D>();
-        visibleCollider.SetPath(0, viewTriangle.AsList());
+    }
+
+    private ShadowEdge CreateLightEdge() {
+        ShadowEdge edge = Util.CreateChild<ShadowEdge>(shadowParent.transform);
+        edge.Init(null, this);
+        return edge;
     }
 
     //void DrawLampshade() {
@@ -124,7 +177,7 @@ public class FixedLight : LightBase {
 
         var vertices = new List<Vector3>();
         var triangles = new List<int>();
-        vertices.Add(transform.position);
+        vertices.Add(GetActualPosition());
 
         foreach (LineSegment shadow in trimmedShadows) {
             triangles.Add(vertices.Count);
@@ -148,8 +201,14 @@ public class FixedLight : LightBase {
     }
 
     void FixedUpdate() {
-        viewTriangle = CalculateViewTriangle();
-        visibleCollider.SetPath(0, LocalViewTriangle().AsList());
+        //Debug.Log("FixedLight FixedUpdate");
+        // This happens first because these are used to calculate the actual
+        // view triangle
+        rightShadowEdge.SetTarget(TargetRightEdge());
+        leftShadowEdge.SetTarget(TargetLeftEdge());
+        farShadowEdge.SetTarget(TargetFarEdge());
+
+        CacheViewTriangles();
 
         DoShadows();
         DrawCastedLight();
@@ -163,23 +222,27 @@ public class FixedLight : LightBase {
     }
 
     void Update() {
-        DoShadows();
-        DrawCastedLight();
+        //Debug.Log("FixedLight Update");
+    //    DoShadows();
+    //    DrawCastedLight();
     }
 
     void DoShadows() {
+        UpdateKnownShadows();
         var shadowCorrespondences = new List<System.Tuple<LineSegment, Shadow>>();
 
         foreach (Shadow s in shadows.Values) {
-            // This if statement will should only be false in some rare edge
-            // cases, due to float precision
-            if (s.caster.CrossSection(transform.position).Intersect(viewTriangle) is LineSegment seg) {
+            var i = s.caster.CrossSection(GetActualPosition()).Intersect(actualViewTriangle);
+            //if (i is LineSegment i2) {
+            //    i = i2.Intersect(targetViewTriangle);
+            //}
+            if (i is LineSegment seg) {
                 shadowCorrespondences.Add(System.Tuple.Create(seg, s));
             }
         }
-        shadowCorrespondences.Add(System.Tuple.Create(FarEdge(), (Shadow)null));
+        shadowCorrespondences.Add(System.Tuple.Create(ActualFarEdge(), (Shadow)null));
 
-        MinimalUnion<Shadow>.Calculate(ref shadowCorrespondences, transform.position, Angle);
+        MinimalUnion<Shadow>.Calculate(ref shadowCorrespondences, GetActualPosition(), Angle);
 
         shadowCorrespondences.Sort((s1, s2) => Angle(s1.Item1.Midpoint()).CompareTo(Angle(s2.Item1.Midpoint())));
 
@@ -208,13 +271,13 @@ public class FixedLight : LightBase {
                 frontFacing[shadow].Add(seg);
                 if (prevSeg is LineSegment prev) {
                     LineSegment right = new LineSegment(prev.p2, seg.p1);
-                    if (right.Length() > .0001 && !right.GoesAwayFrom(Position())) {
+                    if (right.Length() > .0001 && !right.GoesAwayFrom(GetActualPosition())) {
                         rightFacing[shadow] = right;
                     }
                 }
                 if (nextSeg is LineSegment next) {
                     LineSegment left = new LineSegment(seg.p2, next.p1);
-                    if (left.Length() > .0001 && left.GoesAwayFrom(Position())) {
+                    if (left.Length() > .0001 && left.GoesAwayFrom(GetActualPosition())) {
                         leftFacing[shadow] = left;
                     }
                 }
@@ -233,62 +296,57 @@ public class FixedLight : LightBase {
     }
 
     float Angle(Vector2 p) {
-        return RightEdge().Angle(p);
+        return TargetRightEdge().Angle(p);
     }
 
     public override bool IsInDark(Vector2 point) {
-        if (!this.visibleCollider.OverlapPoint(point)) {
+        if (!this.actualViewTriangle.Contains(point)) {
             return true;
         }
 
         foreach (LineSegment seg in trimmedShadows) {
-            if (new Triangle(transform.position, seg.p1, seg.p2).Contains(point)) {
+            if (new Triangle(GetActualPosition(), seg.p1, seg.p2).Contains(point)) {
                 return false;
             }
         }
         return true;
     }
 
-    // I thought this function would get the colliders sooner than waiting for
-    // the events, but I was wrong.
-    //void UpdateKnownShadows() {
-    //    var colliders = new List<Collider2D>();
-    //    visibleCollider.GetContacts(colliders);
-    //    
-    //    var opaqueSet = new HashSet<Opaque>();
-    //    foreach (var collider in colliders) {
-    //        foreach (var opaque in collider.GetComponents<Opaque>()) {
-    //            opaqueSet.Add(opaque);
-    //        }
-    //    }
-    //
-    //    foreach (var opaque in opaqueSet) {
-    //        if (!shadows.ContainsKey(opaque)) {
-    //            Shadow s = Util.CreateChild<Shadow>(transform);
-    //            s.Init(opaque, this);
-    //            shadows.Add(opaque, s);
-    //        }
-    //    }
-    //
-    //    foreach (var opaque in shadows.Keys) {
-    //        if (!opaqueSet.Contains(opaque)) {
-    //            Shadow s = shadows[opaque];
-    //            Destroy(s.gameObject);
-    //            shadows.Remove(opaque);
-    //        }
-    //    }
-    //}
+    void UpdateKnownShadows() {
+        // TODO: This should be larger than the actual view triangle. This may
+        // be why there are problems with update loops. Maybe its fine if we
+        // can get the intersections without a physics iteration.
+        visibleCollider.SetPath(0, CalculateActualLocalViewTriangle().AsList());
 
-    void OnCollisionEnter2D(Collision2D collision) {
-        foreach (Opaque opaque in collision.gameObject.GetComponents<Opaque>()) {
-            Shadow s = Util.CreateChild<Shadow>(transform);
-            s.Init(opaque, this);
-            shadows.Add(opaque, s);
+        // We use raycasts so that we get the current collisions without having
+        // to run a physics step
+        var raycastHits = new List<RaycastHit2D>();
+        GetComponent<Rigidbody2D>().Cast(Vector2.up, raycastHits, 0);
+        
+        
+        var opaqueSet = new HashSet<Opaque>();
+        foreach (var hit in raycastHits) {
+            foreach (var opaque in hit.collider.GetComponents<Opaque>()) {
+                opaqueSet.Add(opaque);
+            }
         }
-    }
     
-    void OnCollisionExit2D(Collision2D collision) {
-        foreach (Opaque opaque in collision.gameObject.GetComponents<Opaque>()) {
+        foreach (var opaque in opaqueSet) {
+            if (!shadows.ContainsKey(opaque)) {
+                Shadow s = Util.CreateChild<Shadow>(shadowParent.transform);
+                s.Init(opaque, this);
+                shadows.Add(opaque, s);
+            }
+        }
+    
+        HashSet<Opaque> toRemove = new HashSet<Opaque>();
+        foreach (var opaque in shadows.Keys) {
+            if (!opaqueSet.Contains(opaque)) {
+                toRemove.Add(opaque);
+            }
+        }
+
+        foreach (var opaque in toRemove) {
             Shadow s = shadows[opaque];
             Destroy(s.gameObject);
             shadows.Remove(opaque);
