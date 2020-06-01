@@ -213,4 +213,12 @@ public readonly struct LineSegment : IEnumerable<Vector2> {
     public static bool operator!=(LineSegment lhs, LineSegment rhs) {
         return !(lhs == rhs);
     }
+
+    // Changes the length of the line segment, with p1 staying fixed
+    public LineSegment WithLength(float newLength) {
+        if (p1 == p2) {
+            return new LineSegment(p1, p1);
+        }
+        return new LineSegment(p1, p1 + (p2 - p1).normalized * newLength);
+    }
 }

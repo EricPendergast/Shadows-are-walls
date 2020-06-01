@@ -37,5 +37,17 @@ Optimizations
 Bugs
     - Setting the scale of an opaque object to 0 and then back to a nonzero
       value causes an error in FixedLight.OnCollisionEnter()
-    - Lights are a bit buggy on the first frame
+    ✓- Lights are a bit buggy on the first frame
     ✓- Lights special shadow edges don't move with the light properly
+    ✓- Light edges aren't getting their targets set correctly; they are too
+      long. This sometimes causes them to think they should be disabled in the
+      wrong situations
+    - ShadowEdges & LightEdges don't update their colliders when they are
+      initialized. They do it only during FixedUpdate, which is called after
+      the frame they are initialized
+
+Possible things to do:
+    Idea: Make shadow edges have a bunch of small colliders, so that there
+        aren't torque bounciness problems
+
+        This would be nontrivial to implement; make sure pros and cons are weighed

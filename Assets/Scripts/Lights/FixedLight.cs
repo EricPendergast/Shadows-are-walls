@@ -16,9 +16,9 @@ public class FixedLight : LightBase {
 
     private Dictionary<Opaque, Shadow> shadows = new Dictionary<Opaque, Shadow>();
 
-    private ShadowEdge rightShadowEdge;
-    private ShadowEdge leftShadowEdge;
-    private ShadowEdge farShadowEdge;
+    private LightEdge rightShadowEdge;
+    private LightEdge leftShadowEdge;
+    private LightEdge farShadowEdge;
 
     // All visible shadows. This does not contain Shadow objects because
     // sometimes shadows get split into multiple line segments
@@ -108,8 +108,11 @@ public class FixedLight : LightBase {
     }
 
     public Triangle CalculateActualViewTriangle() {
-        var leftSeg = leftShadowEdge.GetActual();
-        var rightSeg = rightShadowEdge.GetActual();
+        var leftSeg = leftShadowEdge.GetDivider().WithLength(distance);
+        var rightSeg = rightShadowEdge.GetDivider().WithLength(distance);
+        if (leftSeg.p1 == leftSeg.p2 || rightSeg.p1 == rightSeg.p2) {
+            return CalculateTargetViewTriangle();
+        }
         return new Triangle(leftSeg.p1, leftSeg.p2, rightSeg.p2);
     }
 
@@ -158,9 +161,9 @@ public class FixedLight : LightBase {
         visibleCollider = gameObject.AddComponent<PolygonCollider2D>();
     }
 
-    private ShadowEdge CreateLightEdge() {
-        ShadowEdge edge = Util.CreateChild<ShadowEdge>(shadowParent.transform);
-        edge.Init(null, this);
+    private LightEdge CreateLightEdge() {
+        LightEdge edge = Util.CreateChild<LightEdge>(shadowParent.transform);
+        edge.Init(this);
         return edge;
     }
 
@@ -204,10 +207,6 @@ public class FixedLight : LightBase {
         //Debug.Log("FixedLight FixedUpdate");
         // This happens first because these are used to calculate the actual
         // view triangle
-        rightShadowEdge.SetTarget(TargetRightEdge());
-        leftShadowEdge.SetTarget(TargetLeftEdge());
-        farShadowEdge.SetTarget(TargetFarEdge());
-
         CacheViewTriangles();
 
         DoShadows();
@@ -252,6 +251,7 @@ public class FixedLight : LightBase {
         }
 
         SendDataToShadows(shadowCorrespondences);
+        SendDataToLightEdges(shadowCorrespondences);
     }
 
     void SendDataToShadows(List<System.Tuple<LineSegment, Shadow>> shadowData) {
@@ -264,6 +264,7 @@ public class FixedLight : LightBase {
             LineSegment? nextSeg = i == shadowData.Count-1 ? (LineSegment?)null : shadowData[i+1].Item1;
             LineSegment seg = shadowData[i].Item1;
             Shadow shadow = shadowData[i].Item2;
+
             if (shadow != null) {
                 if (!frontFacing.ContainsKey(shadow)) {
                     frontFacing.Add(shadow, new List<LineSegment>());
@@ -293,6 +294,18 @@ public class FixedLight : LightBase {
         foreach (var entry in leftFacing) {
             entry.Key.SetLeftEdge(entry.Value);
         }
+    }
+
+    void SendDataToLightEdges(List<System.Tuple<LineSegment, Shadow>> shadowData) {
+        rightShadowEdge.SetTarget(TargetRightEdge());
+        leftShadowEdge.SetTarget(TargetLeftEdge());
+        farShadowEdge.SetTarget(TargetFarEdge());
+
+        var rightExtent = shadowData[0].Item1.p1;
+        var leftExtent = shadowData[shadowData.Count-1].Item1.p2;
+        rightShadowEdge.SetTargetLength((rightExtent - GetTargetPosition()).magnitude);
+        leftShadowEdge.SetTargetLength((leftExtent - GetTargetPosition()).magnitude);
+
     }
 
     float Angle(Vector2 p) {

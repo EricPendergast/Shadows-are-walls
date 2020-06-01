@@ -681,9 +681,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 81837a9c9b63118b89cee7bef484716e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  positionLeft: {x: 0.78, y: 7.12}
-  positionRight: {x: -56.4, y: 5.55}
-  position: 0
+  positionLeft: {x: -56.4, y: 5.55}
+  positionRight: {x: 0.78, y: 7.12}
+  position: 1
   controled: {fileID: 1058777889}
 --- !u!4 &309266832
 Transform:
@@ -1755,12 +1755,12 @@ PrefabInstance:
     - target: {fileID: 7909692603331570561, guid: 525e182bd728c0103a02b525d651d69d,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0.74
+      value: 0.06
       objectReference: {fileID: 0}
     - target: {fileID: 7909692603331570561, guid: 525e182bd728c0103a02b525d651d69d,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 7.1
+      value: 6.61
       objectReference: {fileID: 0}
     - target: {fileID: 7909692603331570561, guid: 525e182bd728c0103a02b525d651d69d,
         type: 3}
