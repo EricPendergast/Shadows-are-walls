@@ -2,11 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class LightBase : MonoBehaviour {
+public abstract class LightBase : AllTracker<LightBase> {
     protected static int lightCounter = 0;
-    private static Dictionary<int, LightBase> allLights = new Dictionary<int, LightBase>();
 
     public abstract bool IsInDark(Vector2 point);
+
+    public abstract void DoFixedUpdate();
 
     public static bool IsInDarkAllLights(Vector2 point) {
         foreach (var light in LightBase.GetLights()) {
@@ -17,17 +18,13 @@ public abstract class LightBase : MonoBehaviour {
         return true;
     }
 
-    public virtual void Awake() {
-        allLights.Add(gameObject.GetInstanceID(), this);
+    protected override void Awake() {
+        base.Awake();
         gameObject.layer = LayerMask.NameToLayer("Light");
     }
     
-    public virtual void OnDestroy() {
-        allLights.Remove(gameObject.GetInstanceID());
-    }
-
-    public static Dictionary<int, LightBase>.ValueCollection GetLights() {
-        return allLights.Values;
+    public static IEnumerable<LightBase> GetLights() {
+        return GetAll();
     }
 
     public abstract Vector2 GetTargetPosition();

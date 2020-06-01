@@ -145,7 +145,7 @@ public class FixedLight : LightBase {
     //    Gizmos.color = Color.white;
     //}
 
-    public override void Awake() {
+    protected override void Awake() {
         base.Awake();
 
         shadowParent = new GameObject(gameObject.name + " shadows");
@@ -203,27 +203,15 @@ public class FixedLight : LightBase {
         }
     }
 
-    void FixedUpdate() {
-        //Debug.Log("FixedLight FixedUpdate");
-        // This happens first because these are used to calculate the actual
-        // view triangle
+    public override void DoFixedUpdate() {
         CacheViewTriangles();
 
         DoShadows();
-        DrawCastedLight();
-
-
-        //if (IsInDark(Mouse.WorldPosition())) {
-        //    Debug.Log("Mouse in dark");
-        //} else {
-        //    Debug.Log("Mouse in light");
-        //}
     }
 
     void Update() {
-        //Debug.Log("FixedLight Update");
-    //    DoShadows();
-    //    DrawCastedLight();
+        DoShadows();
+        DrawCastedLight();
     }
 
     void DoShadows() {
@@ -232,9 +220,6 @@ public class FixedLight : LightBase {
 
         foreach (Shadow s in shadows.Values) {
             var i = s.caster.CrossSection(GetActualPosition()).Intersect(actualViewTriangle);
-            //if (i is LineSegment i2) {
-            //    i = i2.Intersect(targetViewTriangle);
-            //}
             if (i is LineSegment seg) {
                 shadowCorrespondences.Add(System.Tuple.Create(seg, s));
             }

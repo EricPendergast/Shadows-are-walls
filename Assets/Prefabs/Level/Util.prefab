@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8123340718301943665}
   - component: {fileID: 8123340718301943664}
+  - component: {fileID: 8189148493077295209}
   m_Layer: 0
   m_Name: Refs
   m_TagString: Untagged
@@ -45,3 +46,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   lightMaterial: {fileID: 2100000, guid: 06fd57209b4d8f8509b31cff4d08ef57, type: 2}
   shadowMaterial: {fileID: 2100000, guid: c4d3ac3526967643b80b402a90b6f639, type: 2}
+--- !u!114 &8189148493077295209
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8123340718301943662}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 303cfca6c1045ed40b81832f45e83b38, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

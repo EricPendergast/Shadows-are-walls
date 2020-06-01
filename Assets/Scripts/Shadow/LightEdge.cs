@@ -27,7 +27,7 @@ public class LightEdge : DividesLight {
     }
 
     // TODO: I wonder if the order this executes is important, relative to ShadowEdge
-    protected virtual void FixedUpdate() {
+    public override void DoFixedUpdate() {
         if (DEBUG) {
             Debug.Log("Break point");
         }

@@ -1,8 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-public abstract class DividesLight : MonoBehaviour {
-    protected static HashSet<DividesLight> allEdges = new HashSet<DividesLight>();
+public abstract class DividesLight : AllTracker<DividesLight> {
     private static List<LineSegment> pieces = new List<LineSegment>();
 
     protected Rigidbody2D rb;
@@ -20,8 +19,10 @@ public abstract class DividesLight : MonoBehaviour {
         this.target = target;
     }
 
-    protected virtual void Awake() {
-        allEdges.Add(this);
+    public abstract void DoFixedUpdate();
+
+    protected override void Awake() {
+        base.Awake();
         gameObject.layer = PhysicsHelper.shadowEdgeLayer;
         rb = gameObject.AddComponent<Rigidbody2D>();
         rb.gravityScale = 0;
@@ -69,7 +70,7 @@ public abstract class DividesLight : MonoBehaviour {
     }
 
     IEnumerable<LineSegment> GetIntersectionCandidates() {
-        foreach (DividesLight edge in allEdges) {
+        foreach (DividesLight edge in GetAll()) {
             if (edge == this) {
                 continue;
             }
@@ -82,10 +83,6 @@ public abstract class DividesLight : MonoBehaviour {
         var targetUnrotated = Vector2.right*target.Length();
         var targetRotated = (Vector2)(Quaternion.Euler(0,0,target.Angle())*targetUnrotated);
         return new LineSegment(rb.position, rb.position + targetRotated);
-    }
-
-    protected virtual void OnDestroy() {
-        allEdges.Remove(this);
     }
 
     protected void OnDrawGizmos() {

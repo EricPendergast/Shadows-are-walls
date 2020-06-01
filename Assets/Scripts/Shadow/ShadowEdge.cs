@@ -6,23 +6,24 @@ public class ShadowEdge : DividesLight {
     private Opaque caster;
     [SerializeField]
     private LightBase lightSource;
-    bool first = true;
 
+    private bool initialized = false;
     public void Init(Opaque caster, LightBase lightSource) {
+        Assert.IsFalse(initialized);
+        initialized = true;
         this.caster = caster;
         this.lightSource = lightSource;
-        Debug.Log("Initialized!!");
+    }
+
+    void Start() {
+        Assert.IsTrue(initialized);
     }
 
     public override LineSegment GetDivider() {
         return target;
     }
 
-    protected virtual void FixedUpdate() {
-        if (first) {
-            Debug.Log("First fixedupdate!!");
-            first = false;
-        }
+    public override void DoFixedUpdate() {
         UpdateColliders();
         AddSimpleForces();
     }

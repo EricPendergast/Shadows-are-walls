@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Shadow : MonoBehaviour {
+public class Shadow : AllTracker<Shadow> {
     [SerializeField]
     private List<ShadowEdge> frontEdges = new List<ShadowEdge>();
     [SerializeField]
@@ -95,7 +95,7 @@ public class Shadow : MonoBehaviour {
         }
     }
 
-    void FixedUpdate() {
+    public void DoFixedUpdate() {
         if (!rightEdgeUpdated) {
             SetRightEdge(null);
         }
@@ -111,7 +111,8 @@ public class Shadow : MonoBehaviour {
         frontEdgesUpdated = false;
     }
 
-    void OnDestroy() {
+    protected override void OnDestroy() {
+        base.OnDestroy();
         DestroyShadowEdge(ref rightEdge);
         DestroyShadowEdge(ref leftEdge);
         foreach (var frontEdge in frontEdges) {

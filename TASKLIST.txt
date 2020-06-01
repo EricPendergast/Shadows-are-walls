@@ -33,6 +33,7 @@ Optimizations
           which intersect its own light
     - For each shadow edge, you only need to check if one of the sides is in
           light, since you know one side is always in light
+    - To check if a point is in the light, you can use binary search for each light
 
 Bugs
     - Setting the scale of an opaque object to 0 and then back to a nonzero
@@ -42,7 +43,7 @@ Bugs
     ✓- Light edges aren't getting their targets set correctly; they are too
       long. This sometimes causes them to think they should be disabled in the
       wrong situations
-    - ShadowEdges & LightEdges don't update their colliders when they are
+    ✓- ShadowEdges & LightEdges don't update their colliders when they are
       initialized. They do it only during FixedUpdate, which is called after
       the frame they are initialized
 
