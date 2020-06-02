@@ -5,10 +5,10 @@ public abstract class Lever : MonoBehaviour {
     //[SerializeField]
     //private float position;
     //
-    public abstract float GetPosition();
+    //public abstract float GetPosition();
     // TODO: Maybe this should be an int, so that the lever can control the
     // rate at which it is pulled
-    public abstract void MovePosition(float direction);
+    public abstract void MovePosition(int direction);
     //
     //// TODO: This is overly simple; there should be some kind of feedback from
     //// the thing which this lever controls. Maybe this method shouldn't even

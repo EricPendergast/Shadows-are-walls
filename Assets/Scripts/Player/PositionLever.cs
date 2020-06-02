@@ -10,6 +10,8 @@ public class PositionLever : Lever {
     [SerializeField]
     private float position = 0;
     [SerializeField]
+    private float speed = .1f;
+    [SerializeField]
     private FixedLight controled;
 
     public void Update() {
@@ -20,12 +22,11 @@ public class PositionLever : Lever {
     void OnDrawGizmosSelected() {
         Gizmos.DrawLine(positionLeft, positionRight);
     }
-    public override float GetPosition() {
-        return position;
-    }
 
-    public override void MovePosition(float direction) {
-        position = Mathf.Clamp01(position + direction);
+    public override void MovePosition(int direction) {
+        var deltaPosition = direction * speed / ((positionLeft - positionRight).magnitude);
+        position = Mathf.Clamp(position + deltaPosition, 0, 1);
+        Debug.Log(position);
         controled.SetTargetPosition(Vector2.Lerp(positionLeft, positionRight, position));
     }
 }

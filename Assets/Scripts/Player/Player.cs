@@ -44,10 +44,10 @@ public class Player : MonoBehaviour {
             rb.AddForce(frictionForce);
         }
 
-        float interaction = (Input.GetKey(KeyCode.Q) ? -1 : 0) + (Input.GetKey(KeyCode.E) ? 1 : 0);
+        int interaction = (Input.GetKey(KeyCode.Q) ? -1 : 0) + (Input.GetKey(KeyCode.E) ? 1 : 0);
         if (interaction != 0) {
             foreach (var lever in GetInteractable()) {
-                lever.MovePosition(interaction * .005f);
+                lever.MovePosition(interaction);
             }
         }
     }
