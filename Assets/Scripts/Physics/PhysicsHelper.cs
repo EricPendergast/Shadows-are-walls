@@ -8,6 +8,7 @@ class PhysicsHelper {
     public static int opaqueLayer = LayerMask.NameToLayer("Opaque");
     public static int freeObjectLayer = LayerMask.NameToLayer("FreeObject");
     public static int interactableLayer = LayerMask.NameToLayer("Interactable");
+    public static int glassLayer = LayerMask.NameToLayer("Glass");
 
     // Truncates 'force' so that when applied to 'body', it will not go over
     // maxSpeed in the next tick

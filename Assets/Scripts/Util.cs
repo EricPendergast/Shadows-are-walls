@@ -25,13 +25,13 @@ public class Util {
 
     public static GameObject CreateChild(Transform parent) {
         var go = new GameObject();
-        go.transform.parent = parent;
+        go.transform.SetParent(parent, false);
         return go;
     }
 
     public static T CreateChild<T>(Transform parent) where T : Component {
         var go = new GameObject();
-        go.transform.parent = parent;
+        go.transform.SetParent(parent, false);
         return go.AddComponent<T>();
     }
 

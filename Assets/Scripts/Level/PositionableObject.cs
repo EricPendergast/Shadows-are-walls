@@ -1,7 +1,7 @@
 using UnityEngine;
 
 [RequireComponent(typeof(TargetJoint2D))]
-public class PositionableBlock : MonoBehaviour, Positionable {
+public class PositionableObject : MonoBehaviour, Positionable {
     TargetJoint2D joint;
     
     void Awake() {
