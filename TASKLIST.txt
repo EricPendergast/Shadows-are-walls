@@ -52,3 +52,8 @@ Possible things to do:
         aren't torque bounciness problems
 
         This would be nontrivial to implement; make sure pros and cons are weighed
+
+    Mqybe we don't need to pass in the illuminated side of each shadow edge; we
+    can just check if the midpoint is illuminated by a light other than its
+    source light. There are some problematic edge cases with this approach
+    though. Specifically, if two lights are illuminating the same surface.

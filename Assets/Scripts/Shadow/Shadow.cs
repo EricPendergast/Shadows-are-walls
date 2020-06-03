@@ -23,9 +23,16 @@ public class Shadow : AllTracker<Shadow> {
     [SerializeField]
     public LightBase lightSource;
 
-    public void Init(Opaque caster, LightBase lightSource) {
+    // Says which side of each shadow edge is illuminated by 'lightSource'.
+    // Notice that this isn't an array of fields; this value indicates the
+    // illuminated side for all passed in line segments
+    [SerializeField]
+    DividesLight.Side illuminatedSide;
+
+    public void Init(LightBase lightSource, DividesLight.Side illuminatedSide, Opaque caster) {
         this.caster = caster;
         this.lightSource = lightSource;
+        this.illuminatedSide = illuminatedSide;
     }
 
     void OnDrawGizmosSelected() {
@@ -83,7 +90,7 @@ public class Shadow : AllTracker<Shadow> {
     private void SetTarget(ref ShadowEdge edge, LineSegment? target) {
         if (edge == null && target != null) {
             edge = Util.CreateChild<ShadowEdge>(transform);
-            edge.Init(caster, lightSource);
+            edge.Init(lightSource, illuminatedSide, caster);
         }
     
         if (edge != null && target == null) {
@@ -127,7 +134,7 @@ public class Shadow : AllTracker<Shadow> {
     private void DestroyShadowEdge(ShadowEdge shadowEdge) {
         if (shadowEdge != null) {
             var g = shadowEdge.gameObject;
-            Destroy(shadowEdge);
+            shadowEdge.Destroy();
             Destroy(g);
         }
     }

@@ -4,12 +4,33 @@ using System.Collections.Generic;
 public abstract class DividesLight : AllTracker<DividesLight> {
     private static List<LineSegment> pieces = new List<LineSegment>();
 
+    public enum Side {
+        right,
+        left
+    }
+
     protected Rigidbody2D rb;
     [SerializeField]
     protected LineSegment target = LineSegment.zero;
+    [SerializeField]
+    private LightBase lightSource;
+    // Says which side is illuminated by 'lightSource'
+    [SerializeField]
+    private Side illuminatedSide;
 
     // The line segment used to calculate intersections
     public abstract LineSegment GetDivider();
+
+    private bool SegmentDividesLightAndDark(LineSegment seg) {
+        var sideToCheck = illuminatedSide == Side.right ? seg.GetLeftSide() : seg.GetRightSide();
+
+        foreach (var light in LightBase.GetAll()) {
+            if (light != lightSource && !light.IsInDark(sideToCheck)) {
+                return false;
+            }
+        }
+        return true;
+    }
 
     public void SetTarget(LineSegment target) {
         if (this.target == LineSegment.zero) {
@@ -28,6 +49,18 @@ public abstract class DividesLight : AllTracker<DividesLight> {
         rb.gravityScale = 0;
         rb.mass = 10;
         rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
+    }
+
+    public void Init(LightBase lightSource, Side illuminatedSide) {
+        Debug.Assert(!initialized);
+        initialized = true;
+        this.lightSource = lightSource;
+        this.illuminatedSide = illuminatedSide;
+    }
+
+    private bool initialized = false;
+    void Start() {
+        Debug.Assert(initialized);
     }
 
     protected void AddSimpleForces() {
@@ -65,13 +98,11 @@ public abstract class DividesLight : AllTracker<DividesLight> {
         }
     }
 
-    bool SegmentDividesLightAndDark(LineSegment seg) {
-        return LightBase.IsInDarkAllLights(seg.GetRightSide()) != LightBase.IsInDarkAllLights(seg.GetLeftSide());
-    }
 
     IEnumerable<LineSegment> GetIntersectionCandidates() {
         foreach (DividesLight edge in GetAll()) {
-            if (edge == this) {
+            // TODO: This can be optimized, if its a bottleneck
+            if (edge.lightSource == this.lightSource) {
                 continue;
             }
             yield return edge.GetDivider();
@@ -79,7 +110,7 @@ public abstract class DividesLight : AllTracker<DividesLight> {
     }
 
     // Where the collider actually is
-    protected LineSegment GetActual() {
+    public LineSegment GetActual() {
         var targetUnrotated = Vector2.right*target.Length();
         var targetRotated = (Vector2)(Quaternion.Euler(0,0,target.Angle())*targetUnrotated);
         return new LineSegment(rb.position, rb.position + targetRotated);

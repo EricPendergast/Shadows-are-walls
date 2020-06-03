@@ -1,22 +1,11 @@
 using UnityEngine;
-using UnityEngine.Assertions;
 
 public class ShadowEdge : DividesLight {
     [SerializeField]
     private Opaque caster;
-    [SerializeField]
-    private LightBase lightSource;
-
-    private bool initialized = false;
-    public void Init(Opaque caster, LightBase lightSource) {
-        Assert.IsFalse(initialized);
-        initialized = true;
+    public void Init(LightBase lightSource, Side illuminatedSide, Opaque caster) {
+        base.Init(lightSource, illuminatedSide);
         this.caster = caster;
-        this.lightSource = lightSource;
-    }
-
-    void Start() {
-        Assert.IsTrue(initialized);
     }
 
     public override LineSegment GetDivider() {

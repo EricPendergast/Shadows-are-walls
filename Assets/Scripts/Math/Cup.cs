@@ -75,6 +75,8 @@ public readonly struct Cup : Convex {
 
     // This isn't actually a true subtraction, it is more like
     // this.Base() - other
+    public List<Cup> Subtract(in Cup other, in List<Cup> output) {
+        // TODO: WHY ISN'T OUTPUT CLEARED HERE
         Assert.AreEqual(convergencePoint, other.convergencePoint);
         using (var tmp = pool.TakeTemporary()) {
             foreach (var seg in Base().Subtract(other, tmp.val)) {

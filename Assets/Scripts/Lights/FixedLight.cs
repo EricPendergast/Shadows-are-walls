@@ -1,12 +1,15 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-// Idea: Light finds all opaque objects in
-// the scene, calculates all their shadows,
-// and then does rendering and collisions
-// stuff
+// General idea: Light finds all opaque objects in the scene, calculates all
+// their shadows, tells all its shadow edges where they should be based on
+// those calculations (setting their "targets"). It also handles rendering
+//
+// Notes about coordinates/terminology:
+//      "right" and "left" are refered to as if you are facing in the
+//      direction of the light
 [RequireComponent(typeof(Rigidbody2D))]
-public class FixedLight : LightBase {
+public class FixedLight : LightBase, Positionable {
     public float targetAngle;
     public float distance;
 
@@ -18,7 +21,7 @@ public class FixedLight : LightBase {
 
     private LightEdge rightShadowEdge;
     private LightEdge leftShadowEdge;
-    private LightEdge farShadowEdge;
+    //private LightEdge farShadowEdge;
 
     // All visible shadows. This does not contain Shadow objects because
     // sometimes shadows get split into multiple line segments
@@ -34,6 +37,10 @@ public class FixedLight : LightBase {
         targetAngle = v;
     }
 
+    public float GetTargetApertureAngle() {
+        return targetAngle;
+    }
+
     public float GetActualApertureAngle() {
         return ActualLeftEdge().UnsignedAngle(ActualRightEdge());
     }
@@ -41,7 +48,14 @@ public class FixedLight : LightBase {
     public float GetActualAngle() {
         var left = ActualLeftEdge();
         var right = ActualRightEdge();
+        if (left.p1 == left.p2 || right.p1 == right.p2) {
+            return GetTargetAngle();
+        }
         return new LineSegment((left.p1 + right.p1)/2, (left.p2 + right.p2)/2).Angle();
+    }
+
+    public float GetTargetAngle() {
+        return transform.localRotation.eulerAngles.z;
     }
 
     public void SetTargetAngle(float v) {
@@ -57,7 +71,12 @@ public class FixedLight : LightBase {
     }
 
     public Vector2 GetActualPosition() {
-        return (ActualLeftEdge().p1 + ActualRightEdge().p1)/2;
+        var left = ActualLeftEdge();
+        var right = ActualRightEdge();
+        if (left.p1 == left.p2 || right.p1 == right.p2) {
+            return GetTargetPosition();
+        }
+        return (left.p1 + right.p1)/2;
     }
 
     public LineSegment ActualFarEdge() {
@@ -90,13 +109,13 @@ public class FixedLight : LightBase {
     }
 
     public Triangle CalculateTargetLocalViewTriangle() {
-        Vector3 v1 = Vector3.zero;
-        Vector3 v2 = Quaternion.Euler(0f,0f, targetAngle/2) * Vector2.up;
-        Vector3 v3 = Quaternion.Euler(0f,0f, -targetAngle/2) * Vector2.up;
-        v2 *= distance;
-        v3 *= distance;
+        Vector3 origin = Vector3.zero;
+        Vector3 leftCorner = Quaternion.Euler(0f,0f, targetAngle/2) * Vector2.right;
+        Vector3 rightCorner = Quaternion.Euler(0f,0f, -targetAngle/2) * Vector2.right;
+        leftCorner *= distance;
+        rightCorner *= distance;
         
-        return new Triangle(v1, v2, v3);
+        return new Triangle(origin, leftCorner, rightCorner);
     }
 
     public Triangle CalculateTargetViewTriangle() {
@@ -108,12 +127,12 @@ public class FixedLight : LightBase {
     }
 
     public Triangle CalculateActualViewTriangle() {
-        var leftSeg = leftShadowEdge.GetDivider().WithLength(distance);
-        var rightSeg = rightShadowEdge.GetDivider().WithLength(distance);
+        var leftSeg = leftShadowEdge.GetActual().WithLength(distance);
+        var rightSeg = rightShadowEdge.GetActual().WithLength(distance);
         if (leftSeg.p1 == leftSeg.p2 || rightSeg.p1 == rightSeg.p2) {
             return CalculateTargetViewTriangle();
         }
-        return new Triangle(leftSeg.p1, leftSeg.p2, rightSeg.p2);
+        return new Triangle((leftSeg.p1+rightSeg.p1)/2, leftSeg.p2, rightSeg.p2);
     }
 
     public Triangle CalculateActualLocalViewTriangle() {
@@ -125,12 +144,16 @@ public class FixedLight : LightBase {
     }
 
     void OnDrawGizmos() {
-        if (rightShadowEdge != null) {
-            Gizmos.color = Color.magenta;
-            foreach (var side in CalculateActualViewTriangle().GetSides()) {
-                Gizmos.DrawLine(side.p1, side.p2);
-            }
+        foreach (var seg in CalculateTargetViewTriangle().GetSides()) {
+            Gizmos.DrawLine(seg.p1, seg.p2);
         }
+        //Gizmos.DrawLine((ActualLeftEdge().p1 + ActualRightEdge().p1)/2, (ActualLeftEdge().p2 + ActualRightEdge().p2)/2);
+        //if (rightShadowEdge != null) {
+        //    Gizmos.color = Color.magenta;
+        //    foreach (var side in CalculateActualViewTriangle().GetSides()) {
+        //        Gizmos.DrawLine(side.p1, side.p2);
+        //    }
+        //}
         //foreach (var side in CalculateTargetViewTriangle().GetSides()) {
         //    Gizmos.DrawLine(side.p1, side.p2);
         //}
@@ -138,8 +161,12 @@ public class FixedLight : LightBase {
     }
 
     //void OnDrawGizmosSelected() {
-    //    Gizmos.color = Color.green;
-    //    foreach (var seg in trimmedShadows) {
+    //    Gizmos.color = Color.red;
+    //    foreach (var seg in CalculateActualViewTriangle().GetSides()) {
+    //        Gizmos.DrawLine(seg.p1, seg.p2);
+    //    }
+    //    Gizmos.color = Color.blue;
+    //    foreach (var seg in CalculateTargetViewTriangle().GetSides()) {
     //        Gizmos.DrawLine(seg.p1, seg.p2);
     //    }
     //    Gizmos.color = Color.white;
@@ -150,21 +177,14 @@ public class FixedLight : LightBase {
 
         shadowParent = new GameObject(gameObject.name + " shadows");
 
-        rightShadowEdge = CreateLightEdge();
-        leftShadowEdge = CreateLightEdge();
-        farShadowEdge = CreateLightEdge();
+        SetUpLightEdges();
 
         CacheViewTriangles();
 
         castLightMesh = Util.CreateMeshWithNewMaterial(gameObject, Refs.instance.lightMaterial);
 
         visibleCollider = gameObject.AddComponent<PolygonCollider2D>();
-    }
-
-    private LightEdge CreateLightEdge() {
-        LightEdge edge = Util.CreateChild<LightEdge>(shadowParent.transform);
-        edge.Init(this);
-        return edge;
+        visibleCollider.isTrigger = true;
     }
 
     //void DrawLampshade() {
@@ -250,7 +270,7 @@ public class FixedLight : LightBase {
             LineSegment seg = shadowData[i].Item1;
             Shadow shadow = shadowData[i].Item2;
 
-            if (shadow != null) {
+            if (shadow != null && seg.Length() > .0001) {
                 if (!frontFacing.ContainsKey(shadow)) {
                     frontFacing.Add(shadow, new List<LineSegment>());
                 }
@@ -281,16 +301,28 @@ public class FixedLight : LightBase {
         }
     }
 
-    void SendDataToLightEdges(List<System.Tuple<LineSegment, Shadow>> shadowData) {
+    private void SetUpLightEdges() {
+        rightShadowEdge = Util.CreateChild<LightEdge>(shadowParent.transform);
+        rightShadowEdge.Init(this, DividesLight.Side.left);
+        leftShadowEdge = Util.CreateChild<LightEdge>(shadowParent.transform);
+        leftShadowEdge.Init(this, DividesLight.Side.right);
+        //farShadowEdge = Util.CreateChild<LightEdge>(shadowParent.transform);
+        //farShadowEdge.Init(this, DividesLight.Side.left);
+    }
+
+    private void SendDataToLightEdges(List<System.Tuple<LineSegment, Shadow>> shadowData) {
         rightShadowEdge.SetTarget(TargetRightEdge());
         leftShadowEdge.SetTarget(TargetLeftEdge());
-        farShadowEdge.SetTarget(TargetFarEdge());
+        //farShadowEdge.SetTarget(TargetFarEdge());
 
         var rightExtent = shadowData[0].Item1.p1;
         var leftExtent = shadowData[shadowData.Count-1].Item1.p2;
-        rightShadowEdge.SetTargetLength((rightExtent - GetTargetPosition()).magnitude);
-        leftShadowEdge.SetTargetLength((leftExtent - GetTargetPosition()).magnitude);
-
+        rightShadowEdge.SetTargetLength(Mathf.Min(
+                    (rightExtent - GetActualPosition()).magnitude,
+                    (rightExtent - GetTargetPosition()).magnitude));
+        leftShadowEdge.SetTargetLength(Mathf.Min(
+                    (leftExtent - GetActualPosition()).magnitude,
+                    (leftExtent - GetTargetPosition()).magnitude));
     }
 
     float Angle(Vector2 p) {
@@ -332,7 +364,7 @@ public class FixedLight : LightBase {
         foreach (var opaque in opaqueSet) {
             if (!shadows.ContainsKey(opaque)) {
                 Shadow s = Util.CreateChild<Shadow>(shadowParent.transform);
-                s.Init(opaque, this);
+                s.Init(this, DividesLight.Side.left, opaque);
                 shadows.Add(opaque, s);
             }
         }
@@ -346,6 +378,7 @@ public class FixedLight : LightBase {
 
         foreach (var opaque in toRemove) {
             Shadow s = shadows[opaque];
+            s.Destroy();
             Destroy(s.gameObject);
             shadows.Remove(opaque);
         }

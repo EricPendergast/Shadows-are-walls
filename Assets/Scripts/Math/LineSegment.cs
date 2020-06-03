@@ -157,6 +157,8 @@ public readonly struct LineSegment : IEnumerable<Vector2> {
         return (p1 - point).sqrMagnitude < (p2 - point).sqrMagnitude;
     }
 
+    // Gets the point just to the right of the midpoint of this line segment,
+    // as if you are standing at p1 and looking at p2
     public Vector2 GetRightSide() {
         Vector2 dir = (p2-p1).normalized*.001f;
         return Midpoint() + new Vector2(dir.y, -dir.x);
