@@ -9,8 +9,8 @@ public class LightEdge : DividesLight {
     }
 
     public override LineSegment GetDivider() {
-        return GetActual();
-        //return target;
+        //return GetActual();
+        return target;
     }
 
     public override void DoFixedUpdate() {

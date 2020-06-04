@@ -24,7 +24,7 @@ Lights
     - Collision boxes
     - Moving collision boxes
 
-    - Lights need to have their data (position & rotation)  depend on their special shadow edges
+    ✓- Lights need to have their data (position & rotation)  depend on their special shadow edges
 
 
 Optimizations
@@ -46,14 +46,20 @@ Bugs
     ✓- ShadowEdges & LightEdges don't update their colliders when they are
       initialized. They do it only during FixedUpdate, which is called after
       the frame they are initialized
-
+    - When rotating a light edge, it doesn't quite look right, and gets worse
+      the longer the edge is
+    - When rotating (and moving?) a light edge, a collider pokes out of the
+      ground where it shouldn't.
+        - I think its because its target pokes into the ground
+        - fixedlight needs to send the correct target
+ 
 Possible things to do:
     Idea: Make shadow edges have a bunch of small colliders, so that there
         aren't torque bounciness problems
 
         This would be nontrivial to implement; make sure pros and cons are weighed
 
-    Mqybe we don't need to pass in the illuminated side of each shadow edge; we
+    Maybe we don't need to pass in the illuminated side of each shadow edge; we
     can just check if the midpoint is illuminated by a light other than its
     source light. There are some problematic edge cases with this approach
     though. Specifically, if two lights are illuminating the same surface.
@@ -61,3 +67,9 @@ Possible things to do:
 
     Make an editor script to have readonly fields, to unconfuse the level
     building process
+
+Visuals:
+    - make the different block types be different colors
+        - They would each have a shader
+        - also decide whether that shader gets applied by their script, or if
+          they are in a prefab

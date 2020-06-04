@@ -1,18 +1,15 @@
 ﻿using UnityEngine;
 
 //[RequireComponent(typeof(Rigidbody2D))]
-public interface Opaque {
-    //public Vector2 p1;
-    //public Vector2 p2;
+public class Opaque : MonoBehaviour {
+    public System.Func<Vector2, LineSegment> crossSectionCallback;
 
-    //void Awake() {
-    //    gameObject.layer = LayerMask.NameToLayer("Opaque");
-    //}
-    //
-    //void OnDrawGizmos() {
-    //    Gizmos.DrawLine(CrossSection(Vector2.zero).p1, CrossSection(Vector2.zero).p2);
-    //}
-
-    LineSegment CrossSection(Vector2 cameraPos);
-        //return new LineSegment(transform.TransformPoint(p1), transform.TransformPoint(p2));
+    // TODO: Make this have nullable return value?
+    public LineSegment CrossSection(Vector2 cameraPos) {
+        if (crossSectionCallback == null) {
+            return LineSegment.zero;
+        } else {
+            return crossSectionCallback(cameraPos);
+        }
+    }
 }

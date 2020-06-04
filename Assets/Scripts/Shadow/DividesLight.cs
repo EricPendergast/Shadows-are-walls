@@ -21,7 +21,7 @@ public abstract class DividesLight : AllTracker<DividesLight> {
     // The line segment used to calculate intersections
     public abstract LineSegment GetDivider();
 
-    private bool SegmentDividesLightAndDark(LineSegment seg) {
+    protected virtual bool SegmentDividesLightAndDark(LineSegment seg) {
         var sideToCheck = illuminatedSide == Side.right ? seg.GetLeftSide() : seg.GetRightSide();
 
         foreach (var light in LightBase.GetAll()) {
@@ -47,7 +47,7 @@ public abstract class DividesLight : AllTracker<DividesLight> {
         gameObject.layer = PhysicsHelper.shadowEdgeLayer;
         rb = gameObject.AddComponent<Rigidbody2D>();
         rb.gravityScale = 0;
-        rb.mass = 10;
+        rb.mass = 100;
         rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
     }
 
@@ -111,6 +111,7 @@ public abstract class DividesLight : AllTracker<DividesLight> {
 
     // Where the collider actually is
     public LineSegment GetActual() {
+        // TODO: Is it a problem that the actual always has the same length as the target?
         var targetUnrotated = Vector2.right*target.Length();
         var targetRotated = (Vector2)(Quaternion.Euler(0,0,target.Angle())*targetUnrotated);
         return new LineSegment(rb.position, rb.position + targetRotated);

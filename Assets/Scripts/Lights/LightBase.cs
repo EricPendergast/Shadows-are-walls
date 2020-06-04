@@ -6,6 +6,7 @@ public abstract class LightBase : AllTracker<LightBase> {
     protected static int lightCounter = 0;
 
     public abstract bool IsInDark(Vector2 point);
+    public abstract bool IsIlluminated(Vector2 point);
 
     public abstract void DoFixedUpdate();
 

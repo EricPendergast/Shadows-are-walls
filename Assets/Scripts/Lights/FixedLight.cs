@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
+using RigidbodyExtensions;
+
 // General idea: Light finds all opaque objects in the scene, calculates all
 // their shadows, tells all its shadow edges where they should be based on
 // those calculations (setting their "targets"). It also handles rendering
@@ -10,6 +12,13 @@ using UnityEngine;
 //      direction of the light
 [RequireComponent(typeof(Rigidbody2D))]
 public class FixedLight : LightBase, Positionable {
+
+    private class DebugSnapshot {
+        public Triangle actualViewTriangle;
+        public Triangle targetViewTriangle;
+    }
+    private DebugSnapshot lastSnapshot;
+
     public float targetAngle;
     public float distance;
 
@@ -18,6 +27,7 @@ public class FixedLight : LightBase, Positionable {
     private PolygonCollider2D visibleCollider;
 
     private Dictionary<Opaque, Shadow> shadows = new Dictionary<Opaque, Shadow>();
+    //public List<Opaque> DEBUG = new List<Opaque>();
 
     private LightEdge rightShadowEdge;
     private LightEdge leftShadowEdge;
@@ -32,6 +42,8 @@ public class FixedLight : LightBase, Positionable {
 
     [SerializeField]
     private GameObject shadowParent;
+
+    private Rigidbody2D body;
 
     public void SetTargetApertureAngle(float v) {
         targetAngle = v;
@@ -55,18 +67,22 @@ public class FixedLight : LightBase, Positionable {
     }
 
     public float GetTargetAngle() {
+        //return body.rotation;
         return transform.localRotation.eulerAngles.z;
     }
 
     public void SetTargetAngle(float v) {
+        //body.rotation = v;
         transform.localRotation = Quaternion.Euler(0, 0, v);
     }
 
     public void SetTargetPosition(Vector2 p) {
+        //body.position = p;
         transform.position = p;
     }
 
     public override Vector2 GetTargetPosition() {
+        //return body.position;
         return transform.position;
     }
 
@@ -119,6 +135,7 @@ public class FixedLight : LightBase, Positionable {
     }
 
     public Triangle CalculateTargetViewTriangle() {
+        // TODO SERIOUS: This shouldn't use transform, this will cause things to happen out of sync
         Triangle loc = CalculateTargetLocalViewTriangle();
         return new Triangle(
                 transform.TransformPoint(loc.p1),
@@ -136,6 +153,7 @@ public class FixedLight : LightBase, Positionable {
     }
 
     public Triangle CalculateActualLocalViewTriangle() {
+        // TODO SERIOUS: This shouldn't use transform, this will cause things to happen out of sync
         Triangle loc = CalculateActualViewTriangle();
         return new Triangle(
                 transform.InverseTransformPoint(loc.p1),
@@ -144,9 +162,7 @@ public class FixedLight : LightBase, Positionable {
     }
 
     void OnDrawGizmos() {
-        foreach (var seg in CalculateTargetViewTriangle().GetSides()) {
-            Gizmos.DrawLine(seg.p1, seg.p2);
-        }
+        DrawSnapshot(lastSnapshot);
         //Gizmos.DrawLine((ActualLeftEdge().p1 + ActualRightEdge().p1)/2, (ActualLeftEdge().p2 + ActualRightEdge().p2)/2);
         //if (rightShadowEdge != null) {
         //    Gizmos.color = Color.magenta;
@@ -158,6 +174,20 @@ public class FixedLight : LightBase, Positionable {
         //    Gizmos.DrawLine(side.p1, side.p2);
         //}
         //OnDrawGizmosSelected();
+    }
+
+    void DrawSnapshot(DebugSnapshot snap) {
+        if (snap == null) {
+            return;
+        }
+        Gizmos.color = Color.red;
+        foreach (var seg in snap.targetViewTriangle.GetSides()) {
+            Gizmos.DrawLine(seg.p1, seg.p2);
+        }
+        Gizmos.color = Color.white;
+        foreach (var seg in snap.actualViewTriangle.GetSides()) {
+            Gizmos.DrawLine(seg.p1, seg.p2);
+        }
     }
 
     //void OnDrawGizmosSelected() {
@@ -174,6 +204,7 @@ public class FixedLight : LightBase, Positionable {
 
     protected override void Awake() {
         base.Awake();
+        body = GetComponent<Rigidbody2D>();
 
         shadowParent = new GameObject(gameObject.name + " shadows");
 
@@ -200,7 +231,7 @@ public class FixedLight : LightBase, Positionable {
 
         var vertices = new List<Vector3>();
         var triangles = new List<int>();
-        vertices.Add(GetActualPosition());
+        vertices.Add(GetTargetPosition());
 
         foreach (LineSegment shadow in trimmedShadows) {
             triangles.Add(vertices.Count);
@@ -224,13 +255,20 @@ public class FixedLight : LightBase, Positionable {
     }
 
     public override void DoFixedUpdate() {
+        //transform.rotation = Quaternion.Euler(0,0,body.rotation);
+        //transform.position = body.position;
+
         CacheViewTriangles();
+        TakeSnapshot();
 
         DoShadows();
+
+        //DEBUG.Clear();
+        //DEBUG.AddRange(shadows.Keys);
     }
 
     void Update() {
-        DoShadows();
+        //DoShadows();
         DrawCastedLight();
     }
 
@@ -239,14 +277,14 @@ public class FixedLight : LightBase, Positionable {
         var shadowCorrespondences = new List<System.Tuple<LineSegment, Shadow>>();
 
         foreach (Shadow s in shadows.Values) {
-            var i = s.caster.CrossSection(GetActualPosition()).Intersect(actualViewTriangle);
+            var i = s.caster.CrossSection(GetTargetPosition()).Intersect(targetViewTriangle);
             if (i is LineSegment seg) {
                 shadowCorrespondences.Add(System.Tuple.Create(seg, s));
             }
         }
-        shadowCorrespondences.Add(System.Tuple.Create(ActualFarEdge(), (Shadow)null));
+        shadowCorrespondences.Add(System.Tuple.Create(TargetFarEdge(), (Shadow)null));
 
-        MinimalUnion<Shadow>.Calculate(ref shadowCorrespondences, GetActualPosition(), Angle);
+        MinimalUnion<Shadow>.Calculate(ref shadowCorrespondences, GetTargetPosition(), Angle);
 
         shadowCorrespondences.Sort((s1, s2) => Angle(s1.Item1.Midpoint()).CompareTo(Angle(s2.Item1.Midpoint())));
 
@@ -277,13 +315,13 @@ public class FixedLight : LightBase, Positionable {
                 frontFacing[shadow].Add(seg);
                 if (prevSeg is LineSegment prev) {
                     LineSegment right = new LineSegment(prev.p2, seg.p1);
-                    if (right.Length() > .0001 && !right.GoesAwayFrom(GetActualPosition())) {
+                    if (right.Length() > .0001 && !right.GoesAwayFrom(GetTargetPosition())) {
                         rightFacing[shadow] = right;
                     }
                 }
                 if (nextSeg is LineSegment next) {
                     LineSegment left = new LineSegment(seg.p2, next.p1);
-                    if (left.Length() > .0001 && left.GoesAwayFrom(GetActualPosition())) {
+                    if (left.Length() > .0001 && left.GoesAwayFrom(GetTargetPosition())) {
                         leftFacing[shadow] = left;
                     }
                 }
@@ -311,31 +349,37 @@ public class FixedLight : LightBase, Positionable {
     }
 
     private void SendDataToLightEdges(List<System.Tuple<LineSegment, Shadow>> shadowData) {
-        rightShadowEdge.SetTarget(TargetRightEdge());
-        leftShadowEdge.SetTarget(TargetLeftEdge());
+        //rightShadowEdge.SetTarget(TargetRightEdge());
+        //leftShadowEdge.SetTarget(TargetLeftEdge());
         //farShadowEdge.SetTarget(TargetFarEdge());
 
         var rightExtent = shadowData[0].Item1.p1;
         var leftExtent = shadowData[shadowData.Count-1].Item1.p2;
-        rightShadowEdge.SetTargetLength(Mathf.Min(
-                    (rightExtent - GetActualPosition()).magnitude,
-                    (rightExtent - GetTargetPosition()).magnitude));
-        leftShadowEdge.SetTargetLength(Mathf.Min(
-                    (leftExtent - GetActualPosition()).magnitude,
-                    (leftExtent - GetTargetPosition()).magnitude));
+        rightShadowEdge.SetTarget(new LineSegment(GetTargetPosition(), rightExtent));
+        leftShadowEdge.SetTarget(new LineSegment(GetTargetPosition(), leftExtent));
+        //rightShadowEdge.SetTargetLength(Mathf.Min(
+        //            (rightExtent - GetActualPosition()).magnitude,
+        //            (rightExtent - GetTargetPosition()).magnitude));
+        //leftShadowEdge.SetTargetLength(Mathf.Min(
+        //            (leftExtent - GetActualPosition()).magnitude,
+        //            (leftExtent - GetTargetPosition()).magnitude));
     }
 
     float Angle(Vector2 p) {
         return TargetRightEdge().Angle(p);
     }
 
+    public override bool IsIlluminated(Vector2 point) {
+        return !IsInDark(point);
+    }
+
     public override bool IsInDark(Vector2 point) {
-        if (!this.actualViewTriangle.Contains(point)) {
+        if (!this.targetViewTriangle.Contains(point)) {
             return true;
         }
 
         foreach (LineSegment seg in trimmedShadows) {
-            if (new Triangle(GetActualPosition(), seg.p1, seg.p2).Contains(point)) {
+            if (new Triangle(GetTargetPosition(), seg.p1, seg.p2).Contains(point)) {
                 return false;
             }
         }
@@ -347,16 +391,16 @@ public class FixedLight : LightBase, Positionable {
         // be why there are problems with update loops. Maybe its fine if we
         // can get the intersections without a physics iteration.
         visibleCollider.SetPath(0, CalculateActualLocalViewTriangle().AsList());
+        var overlap = new List<Collider2D>();
+        visibleCollider.OverlapCollider(new ContactFilter2D{useTriggers=true, layerMask = PhysicsHelper.opaqueLayer}, overlap);
 
-        // We use raycasts so that we get the current collisions without having
-        // to run a physics step
-        var raycastHits = new List<RaycastHit2D>();
-        GetComponent<Rigidbody2D>().Cast(Vector2.up, raycastHits, 0);
+        visibleCollider.SetPath(0, CalculateTargetLocalViewTriangle().AsList());
+        visibleCollider.OverlapCollider(new ContactFilter2D{useTriggers=true, layerMask = PhysicsHelper.opaqueLayer}, overlap);
         
         
         var opaqueSet = new HashSet<Opaque>();
-        foreach (var hit in raycastHits) {
-            foreach (var opaque in hit.collider.GetComponents<Opaque>()) {
+        foreach (var hit in overlap) {
+            foreach (var opaque in hit.GetComponents<Opaque>()) {
                 opaqueSet.Add(opaque);
             }
         }
@@ -382,5 +426,14 @@ public class FixedLight : LightBase, Positionable {
             Destroy(s.gameObject);
             shadows.Remove(opaque);
         }
+    }
+
+    void TakeSnapshot() {
+        if (lastSnapshot == null) {
+            lastSnapshot = new DebugSnapshot();
+        }
+
+        lastSnapshot.actualViewTriangle = actualViewTriangle;
+        lastSnapshot.targetViewTriangle = targetViewTriangle;
     }
 }

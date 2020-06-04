@@ -1,14 +1,15 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class OpaqueSolidObject : LevelObject, Opaque {
+public class OpaqueSolidObject : LevelObject {
     protected override void Awake() {
         base.Awake();
 
+        gameObject.AddComponent<Opaque>().crossSectionCallback = this.CrossSection;
         gameObject.layer = PhysicsHelper.opaqueLayer;
     }
 
-    public LineSegment CrossSection(Vector2 cameraPos) {
+    private LineSegment CrossSection(Vector2 cameraPos) {
         if (collider is BoxCollider2D boxColl) {
             List<Vector2> corners = new List<Vector2>{
                 new Vector2(-.5f, -.5f),
