@@ -24,6 +24,7 @@ public class Player : MonoBehaviour {
 
     void Start() {
         rb = GetComponent<Rigidbody2D>();
+        Refs.instance.cameraTracker.trackedObject = gameObject;
     }
 
     void FixedUpdate() {

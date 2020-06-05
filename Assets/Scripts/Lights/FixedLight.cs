@@ -378,9 +378,6 @@ public class FixedLight : LightBase, Positionable {
     }
 
     void UpdateKnownShadows() {
-        // TODO: This should be larger than the actual view triangle. This may
-        // be why there are problems with update loops. Maybe its fine if we
-        // can get the intersections without a physics iteration.
         visibleCollider.SetPath(0, CalculateActualLocalViewTriangle().AsList());
         var overlap = new List<Collider2D>();
         visibleCollider.OverlapCollider(new ContactFilter2D{useTriggers=true, layerMask = PhysicsHelper.opaqueLayer}, overlap);

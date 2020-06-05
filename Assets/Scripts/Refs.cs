@@ -5,6 +5,7 @@ public class Refs : MonoBehaviour {
 
     public Material lightMaterial;
     public Material shadowMaterial;
+    public CameraTracker2D cameraTracker;
 
     void Awake() {
         instance = this;

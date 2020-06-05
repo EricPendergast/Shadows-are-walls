@@ -10,6 +10,13 @@ public class SimpleLever : Lever {
     private GameObject controledGameObject;
     private SimpleLeverControlable controled;
 
+    protected override void Awake() {
+        base.Awake();
+        gameObject.layer = PhysicsHelper.interactableLayer;
+        collider.isTrigger = true;
+        body.constraints = RigidbodyConstraints2D.FreezeAll;
+    }
+
     void Start() {
         controled = controledGameObject.GetComponent<SimpleLeverControlable>();
         if (controled == null) {

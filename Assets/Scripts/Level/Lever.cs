@@ -1,7 +1,5 @@
-using UnityEngine;
 
-
-public abstract class Lever : MonoBehaviour {
+public abstract class Lever : LevelObject {
     //[SerializeField]
     //private float position;
     //
