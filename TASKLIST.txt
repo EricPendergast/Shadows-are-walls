@@ -46,7 +46,7 @@ Bugs
     ✓- ShadowEdges & LightEdges don't update their colliders when they are
       initialized. They do it only during FixedUpdate, which is called after
       the frame they are initialized
-    - When rotating a light edge, it doesn't quite look right, and gets worse
+    ✓- When rotating a light edge, it doesn't quite look right, and gets worse
       the longer the edge is
     - When rotating (and moving?) a light edge, a collider pokes out of the
       ground where it shouldn't.
