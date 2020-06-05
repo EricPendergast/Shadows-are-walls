@@ -1,8 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-using RigidbodyExtensions;
-
 // General idea: Light finds all opaque objects in the scene, calculates all
 // their shadows, tells all its shadow edges where they should be based on
 // those calculations (setting their "targets"). It also handles rendering
@@ -24,7 +22,6 @@ public class FixedLight : LightBase, Positionable {
 
     private Mesh castLightMesh;
 
-    private PolygonCollider2D visibleCollider;
 
     private Dictionary<Opaque, Shadow> shadows = new Dictionary<Opaque, Shadow>();
     //public List<Opaque> DEBUG = new List<Opaque>();
@@ -43,7 +40,12 @@ public class FixedLight : LightBase, Positionable {
     [SerializeField]
     private GameObject shadowParent;
 
-    private Rigidbody2D body;
+    private PolygonCollider2D visibleCollider;
+
+    private Rigidbody2D _body;
+    private Rigidbody2D body {
+        get => _body == null ? (_body = GetComponent<Rigidbody2D>()) : _body;
+    }
 
     public void SetTargetApertureAngle(float v) {
         targetAngle = v;
@@ -67,23 +69,19 @@ public class FixedLight : LightBase, Positionable {
     }
 
     public float GetTargetAngle() {
-        //return body.rotation;
-        return transform.localRotation.eulerAngles.z;
+        return body.rotation;
     }
 
     public void SetTargetAngle(float v) {
-        //body.rotation = v;
-        transform.localRotation = Quaternion.Euler(0, 0, v);
+        body.rotation = v;
     }
 
     public void SetTargetPosition(Vector2 p) {
-        //body.position = p;
-        transform.position = p;
+        body.position = p;
     }
 
     public override Vector2 GetTargetPosition() {
-        //return body.position;
-        return transform.position;
+        return body.position;
     }
 
     public Vector2 GetActualPosition() {
@@ -162,18 +160,10 @@ public class FixedLight : LightBase, Positionable {
     }
 
     void OnDrawGizmos() {
-        DrawSnapshot(lastSnapshot);
-        //Gizmos.DrawLine((ActualLeftEdge().p1 + ActualRightEdge().p1)/2, (ActualLeftEdge().p2 + ActualRightEdge().p2)/2);
-        //if (rightShadowEdge != null) {
-        //    Gizmos.color = Color.magenta;
-        //    foreach (var side in CalculateActualViewTriangle().GetSides()) {
-        //        Gizmos.DrawLine(side.p1, side.p2);
-        //    }
-        //}
-        //foreach (var side in CalculateTargetViewTriangle().GetSides()) {
-        //    Gizmos.DrawLine(side.p1, side.p2);
-        //}
-        //OnDrawGizmosSelected();
+        foreach (var side in CalculateTargetViewTriangle().GetSides()) {
+            Gizmos.DrawLine(side.p1, side.p2);
+        }
+        //DrawSnapshot(lastSnapshot);
     }
 
     void DrawSnapshot(DebugSnapshot snap) {
@@ -204,7 +194,6 @@ public class FixedLight : LightBase, Positionable {
 
     protected override void Awake() {
         base.Awake();
-        body = GetComponent<Rigidbody2D>();
 
         shadowParent = new GameObject(gameObject.name + " shadows");
 
@@ -255,25 +244,33 @@ public class FixedLight : LightBase, Positionable {
     }
 
     public override void DoFixedUpdate() {
-        //transform.rotation = Quaternion.Euler(0,0,body.rotation);
-        //transform.position = body.position;
+        transform.rotation = Quaternion.Euler(0,0,body.rotation);
+        transform.position = body.position;
 
         CacheViewTriangles();
         TakeSnapshot();
 
-        DoShadows();
+        UpdateKnownShadows();
+
+        var shadowData = GetShadowData();
+
+        trimmedShadows.Clear();
+        foreach (var tuple in shadowData) {
+            trimmedShadows.Add(tuple.Item1);
+        }
+
+        SendDataToShadows(shadowData);
+        SendDataToLightEdges(shadowData);
 
         //DEBUG.Clear();
         //DEBUG.AddRange(shadows.Keys);
     }
 
     void Update() {
-        //DoShadows();
         DrawCastedLight();
     }
 
-    void DoShadows() {
-        UpdateKnownShadows();
+    List<System.Tuple<LineSegment, Shadow>> GetShadowData() {
         var shadowCorrespondences = new List<System.Tuple<LineSegment, Shadow>>();
 
         foreach (Shadow s in shadows.Values) {
@@ -288,13 +285,7 @@ public class FixedLight : LightBase, Positionable {
 
         shadowCorrespondences.Sort((s1, s2) => Angle(s1.Item1.Midpoint()).CompareTo(Angle(s2.Item1.Midpoint())));
 
-        trimmedShadows.Clear();
-        foreach (var tuple in shadowCorrespondences) {
-            trimmedShadows.Add(tuple.Item1);
-        }
-
-        SendDataToShadows(shadowCorrespondences);
-        SendDataToLightEdges(shadowCorrespondences);
+        return shadowCorrespondences;
     }
 
     void SendDataToShadows(List<System.Tuple<LineSegment, Shadow>> shadowData) {
