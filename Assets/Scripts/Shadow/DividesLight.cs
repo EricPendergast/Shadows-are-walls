@@ -67,7 +67,8 @@ public abstract class DividesLight : AllTracker<DividesLight> {
         if (target == LineSegment.zero) {
             return;
         }
-        Vector2 force = PhysicsHelper.GetMoveToForce(rb, target.p1);
+        Vector2 targetCenterOfMass = target.p1 + (target.p2 - target.p1).normalized*rb.centerOfMass.magnitude;
+        Vector2 force = PhysicsHelper.GetMoveToForce(rb, rb.worldCenterOfMass, targetCenterOfMass);
         float torque = PhysicsHelper.GetRotateToTorque(rb, target.Angle());
 
         //rb.AddForce(Vector2.ClampMagnitude(force, 10*rb.mass));

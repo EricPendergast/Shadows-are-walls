@@ -1,5 +1,6 @@
 using UnityEngine;
 
+[RequireComponent(typeof(Rigidbody2D))]
 public class LightAngler : MonoBehaviour, SimpleLeverControlable {
 
     [SerializeField]
@@ -10,17 +11,26 @@ public class LightAngler : MonoBehaviour, SimpleLeverControlable {
     private float angleRight = 90;
     [SerializeField]
     private float currentAngle = 0;
-    private float? initialAngle;
+    private float? _initialAngle;
+    private float initialAngle {
+        get => _initialAngle == null ? controled.GetActualAngle() : (float)_initialAngle;
+    }
     [SerializeField]
     private float speed = .1f;
     [SerializeField]
     private FixedLight controled;
 
+    private RelativeJoint2D myJoint;
+
     public void Start() {
-        //var actualAngle = (controled.GetActualAngle()%360+360)%360;
+        _initialAngle = controled.GetActualAngle();
         currentAngle = 0;
-        initialAngle = controled.GetActualAngle();
-        //currentAngle = (actualAngle - angleLeft)/(angleRight-angleLeft);
+        myJoint = gameObject.AddComponent<RelativeJoint2D>();
+        myJoint.connectedBody = controled.GetComponent<Rigidbody2D>();
+        myJoint.maxForce = 10000;
+        myJoint.maxTorque = 10000;
+        myJoint.autoConfigureOffset = false;
+        myJoint.angularOffset = 0;
     }
 
     public void Update() {
@@ -28,28 +38,16 @@ public class LightAngler : MonoBehaviour, SimpleLeverControlable {
     }
 
     public void MovePosition(int direction) {
-        //var deltaPosition;
-        //if (direction < 0) {
-        //    deltaPosition = direction * speed / angleLeft;
-        //} else if (direction > 0) {
-        //    deltaPosition = direction * speed / angleRight;
-        //} else {
-        //    deltaPosition = 0;
-        //}
-        //currentAngle = Mathf.Clamp(currentAngle + deltaPosition, -1, 1);
         currentAngle = Mathf.Clamp(currentAngle + direction*speed, -angleLeft, angleRight);
         // TODO: Don't do this, do something with joints
-        controled.SetTargetAngle((float)initialAngle + currentAngle);
+        //controled.SetTargetAngle(initialAngle + currentAngle);
+        myJoint.angularOffset = currentAngle;
     }
 
 
     void OnDrawGizmos() {
-        float? init = initialAngle;
-        if (init == null) {
-            init = controled.GetActualAngle();
-        }
         Gizmos.color = Color.red;
-        Gizmos.DrawRay(controled.GetActualPosition(), Quaternion.Euler(0,0,(float)init - angleLeft - controled.GetTargetApertureAngle()/2)*Vector2.right);
-        Gizmos.DrawRay(controled.GetActualPosition(), Quaternion.Euler(0,0,(float)init + angleRight + controled.GetTargetApertureAngle()/2)*Vector2.right);
+        Gizmos.DrawRay(controled.GetActualPosition(), Quaternion.Euler(0,0,initialAngle - angleLeft - controled.GetTargetApertureAngle()/2)*Vector2.right);
+        Gizmos.DrawRay(controled.GetActualPosition(), Quaternion.Euler(0,0,initialAngle + angleRight + controled.GetTargetApertureAngle()/2)*Vector2.right);
     }
 }

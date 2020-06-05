@@ -244,8 +244,8 @@ public class FixedLight : LightBase, Positionable {
     }
 
     public override void DoFixedUpdate() {
-        transform.rotation = Quaternion.Euler(0,0,body.rotation);
-        transform.position = body.position;
+        //transform.rotation = Quaternion.Euler(0,0,body.rotation);
+        //transform.position = body.position;
 
         CacheViewTriangles();
         TakeSnapshot();

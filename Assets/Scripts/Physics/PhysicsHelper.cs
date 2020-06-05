@@ -62,12 +62,14 @@ class PhysicsHelper {
         // p_t = p_0 + v_0*t + 1/2*a*t^2
         float angAccel = 2*(endAngle - startAngle - startAngVelocity*time)/(time*time);
 
-        // For some strange reason, we need to divide by 120; I can't figure out why.
-        return angAccel*body.inertia/120;
+        // For some strange reason, we need to divide by 115; I can't figure out why.
+        return angAccel*body.inertia/115;
     }
 
     public static Vector2 GetMoveToForce(Rigidbody2D body, Vector2 endPosition) {
-        Vector2 startPosition = body.position;
+        return GetMoveToForce(body, body.position, endPosition);
+    }
+    public static Vector2 GetMoveToForce(Rigidbody2D body, Vector2 startPosition, Vector2 endPosition) {
         Vector2 startVelocity = body.velocity;
         float time = Time.deltaTime == 0 ? Time.fixedDeltaTime : Time.deltaTime;
         // Solving for acceleration using
