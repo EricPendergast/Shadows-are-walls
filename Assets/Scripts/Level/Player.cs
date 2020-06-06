@@ -2,6 +2,14 @@
 using UnityEngine;
 
 public class Player : MonoBehaviour {
+    public enum State {
+        initial,
+        inAir,
+        onGround,
+        jumping
+    }
+    [SerializeField]
+    private State current;
     Rigidbody2D rb;
     [SerializeField]
     private float airAccel;
@@ -21,27 +29,35 @@ public class Player : MonoBehaviour {
     private Collider2D mainCollider;
     [SerializeField]
     private float jumpSpeed;
+    [SerializeField]
+    private float jumpTime;
+
+    private float timeOfLastJump;
 
     void Start() {
         rb = GetComponent<Rigidbody2D>();
         Refs.instance.cameraTracker.trackedObject = gameObject;
+        timeOfLastJump = -1000;
+        current = State.initial;
     }
 
     void FixedUpdate() {
-        int lr = (Input.GetKey(KeyCode.A) ? -1 : 0) + (Input.GetKey(KeyCode.D) ? 1 : 0);
-        bool onGround = IsOnGround();
-        var inputForce = (onGround ? groundAccel : airAccel) * Vector3.right * lr;
+        DoStateMachine();
 
-        if (Input.GetKey(KeyCode.Space) && onGround) {
-            rb.AddForce(PhysicsHelper.GetNeededForce(rb, Vector2.up*jumpSpeed));
-        }
+        int lr = (Input.GetKey(KeyCode.A) ? -1 : 0) + (Input.GetKey(KeyCode.D) ? 1 : 0);
+        var inputForce = (current == State.onGround ? groundAccel : airAccel) * Vector3.right * lr;
 
         if (inputForce != Vector3.zero) {
             inputForce = PhysicsHelper.TruncateForce(rb, maxSpeed, inputForce);
             rb.AddForce(inputForce);
         }
+
+        if (current == State.jumping) {
+            rb.AddForce(PhysicsHelper.GetNeededForce(rb, new Vector2(0,rb.velocity.y), Vector2.up*jumpSpeed));
+        }
+
         if (inputForce.x * rb.velocity.x <= 0) {
-            var frictionForce = -(onGround ? groundFriction : airFriction) * Vector3.right * rb.mass * rb.velocity.x;
+            var frictionForce = -(current == State.onGround ? groundFriction : airFriction) * Vector3.right * rb.mass * rb.velocity.x;
             rb.AddForce(frictionForce);
         }
 
@@ -62,6 +78,25 @@ public class Player : MonoBehaviour {
                 yield return lever;
             }
         }
+    }
+
+    void DoStateMachine() {
+        if (current == State.onGround) {
+            if (Input.GetKey(KeyCode.Space)) {
+                current = State.jumping;
+                timeOfLastJump = Time.time;
+                return;
+            }
+        } else if (current == State.jumping) {
+            // If the player is still holding space, and it is within the
+            // specified time limit, stay jumping. This allows the player to
+            // alter the height of their jump
+            if (Time.time - timeOfLastJump < jumpTime && Input.GetKey(KeyCode.Space)) {
+                return;
+            }
+        }
+
+        current = IsOnGround() ? State.onGround : State.inAir;
     }
 
     bool IsOnGround() {

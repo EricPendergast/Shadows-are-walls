@@ -9,7 +9,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7235870075287817495}
-  - component: {fileID: 7235870075287817490}
   - component: {fileID: 7235870075287817489}
   - component: {fileID: 7235870075287817488}
   m_Layer: 11
@@ -34,27 +33,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &7235870075287817490
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7235870075287817494}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2e53cf647d235d8a68b754fd62cf625d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  airAccel: 20
-  airFriction: 5
-  groundAccel: 50
-  groundFriction: 20
-  maxSpeed: 7
-  groundDetector: {fileID: 7235870076345219020}
-  interactableDetector: {fileID: 7235870075377882479}
-  mainCollider: {fileID: 7235870076155195135}
-  jumpSpeed: 10
 --- !u!50 &7235870075287817489
 Rigidbody2D:
   serializedVersion: 4
@@ -67,7 +45,7 @@ Rigidbody2D:
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
-  m_Mass: 1
+  m_Mass: 0.0001
   m_LinearDrag: 0
   m_AngularDrag: 0.05
   m_GravityScale: 1
@@ -183,6 +161,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7235870076155195129}
+  - component: {fileID: 1837859310}
   - component: {fileID: 7235870076155195135}
   - component: {fileID: 7235870076155195134}
   - component: {fileID: 7235870076155195133}
@@ -210,6 +189,29 @@ Transform:
   m_Father: {fileID: 7235870075287817495}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1837859310
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7235870076155195123}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2e53cf647d235d8a68b754fd62cf625d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  current: 2
+  airAccel: 20
+  airFriction: 5
+  groundAccel: 50
+  groundFriction: 20
+  maxSpeed: 7
+  groundDetector: {fileID: 7235870076345219020}
+  interactableDetector: {fileID: 7235870075377882479}
+  mainCollider: {fileID: 7235870076155195135}
+  jumpSpeed: 10
+  jumpTime: 0.2
 --- !u!61 &7235870076155195135
 BoxCollider2D:
   m_ObjectHideFlags: 0

@@ -18,7 +18,14 @@ public class SimpleLever : Lever {
     }
 
     void Start() {
-        controled = controledGameObject.GetComponent<SimpleLeverControlable>();
+        controled = null;
+        foreach (var controlable in controledGameObject.GetComponentsInChildren<SimpleLeverControlable>()) {
+            if (controled == null) {
+                controled = controlable;
+            } else {
+                Debug.Log("Warning: controledGameObject has multiple SimpleLeverControlable components");
+            }
+        }
         if (controled == null) {
             Debug.LogError("Warning: controledGameObject has no SimpleLeverControlable component");
         }
