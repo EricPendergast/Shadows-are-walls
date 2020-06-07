@@ -1,5 +1,3 @@
-//using System.Collections.Generic;
-using System.Collections;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody2D))]
@@ -22,6 +20,8 @@ public class LightAngler : MonoBehaviour, SimpleLeverControlable, SimpleButtonCo
     [SerializeField]
     private FixedLight controled;
     private SimpleButton.State? buttonState = null;
+    [SerializeField]
+    private float gizmoLength = 1;
 
     private RelativeJoint2D myJoint;
 
@@ -56,7 +56,11 @@ public class LightAngler : MonoBehaviour, SimpleLeverControlable, SimpleButtonCo
 
     void OnDrawGizmos() {
         Gizmos.color = Color.red;
-        Gizmos.DrawRay(controled.GetActualPosition(), Quaternion.Euler(0,0,initialAngle - angleLeft - controled.GetTargetApertureAngle()/2)*Vector2.right);
-        Gizmos.DrawRay(controled.GetActualPosition(), Quaternion.Euler(0,0,initialAngle + angleRight + controled.GetTargetApertureAngle()/2)*Vector2.right);
+        Gizmos.DrawRay(controled.GetActualPosition(), Quaternion.Euler(0,0,initialAngle - angleLeft - controled.GetTargetApertureAngle()/2)*Vector2.right*gizmoLength);
+        Gizmos.DrawRay(controled.GetActualPosition(), Quaternion.Euler(0,0,initialAngle + angleRight + controled.GetTargetApertureAngle()/2)*Vector2.right*gizmoLength);
+
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawRay(controled.GetActualPosition(), Quaternion.Euler(0,0,initialAngle - angleLeft + controled.GetTargetApertureAngle()/2)*Vector2.right*gizmoLength);
+        Gizmos.DrawRay(controled.GetActualPosition(), Quaternion.Euler(0,0,initialAngle + angleRight - controled.GetTargetApertureAngle()/2)*Vector2.right*gizmoLength);
     }
 }
