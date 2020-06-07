@@ -48,7 +48,7 @@ Bugs
       the frame they are initialized
     ✓- When rotating a light edge, it doesn't quite look right, and gets worse
       the longer the edge is
-    - When rotating (and moving?) a light edge, a collider pokes out of the
+    ✓- When rotating (and moving?) a light edge, a collider pokes out of the
       ground where it shouldn't.
         - I think its because its target pokes into the ground
         - fixedlight needs to send the correct target
@@ -59,17 +59,19 @@ Possible things to do:
 
         This would be nontrivial to implement; make sure pros and cons are weighed
 
-    Maybe we don't need to pass in the illuminated side of each shadow edge; we
-    can just check if the midpoint is illuminated by a light other than its
-    source light. There are some problematic edge cases with this approach
-    though. Specifically, if two lights are illuminating the same surface.
+    ✗ Maybe we don't need to pass in the illuminated side of each shadow edge; we
+    ✗ can just check if the midpoint is illuminated by a light other than its
+    ✗ source light. There are some problematic edge cases with this approach
+    ✗ though. Specifically, if two lights are illuminating the same surface.
 
 
     Make an editor script to have readonly fields, to unconfuse the level
     building process
 
+    Make lights be trapezoids instead of triangles. This would allow for more general lights, like possibly lasers
+
 Visuals:
-    - make the different block types be different colors
+    ✓- make the different block types be different colors
         - They would each have a shader
         - also decide whether that shader gets applied by their script, or if
           they are in a prefab

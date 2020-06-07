@@ -1,7 +1,9 @@
+//using System.Collections.Generic;
+using System.Collections;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody2D))]
-public class LightAngler : MonoBehaviour, SimpleLeverControlable {
+public class LightAngler : MonoBehaviour, SimpleLeverControlable, SimpleButtonControlable {
 
     [SerializeField]
     [Range(0,180)]
@@ -16,11 +18,13 @@ public class LightAngler : MonoBehaviour, SimpleLeverControlable {
         get => _initialAngle == null ? controled.GetActualAngle() : (float)_initialAngle;
     }
     [SerializeField]
-    private float speed = .1f;
+    private float speed = 10;
     [SerializeField]
     private FixedLight controled;
+    private SimpleButton.State? buttonState = null;
 
     private RelativeJoint2D myJoint;
+
 
     public void Start() {
         _initialAngle = controled.GetActualAngle();
@@ -34,10 +38,21 @@ public class LightAngler : MonoBehaviour, SimpleLeverControlable {
     }
 
     public void MovePosition(int direction) {
-        currentAngle = Mathf.Clamp(currentAngle + direction*speed, -angleLeft, angleRight);
+        currentAngle = Mathf.Clamp(currentAngle + direction*speed*Time.deltaTime, -angleLeft, angleRight);
         myJoint.angularOffset = currentAngle;
     }
 
+    public void SetState(SimpleButton.State state) {
+        buttonState = state;
+    }
+
+    void FixedUpdate() {
+        if (buttonState == SimpleButton.State.unpressed) {
+            MovePosition(-1);
+        } else if (buttonState == SimpleButton.State.pressed) {
+            MovePosition(1);
+        }
+    }
 
     void OnDrawGizmos() {
         Gizmos.color = Color.red;

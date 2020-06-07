@@ -94,7 +94,7 @@ public abstract class DividesLight : AllTracker<DividesLight> {
             // TODO: Maybe we shouldn't use the target here (<-- obsolete comment for now)
             // TODO: I feel like there is something important I'm missing here
             colliders[i].offset = new Vector2((pieces[i].p1 - GetDivider().p1).magnitude + width/2, 0);
-            colliders[i].size = new Vector2(width, .1f);
+            colliders[i].size = new Vector2(width, .01f);
             colliders[i].enabled = SegmentDividesLightAndDark(pieces[i]);
         }
     }
