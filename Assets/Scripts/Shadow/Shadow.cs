@@ -36,24 +36,26 @@ public class Shadow : AllTracker<Shadow> {
     }
 
     void OnDrawGizmosSelected() {
-        var p1 = caster.CrossSection(lightSource.GetTargetPosition()).p1;
-        var p2 = caster.CrossSection(lightSource.GetTargetPosition()).p2;
-        //Gizmos.DrawLine(p1, p2);
-        Gizmos.DrawSphere(p1, .1f);
-        Gizmos.DrawSphere(p2, .1f);
-        if (rightEdge != null) {
-            Gizmos.color = Color.red;
-            rightEdge.DrawGizmos();
+        if (caster.CrossSection(lightSource.GetTargetPosition()) is LineSegment crossSec) {
+            var p1 = crossSec.p1;
+            var p2 = crossSec.p2;
+            //Gizmos.DrawLine(p1, p2);
+            Gizmos.DrawSphere(p1, .1f);
+            Gizmos.DrawSphere(p2, .1f);
+            if (rightEdge != null) {
+                Gizmos.color = Color.red;
+                rightEdge.DrawGizmos();
+            }
+            if (leftEdge != null) {
+                Gizmos.color = Color.blue;
+                leftEdge.DrawGizmos();
+            }
+            Gizmos.color = Color.yellow;
+            foreach (var frontEdge in frontEdges) {
+                frontEdge.DrawGizmos();
+            }
+            Gizmos.color = Color.white;
         }
-        if (leftEdge != null) {
-            Gizmos.color = Color.blue;
-            leftEdge.DrawGizmos();
-        }
-        Gizmos.color = Color.yellow;
-        foreach (var frontEdge in frontEdges) {
-            frontEdge.DrawGizmos();
-        }
-        Gizmos.color = Color.white;
     }
 
     public void SetRightEdge(LineSegment? right) {
@@ -77,6 +79,10 @@ public class Shadow : AllTracker<Shadow> {
                 var edge = frontEdges[count];
                 SetTarget(ref edge, seg);
                 frontEdges[count] = edge;
+                if (caster.disableFrontFaceColliders) {
+                    edge.DisableColliders();
+                }
+                
                 count++;
             }
         }

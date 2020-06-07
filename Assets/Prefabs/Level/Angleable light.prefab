@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2653933352807445335}
   m_Layer: 0
-  m_Name: Angleable light 2
+  m_Name: Angleable light
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -100,7 +100,7 @@ MonoBehaviour:
   angleLeft: 74
   angleRight: 87
   currentAngle: 0
-  speed: 0.59
+  speed: 30
   controled: {fileID: 286075417374860649}
 --- !u!1001 &7943372897459195629
 PrefabInstance:

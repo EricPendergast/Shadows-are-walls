@@ -15,7 +15,9 @@ public class ShadowLine : LevelObject {
         body.constraints = RigidbodyConstraints2D.FreezeAll;
         collider.isTrigger = true;
 
-        gameObject.AddComponent<Opaque>().crossSectionCallback = this.CrossSection;
+        var opaque = gameObject.AddComponent<Opaque>();
+        opaque.crossSectionCallback = this.CrossSection;
+        opaque.disableFrontFaceColliders = false;
     }
 
     private LineSegment CrossSection(Vector2 cameraPos) {

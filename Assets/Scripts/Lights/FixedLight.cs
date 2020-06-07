@@ -274,9 +274,10 @@ public class FixedLight : LightBase, Positionable {
         var shadowCorrespondences = new List<System.Tuple<LineSegment, Shadow>>();
 
         foreach (Shadow s in shadows.Values) {
-            var i = s.caster.CrossSection(GetTargetPosition()).Intersect(targetViewTriangle);
-            if (i is LineSegment seg) {
-                shadowCorrespondences.Add(System.Tuple.Create(seg, s));
+            if (s.caster.CrossSection(GetTargetPosition()) is LineSegment crossSec) {
+                if (crossSec.Intersect(targetViewTriangle) is LineSegment seg) {
+                    shadowCorrespondences.Add(System.Tuple.Create(seg, s));
+                }
             }
         }
         shadowCorrespondences.Add(System.Tuple.Create(TargetFarEdge(), (Shadow)null));

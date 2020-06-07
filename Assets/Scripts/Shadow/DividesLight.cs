@@ -86,7 +86,8 @@ public abstract class DividesLight : AllTracker<DividesLight> {
             colliders[i].enabled = false;
         }
         for (int i = colliders.Count; i < pieces.Count; i++) {
-            colliders.Add(gameObject.AddComponent<BoxCollider2D>());
+            var toAdd = gameObject.AddComponent<BoxCollider2D>();
+            colliders.Add(toAdd);
         }
 
         for (int i = 0; i < pieces.Count; i++) {

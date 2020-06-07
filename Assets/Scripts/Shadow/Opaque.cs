@@ -3,11 +3,17 @@
 //[RequireComponent(typeof(Rigidbody2D))]
 public class Opaque : MonoBehaviour {
     public System.Func<Vector2, LineSegment> crossSectionCallback;
+    // Indicates whether the front shadow edge face should have colliders. If
+    // the opaque object already has a collider, this should be false
+    public bool disableFrontFaceColliders;
 
-    // TODO: Make this have nullable return value?
-    public LineSegment CrossSection(Vector2 cameraPos) {
+    void Awake() {
+        disableFrontFaceColliders = false;
+    }
+
+    public LineSegment? CrossSection(Vector2 cameraPos) {
         if (crossSectionCallback == null) {
-            return LineSegment.zero;
+            return null;
         } else {
             return crossSectionCallback(cameraPos);
         }

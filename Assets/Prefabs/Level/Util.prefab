@@ -147,6 +147,8 @@ MonoBehaviour:
   lightMaterial: {fileID: 2100000, guid: 06fd57209b4d8f8509b31cff4d08ef57, type: 2}
   shadowMaterial: {fileID: 2100000, guid: c4d3ac3526967643b80b402a90b6f639, type: 2}
   cameraTracker: {fileID: 732283230}
+  frictionlessMaterial: {fileID: 6200000, guid: 1fcf47d26caf78866a15ed6238025364,
+    type: 2}
 --- !u!114 &8189148493077295209
 MonoBehaviour:
   m_ObjectHideFlags: 0

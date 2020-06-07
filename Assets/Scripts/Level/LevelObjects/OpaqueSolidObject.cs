@@ -5,10 +5,32 @@ public class OpaqueSolidObject : LevelObject {
     protected override void Awake() {
         base.Awake();
 
-        gameObject.AddComponent<Opaque>().crossSectionCallback = this.CrossSection;
+        List<Vector2> corners = new List<Vector2>{
+            new Vector2(-.5f, -.5f),
+            new Vector2(-.5f, .5f),
+            new Vector2(.5f, .5f),
+            new Vector2(.5f, -.5f)};
+        for (int i = 0; i < 4; i++) {
+            corners[i] = transform.TransformPoint(corners[i]);
+        }
+
+        var opaque1 = gameObject.AddComponent<Opaque>();
+        opaque1.crossSectionCallback = (Vector2) => {
+            return new LineSegment(corners[0], corners[2]);
+        };
+        opaque1.disableFrontFaceColliders = true;
+
+        var opaque2 = gameObject.AddComponent<Opaque>();
+        opaque2.crossSectionCallback = (Vector2) => {
+            return new LineSegment(corners[1], corners[3]);
+        };
+        opaque2.disableFrontFaceColliders = true;
+
         gameObject.layer = PhysicsHelper.opaqueLayer;
     }
 
+    // This method is obsolete now, since it turns out having different cross
+    // sections for different lights causes some subtle bugs.
     private LineSegment CrossSection(Vector2 cameraPos) {
         if (collider is BoxCollider2D boxColl) {
             List<Vector2> corners = new List<Vector2>{

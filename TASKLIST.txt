@@ -52,6 +52,10 @@ Bugs
       ground where it shouldn't.
         - I think its because its target pokes into the ground
         - fixedlight needs to send the correct target
+    - Objects need to have custom friction, since moving lights often makes
+      things slide when they shouldn't
+        - Also this makes circle colliders problematic, I would need to
+          implement rolling friction myself...
  
 Possible things to do:
     Idea: Make shadow edges have a bunch of small colliders, so that there
@@ -69,6 +73,12 @@ Possible things to do:
     building process
 
     Make lights be trapezoids instead of triangles. This would allow for more general lights, like possibly lasers
+
+    Make light anglers also do the aperture angle (have leftAperture and rightAperture fields)
+
+    Change names of things:
+        DividesLight to LightDivider
+        FixedLight to ...?
 
 Visuals:
     ✓- make the different block types be different colors
