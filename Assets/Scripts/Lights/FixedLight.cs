@@ -9,7 +9,7 @@ using UnityEngine;
 //      "right" and "left" are refered to as if you are facing in the
 //      direction of the light
 [RequireComponent(typeof(Rigidbody2D))]
-public class FixedLight : LightBase, Positionable {
+public class FixedLight : LightBase {
 
     private class DebugSnapshot {
         public Triangle actualViewTriangle;

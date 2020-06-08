@@ -5,24 +5,19 @@ public class OpaqueSolidObject : LevelObject {
     protected override void Awake() {
         base.Awake();
 
-        List<Vector2> corners = new List<Vector2>{
-            new Vector2(-.5f, -.5f),
-            new Vector2(-.5f, .5f),
-            new Vector2(.5f, .5f),
-            new Vector2(.5f, -.5f)};
-        for (int i = 0; i < 4; i++) {
-            corners[i] = transform.TransformPoint(corners[i]);
-        }
-
         var opaque1 = gameObject.AddComponent<Opaque>();
         opaque1.crossSectionCallback = (Vector2) => {
-            return new LineSegment(corners[0], corners[2]);
+            return new LineSegment(
+                    transform.TransformPoint(new Vector2(-.5f, -.5f)),
+                    transform.TransformPoint(new Vector2(.5f, .5f)));
         };
         opaque1.disableFrontFaceColliders = true;
 
         var opaque2 = gameObject.AddComponent<Opaque>();
         opaque2.crossSectionCallback = (Vector2) => {
-            return new LineSegment(corners[1], corners[3]);
+            return new LineSegment(
+                    transform.TransformPoint(new Vector2(.5f, -.5f)),
+                    transform.TransformPoint(new Vector2(-.5f, .5f)));
         };
         opaque2.disableFrontFaceColliders = true;
 

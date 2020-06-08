@@ -1,25 +1,22 @@
-
-
 using UnityEngine;
 
+public class PositionerPoint : MonoBehaviour {
 
-public class PositionLeverPoint : MonoBehaviour {
-
-    public PositionLever myLever;
+    public Positioner myPositioner;
 
     void OnDrawGizmosSelected() {
         Draw();
-        if (myLever != null) {
-            myLever.Draw();
+        if (myPositioner != null) {
+            myPositioner.Draw();
         }
     }
 
     public void Draw() {
         Gizmos.color = Color.white;
         GizmosUtil.DrawConstantWidthSphere(transform.position, .1f);
-        if (myLever != null) {
+        if (myPositioner != null) {
             Gizmos.color = Color.cyan;
-            Gizmos.DrawLine(Position(), myLever.transform.position);
+            Gizmos.DrawLine(Position(), myPositioner.transform.position);
         }
     }
 
