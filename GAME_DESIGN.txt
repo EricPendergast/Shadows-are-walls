@@ -1,0 +1,36 @@
+
+Possible TODOs:
+    Make speed of light rotating/moving start off slow, then be fast, so that
+    it's easier to move lights with precision
+
+    Decide if the levels should be grid based. Pros:
+        1. There will often be times when the player needs to know if they can
+            reach a spot
+        2. Makes levels easier to build
+        3. Generally makes for less guessing for the player
+    Cons:
+        1. Less control over level building
+        2. Less control over level visuals
+
+
+    Make shadow edges have zero friction if they are a certain angle, in order
+    to make it obvious when you can or can't climb them
+        Give some visual indication you can climb them
+        Like having steps? that might be interesting. Also confusing. Also hard to implement.
+
+        If you combine this with the grid, you can make them climbable at 45
+        degrees or more, and then make lights only be placeable on grid
+        intersections, and then it is obvious to the player when they are climbable
+
+
+I need to figure out what happens when a light compresses an object.
+    Idea 1: the object breaks
+    Idea 2: The object stops the light
+        At what point does the light stop?
+        When the object stops moving?
+
+
+Idea:
+    Make object be made of 4 colliders, one at each corner, held together by
+    springs. This might be a good way to give feedback about crushing
+    

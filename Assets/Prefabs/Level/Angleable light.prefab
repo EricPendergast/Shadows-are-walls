@@ -100,8 +100,9 @@ MonoBehaviour:
   angleLeft: 74
   angleRight: 87
   currentAngle: 0
-  speed: 30
+  speed: 20
   controled: {fileID: 286075417374860649}
+  gizmoLength: 1
 --- !u!1001 &7943372897459195629
 PrefabInstance:
   m_ObjectHideFlags: 0

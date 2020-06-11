@@ -14,7 +14,7 @@ public class SimpleLever : Lever {
         base.Awake();
         gameObject.layer = PhysicsHelper.interactableLayer;
         collider.isTrigger = true;
-        body.constraints = RigidbodyConstraints2D.FreezeAll;
+        body.gravityScale = 0;
     }
 
     void Start() {

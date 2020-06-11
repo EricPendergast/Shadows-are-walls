@@ -216,11 +216,26 @@ public readonly struct LineSegment : IEnumerable<Vector2> {
         return !(lhs == rhs);
     }
 
+    public static LineSegment operator-(LineSegment lhs, Vector2 rhs) {
+        return new LineSegment(lhs.p1 - rhs, lhs.p2 - rhs);
+    }
+    public static LineSegment operator+(LineSegment lhs, Vector2 rhs) {
+        return new LineSegment(lhs.p1 + rhs, lhs.p2 + rhs);
+    }
+
     // Changes the length of the line segment, with p1 staying fixed
     public LineSegment WithLength(float newLength) {
         if (p1 == p2) {
             return new LineSegment(p1, p1);
         }
         return new LineSegment(p1, p1 + (p2 - p1).normalized * newLength);
+    }
+
+    public Vector2 PerpendicularComponent(Vector2 v) {
+        return v - (Vector2)Vector3.Project(v, (p1 - p2));
+    }
+
+    public LineSegment Rotate(float angle) {
+        return new LineSegment(p1, p1 + (Vector2)(Quaternion.Euler(0,0,angle)*(p2 - p1)));
     }
 }

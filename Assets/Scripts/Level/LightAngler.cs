@@ -4,16 +4,16 @@ using UnityEngine;
 public class LightAngler : MonoBehaviour, SimpleLeverControlable, SimpleButtonControlable {
 
     [SerializeField]
-    [Range(0,180)]
+    [Range(-180,180)]
     private float angleLeft = 90;
     [SerializeField]
-    [Range(0,180)]
+    [Range(-180,180)]
     private float angleRight = 90;
     [SerializeField]
     private float currentAngle = 0;
     private float? _initialAngle;
     private float initialAngle {
-        get => _initialAngle == null ? controled.GetActualAngle() : (float)_initialAngle;
+        get => _initialAngle == null ? controled.GetActualAngle() - GetComponent<Rigidbody2D>().rotation: (float)_initialAngle;
     }
     [SerializeField]
     private float speed = 10;
@@ -27,19 +27,39 @@ public class LightAngler : MonoBehaviour, SimpleLeverControlable, SimpleButtonCo
 
 
     public void Start() {
-        _initialAngle = controled.GetActualAngle();
-        currentAngle = 0;
+        _initialAngle = initialAngle;
         myJoint = gameObject.AddComponent<RelativeJoint2D>();
         myJoint.connectedBody = controled.GetComponent<Rigidbody2D>();
         myJoint.maxForce = 10;
         myJoint.maxTorque = 10;
         myJoint.autoConfigureOffset = false;
-        myJoint.angularOffset = 0;
+        currentAngle = 0;
+        myJoint.angularOffset = initialAngle + currentAngle;
+
+        MovePosition(0);
     }
 
     public void MovePosition(int direction) {
-        currentAngle = Mathf.Clamp(currentAngle + direction*speed*Time.deltaTime, -angleLeft, angleRight);
-        myJoint.angularOffset = currentAngle;
+        var minAngle = Mathf.Min(-angleLeft, angleRight);
+        var maxAngle = Mathf.Max(-angleLeft, angleRight);
+        if (-angleLeft > angleRight) {
+            direction = -direction;
+        }
+
+        var newCurrentAngle = Mathf.Clamp(currentAngle + direction*speed*Time.deltaTime, minAngle, maxAngle);
+
+        //var targetAngle = initialAngle + newCurrentAngle;
+        //
+        //var actualAngle = controled.GetActualAngle() - GetComponent<Rigidbody2D>().rotation;
+        //
+        //var differenceFromTarget = Mathf.Abs(Mathf.DeltaAngle(actualAngle, targetAngle));
+        //if (differenceFromTarget > 2*speed*Time.deltaTime) {
+        //    if (Mathf.Abs(Mathf.DeltaAngle(actualAngle, currentAngle)) <= differenceFromTarget) {
+        //        return;
+        //    }
+        //}
+        currentAngle = newCurrentAngle;
+        myJoint.angularOffset = initialAngle + currentAngle;
     }
 
     public void SetState(SimpleButton.State state) {

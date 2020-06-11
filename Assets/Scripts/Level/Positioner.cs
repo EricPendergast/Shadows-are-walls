@@ -39,7 +39,8 @@ public class Positioner : MonoBehaviour, SimpleLeverControlable, SimpleButtonCon
         var deltaPosition = direction * speed / ((left.Position() - right.Position()).magnitude) * Time.deltaTime;
         position = Mathf.Clamp(position + deltaPosition, 0, 1);
         var newTarget = Vector2.Lerp(left.Position(), right.Position(), position);
-        myJoint.linearOffset = newTarget - (Vector2)transform.position;
+        myJoint.linearOffset = transform.InverseTransformPoint(newTarget);
+        //myJoint.angularOffset = GetComponent<Rigidbody2D>().rotation - controled.rotation;
         //controled.SetTargetPosition(Vector2.Lerp(left.Position(), right.Position(), position));
     }
 

@@ -3,6 +3,11 @@ Player movement
     - Make player jump height more predictable
     - Make player jump height depend on how long the spacebar is pressed
 
+Physics
+    - Add a max velocity (or max force?) to the various physicshelper functions
+      because this may help with competing forces on objects
+      (Will it actually help though?)
+
 Lights
     - Single light
         ✓- Frustrum clipping
@@ -52,10 +57,13 @@ Bugs
       ground where it shouldn't.
         - I think its because its target pokes into the ground
         - fixedlight needs to send the correct target
-    - Objects need to have custom friction, since moving lights often makes
+    ✓- Objects need to have custom friction, since moving lights often makes
       things slide when they shouldn't
-        - Also this makes circle colliders problematic, I would need to
+        ✓- Also this makes circle colliders problematic, I would need to
           implement rolling friction myself...
+
+          Solution: Make it so shadow edges don't have colliders for the front
+          faces when the opaque object already has a collider
  
 Possible things to do:
     Idea: Make shadow edges have a bunch of small colliders, so that there
@@ -79,6 +87,12 @@ Possible things to do:
     Change names of things:
         DividesLight to LightDivider
         FixedLight to ...?
+
+    Make shadow edges use PlatformEffector2D. I think this will make their
+    behavior cleaner in some edge cases
+        This would require having two platform effectors for each edge; on the
+        handle light objects, and one to handle dark objects
+
 
 Visuals:
     ✓- make the different block types be different colors

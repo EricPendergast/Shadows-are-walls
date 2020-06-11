@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using RigidbodyExtensions;
 
 class PhysicsHelper {
 
@@ -49,6 +50,9 @@ class PhysicsHelper {
         return GetNeededTorque(body, body.angularVelocity, endAngVel);
     }
 
+    public static float GetRotateToTorque(Rigidbody2D body, float startAngle, float endAngle) {
+        return GetRotateToTorque(body, endAngle - startAngle + body.rotation);
+    }
     public static float GetRotateToTorque(Rigidbody2D body, float endAngle) {
         float startAngle = body.rotation;
         // Making endAngle be as close to startAngle as possible (in
@@ -88,5 +92,17 @@ class PhysicsHelper {
     {
         float diff = ( angle2 - angle1 + 180 ) % 360 - 180;
         return diff < -180 ? diff + 360 : diff;
+    }
+
+    public static void GetForceAndTorque(Rigidbody2D body, LineSegment target, out Vector2 force, out float torque) {
+        Vector2 targetCenterOfMass = target.p1 + (target.p2 - target.p1).normalized*body.centerOfMass.magnitude;
+        force = PhysicsHelper.GetMoveToForce(body, body.worldCenterOfMass, targetCenterOfMass);
+        torque = PhysicsHelper.GetRotateToTorque(body, target.Angle());
+    }
+
+    public static void GetForceAndTorque(Rigidbody2D body, LineSegment actual, LineSegment target, out Vector2 force, out float torque) {
+        target = target.Rotate(body.rotation - actual.Angle());
+        target = target + (body.position + actual.p1);
+        GetForceAndTorque(body, target, out force, out torque);
     }
 }

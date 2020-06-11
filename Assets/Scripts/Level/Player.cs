@@ -103,7 +103,7 @@ public class Player : MonoBehaviour {
         var colliders = new List<Collider2D>();
         groundDetector.GetContacts(colliders);
         foreach (var col in colliders) {
-            if (col != mainCollider && col != interactableDetector) {
+            if (col != mainCollider && col != interactableDetector && !col.isTrigger) {
                 return true;
             }
         }

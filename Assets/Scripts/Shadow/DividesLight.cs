@@ -13,7 +13,7 @@ public abstract class DividesLight : AllTracker<DividesLight> {
     [SerializeField]
     protected LineSegment target = LineSegment.zero;
     [SerializeField]
-    private LightBase lightSource;
+    protected LightBase lightSource;
     // Says which side is illuminated by 'lightSource'
     [SerializeField]
     private Side illuminatedSide;
@@ -67,9 +67,7 @@ public abstract class DividesLight : AllTracker<DividesLight> {
         if (target == LineSegment.zero) {
             return;
         }
-        Vector2 targetCenterOfMass = target.p1 + (target.p2 - target.p1).normalized*rb.centerOfMass.magnitude;
-        Vector2 force = PhysicsHelper.GetMoveToForce(rb, rb.worldCenterOfMass, targetCenterOfMass);
-        float torque = PhysicsHelper.GetRotateToTorque(rb, target.Angle());
+        PhysicsHelper.GetForceAndTorque(rb, target, out Vector2 force, out float torque);
 
         //rb.AddForce(Vector2.ClampMagnitude(force, 10*rb.mass));
         //rb.AddTorque(Mathf.Clamp(torque, -10*rb.inertia, 10*rb.inertia));
