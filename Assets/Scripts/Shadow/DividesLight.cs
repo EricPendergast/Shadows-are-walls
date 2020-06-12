@@ -99,9 +99,9 @@ public abstract class DividesLight : AllTracker<DividesLight> {
             return;
         }
         var targetAngle = target.Angle();
-        var deltaAngle = targetAngle - rb.rotation - lightSource.GetComponent<Rigidbody2D>().angularVelocity*Time.deltaTime;
+        var deltaAngle = Mathf.DeltaAngle(rb.rotation, targetAngle) - lightSource.GetComponent<Rigidbody2D>().angularVelocity*Time.deltaTime;
 
-        var motorSpeed = deltaAngle/Time.deltaTime*.5f;
+        var motorSpeed = deltaAngle/Time.deltaTime;
         if (DEBUG) {
             Debug.Log("Motor speed: " + motorSpeed);
             Debug.Log("Target angle: " + targetAngle);

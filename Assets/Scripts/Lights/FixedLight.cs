@@ -300,8 +300,9 @@ public class FixedLight : LightBase {
     void DoForces(LightEdge edge) {
         edge.MaxDifferenceFromTarget(out var point, out var difference);
     
-        //Debug.Log("difference magnitude " + difference.magnitude);
-        if (difference.magnitude > .15) {
+        Debug.Log("difference magnitude " + difference.magnitude);
+        if (difference.magnitude >= .13) {
+            difference = difference.normalized * (difference.magnitude - .13f);
             // The angle change from actual to target
             var angleDelta = new LineSegment(body.position, point + difference).Angle(point);
             //var torque = PhysicsHelper.GetRotateToTorque(body, 0, angleDelta*.1f)*.5f;
