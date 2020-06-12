@@ -7,8 +7,8 @@ public abstract class DividesLight : AllTracker<DividesLight> {
 
     private static List<LineSegment> pieces = new List<LineSegment>();
 
-    private readonly float maxTorque = 10000000;
-    private readonly float maxAngularSpeed = 360;
+    private readonly float maxTorque = 1000000000;
+    private readonly float maxAngularSpeed = 120;
 
     public enum Side {
         right,
