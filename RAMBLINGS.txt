@@ -1,0 +1,66 @@
+Shadow crushing:
+
+There are multiple constraints, all of which need to be met as closely as possible
+This indicates that having relative joints is a bad idea, because in a fight
+between two relative joints, one will always win (the one with higher max force)
+If any joints, spring joints are the best
+These joints should be tuned so that the most important constraints are prioritized
+
+
+How do targets work
+    Targets are decided on at the beginning of each physics frame
+        Right now, targets depend on the light's rigidbody
+    The light's rigidbody is positioned by forces
+
+    The question is, what happens if an edge can't reach its target
+        This indicates it hit something which could not move out of the way
+        It should move its light in such a way as to fix the constraints
+
+        ***I like this idea:
+        There can be an arbitrary number of constraints, and so it almost seems
+        like each light should have a list of all their constraints each frame,
+        and resolve them en masse.
+            This would give cleaner results than having each constraint be a spring
+            It's also more general
+            It's also harder to implement (maybe not though, because diagnosing bugs with spring constants seems really frustrating)
+            
+            The idea is that each shadow edge generates one constraint for each
+            of its detected collisions (detected with raycast possibly), and
+            then sends it to the light. Then the light works out how to
+            maximally satisfy those constraints.
+
+            What these constraints look like:
+                - light edge must meet its target relative to the light (the relative part is important; that means it may move the light, or move itself)
+                - shadow edge must keep in line with the light
+                - any divider edge must not intersect any free objects
+
+            Solving these constraints is also a hard question. Gradient
+            descent? Is that the same as having springs? Usually there will be
+            0-2 constraints. Maybe having the right type of constraints will
+            make this easier. Like if each constraint was a line the light has
+            to lie on.
+
+            What do these constraints do which box2d can't do?
+            Could this be handled by having another physics scene?
+
+
+        *** but before working on that, I'll try a simpler solution, and see how it works
+            What if I just make the target approaching code have a max velocity?
+        *** Or another simple solution
+            at the end of each physics iteration, look at the shadow edges
+            displacement from their targets, move the light so that it lines up
+            with all the shadow edges properly
+
+            This one is actually quite similar to the constraints solution above
+
+            Start this one by just handling the light edges
+        *** Or another solution
+            For each shadow edge, look at the forces it applied to other
+            objects, and then use the laws of conservation of momentum to apply
+            those forces to the light's rigidbody
+
+             This makes it so the shadow edges can have high mass, but then the
+             light can have low mass so it looks more naturally affected by
+             forces
+
+    But also its important to figure out whether it thinks it reached its target

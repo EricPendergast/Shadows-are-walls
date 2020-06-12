@@ -238,4 +238,22 @@ public readonly struct LineSegment : IEnumerable<Vector2> {
     public LineSegment Rotate(float angle) {
         return new LineSegment(p1, p1 + (Vector2)(Quaternion.Euler(0,0,angle)*(p2 - p1)));
     }
+
+    // The distance from this line segment, extended to a complete line, to the
+    // given point
+    // TODO: This has not been verified to work yet
+    public float Distance(Vector2 point) {
+        var top = Mathf.Abs((p2.y-p1.y)*point.x - (p2.x-p1.x)*point.y + p2.x*p1.y - p2.y*p1.x);
+        var bottom = Mathf.Sqrt(Mathf.Pow(p2.y - p1.y, 2) + Mathf.Pow(p2.x - p1.x, 2));
+        return top/bottom;
+    }
+
+    // Gives the closest point on this line segment (extended to a full line)
+    // to 'point'
+    public Vector2 Closest(Vector2 point) {
+        var lineDir = (p2 - p1).normalized;
+        var v = point - p1;
+        var d = Vector3.Dot(v, lineDir);
+        return p1 + lineDir * d;
+    }
 }

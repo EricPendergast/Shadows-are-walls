@@ -25,7 +25,6 @@ public class LightAngler : MonoBehaviour, SimpleLeverControlable, SimpleButtonCo
 
     private RelativeJoint2D myJoint;
 
-
     public void Start() {
         _initialAngle = initialAngle;
         myJoint = gameObject.AddComponent<RelativeJoint2D>();

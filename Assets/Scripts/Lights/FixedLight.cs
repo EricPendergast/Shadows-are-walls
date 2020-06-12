@@ -20,6 +20,9 @@ public class FixedLight : LightBase {
     public float targetAngle;
     public float distance;
 
+    public float correctionSpringConstant;
+    public float correctionDampingConstant;
+
     private Mesh castLightMesh;
 
 
@@ -45,6 +48,19 @@ public class FixedLight : LightBase {
     private Rigidbody2D _body;
     private Rigidbody2D body {
         get => _body == null ? (_body = GetComponent<Rigidbody2D>()) : _body;
+    }
+
+    private Rigidbody2D _edgeMountPoint;
+
+    public override Rigidbody2D GetEdgeMountPoint() {
+        if (_edgeMountPoint == null) {
+            _edgeMountPoint = Util.CreateChild<Rigidbody2D>(transform);
+            //_edgeMountPoint.constraints = RigidbodyConstraints2D.FreezeRotation;
+            _edgeMountPoint.constraints = RigidbodyConstraints2D.FreezeAll;
+            _edgeMountPoint.gravityScale = 0;
+            _edgeMountPoint.gameObject.name = "Edge mount point";
+        }
+        return _edgeMountPoint;
     }
 
     public void SetTargetApertureAngle(float v) {
@@ -195,7 +211,8 @@ public class FixedLight : LightBase {
     protected override void Awake() {
         base.Awake();
 
-        shadowParent = new GameObject(gameObject.name + " shadows");
+        //shadowParent = new GameObject(gameObject.name + " shadows");
+        shadowParent = gameObject;
 
         SetUpLightEdges();
 
@@ -205,6 +222,8 @@ public class FixedLight : LightBase {
 
         visibleCollider = gameObject.AddComponent<PolygonCollider2D>();
         visibleCollider.isTrigger = true;
+
+        body.inertia = 1;
     }
 
     //void DrawLampshade() {
@@ -246,6 +265,8 @@ public class FixedLight : LightBase {
     public override void DoFixedUpdate() {
         //transform.rotation = Quaternion.Euler(0,0,body.rotation);
         //transform.position = body.position;
+        
+        DoForces();
 
         CacheViewTriangles();
         TakeSnapshot();
@@ -268,6 +289,31 @@ public class FixedLight : LightBase {
 
     void Update() {
         DrawCastedLight();
+    }
+
+    void DoForces() {
+        //return;
+        DoForces(rightShadowEdge);
+        DoForces(leftShadowEdge);
+    }
+
+    void DoForces(LightEdge edge) {
+        edge.MaxDifferenceFromTarget(out var point, out var difference);
+    
+        Debug.Log("difference magnitude " + difference.magnitude);
+        if (difference.magnitude > .01) {
+            // The angle change from actual to target
+            var angleDelta = new LineSegment(body.position, point + difference).Angle(point);
+            //var torque = PhysicsHelper.GetRotateToTorque(body, 0, angleDelta*.1f)*.5f;
+            //var torque = PhysicsHelper.GetRotateToTorque(body, 0, 0);
+            //Debug.Log("test1 " + torque);
+            //Debug.Log("test2 " + point);
+            //Debug.Log("test3 " + difference);
+            //Debug.Log("test5 " + angleDelta);
+            //body.AddTorque(torque);
+            //body.angularVelocity *= .9f;
+            body.AddTorque(PhysicsHelper.GetSpringTorque(body, angleDelta, 0, correctionSpringConstant, correctionDampingConstant));
+        }
     }
 
     List<System.Tuple<LineSegment, Shadow>> GetShadowData() {

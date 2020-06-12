@@ -105,4 +105,10 @@ class PhysicsHelper {
         target = target + (body.position + actual.p1);
         GetForceAndTorque(body, target, out force, out torque);
     }
+
+    public static float GetSpringTorque(Rigidbody2D body, float rbAngle, float springAngle, float springConstant, float damping) {
+        // Using the equation F = -k*x - b*v
+        var angleDifference = rbAngle - springAngle;
+        return -angleDifference * springConstant - body.angularVelocity*damping;
+    }
 }

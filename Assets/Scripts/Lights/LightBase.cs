@@ -7,6 +7,7 @@ public abstract class LightBase : AllTracker<LightBase> {
 
     public abstract bool IsInDark(Vector2 point);
     public abstract bool IsIlluminated(Vector2 point);
+    public abstract Rigidbody2D GetEdgeMountPoint();
 
     public abstract void DoFixedUpdate();
 

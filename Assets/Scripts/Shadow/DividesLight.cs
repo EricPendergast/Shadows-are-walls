@@ -4,6 +4,9 @@ using System.Collections.Generic;
 public abstract class DividesLight : AllTracker<DividesLight> {
     private static List<LineSegment> pieces = new List<LineSegment>();
 
+    private readonly float maxTorque = 10000000;
+    private readonly float maxAngularSpeed = 360;
+
     public enum Side {
         right,
         left
@@ -17,6 +20,7 @@ public abstract class DividesLight : AllTracker<DividesLight> {
     // Says which side is illuminated by 'lightSource'
     [SerializeField]
     private Side illuminatedSide;
+    private HingeJoint2D joint;
 
     // The line segment used to calculate intersections
     public abstract LineSegment GetDivider();
@@ -47,7 +51,7 @@ public abstract class DividesLight : AllTracker<DividesLight> {
         gameObject.layer = PhysicsHelper.shadowEdgeLayer;
         rb = gameObject.AddComponent<Rigidbody2D>();
         rb.gravityScale = 0;
-        rb.mass = 100;
+        rb.mass = 5;
         rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
     }
 
@@ -56,6 +60,16 @@ public abstract class DividesLight : AllTracker<DividesLight> {
         initialized = true;
         this.lightSource = lightSource;
         this.illuminatedSide = illuminatedSide;
+
+        //joint = gameObject.AddComponent<HingeJoint2D>();
+        joint = lightSource.GetEdgeMountPoint().gameObject.AddComponent<HingeJoint2D>();
+        joint.autoConfigureConnectedAnchor = false;
+        // TODO: Connected anchor is improperly set
+        //joint.connectedBody = lightSource.GetComponent<Rigidbody2D>();
+        joint.connectedBody = rb;
+        joint.connectedAnchor = Vector2.zero;
+        joint.useMotor = true;
+        joint.motor = new JointMotor2D{maxMotorTorque = maxTorque, motorSpeed = 0};
     }
 
     private bool initialized = false;
@@ -67,12 +81,16 @@ public abstract class DividesLight : AllTracker<DividesLight> {
         if (target == LineSegment.zero) {
             return;
         }
-        PhysicsHelper.GetForceAndTorque(rb, target, out Vector2 force, out float torque);
+        var targetAngle = target.Angle();
+        var deltaAngle = targetAngle - rb.rotation - lightSource.GetComponent<Rigidbody2D>().angularVelocity*Time.deltaTime;
+        joint.motor = new JointMotor2D{maxMotorTorque = maxTorque, motorSpeed = Mathf.Clamp(deltaAngle/Time.deltaTime*.5f, -maxAngularSpeed, maxAngularSpeed)};
+        joint.connectedAnchor = new Vector2(-(lightSource.GetComponent<Rigidbody2D>().position - target.p1).magnitude, 0);
+        //PhysicsHelper.GetForceAndTorque(rb, target, out Vector2 force, out float torque);
 
         //rb.AddForce(Vector2.ClampMagnitude(force, 10*rb.mass));
         //rb.AddTorque(Mathf.Clamp(torque, -10*rb.inertia, 10*rb.inertia));
-        rb.AddForce(force);
-        rb.AddTorque(torque);
+        //rb.AddForce(force);
+        //rb.AddTorque(torque);
     }
 
     protected void UpdateColliders() {
@@ -92,6 +110,7 @@ public abstract class DividesLight : AllTracker<DividesLight> {
             float width = pieces[i].Length();
             // TODO: Maybe we shouldn't use the target here (<-- obsolete comment for now)
             // TODO: I feel like there is something important I'm missing here
+            //colliders[i].offset = new Vector2((pieces[i].p1 - lightSource.GetTargetPosition()).magnitude + width/2, 0);
             colliders[i].offset = new Vector2((pieces[i].p1 - GetDivider().p1).magnitude + width/2, 0);
             colliders[i].size = new Vector2(width, .01f);
             colliders[i].enabled = SegmentDividesLightAndDark(pieces[i]);
@@ -113,7 +132,7 @@ public abstract class DividesLight : AllTracker<DividesLight> {
     public LineSegment GetActual() {
         // TODO: Is it a problem that the actual always has the same length as the target?
         var targetUnrotated = Vector2.right*target.Length();
-        var targetRotated = (Vector2)(Quaternion.Euler(0,0,target.Angle())*targetUnrotated);
+        var targetRotated = (Vector2)(Quaternion.Euler(0,0,rb.rotation)*targetUnrotated);
         return new LineSegment(rb.position, rb.position + targetRotated);
     }
 
