@@ -2,6 +2,9 @@ using UnityEngine;
 using System.Collections.Generic;
 
 public abstract class DividesLight : AllTracker<DividesLight> {
+    [SerializeField]
+    protected bool DEBUG = false;
+
     private static List<LineSegment> pieces = new List<LineSegment>();
 
     private readonly float maxTorque = 10000000;
@@ -20,6 +23,7 @@ public abstract class DividesLight : AllTracker<DividesLight> {
     // Says which side is illuminated by 'lightSource'
     [SerializeField]
     private Side illuminatedSide;
+    private Side initialIlluminatedSide;
     private HingeJoint2D joint;
 
     // The line segment used to calculate intersections
@@ -37,11 +41,20 @@ public abstract class DividesLight : AllTracker<DividesLight> {
     }
 
     public void SetTarget(LineSegment target) {
-        if (this.target == LineSegment.zero) {
-            rb.position = target.p1;
-            rb.rotation = target.Angle();
-        }
+        bool firstSetTarget = this.target == LineSegment.zero;
+
         this.target = target;
+
+        if (!this.target.GoesAwayFrom(lightSource.GetTargetPosition())) {
+            this.target = this.target.Swapped();
+            illuminatedSide = initialIlluminatedSide == Side.left ? Side.right : Side.left;
+        }
+
+        if (firstSetTarget) {
+            rb.position = lightSource.GetTargetPosition();
+            rb.rotation = this.target.Angle();
+            firstSetTarget = false;
+        }
     }
 
     public abstract void DoFixedUpdate();
@@ -59,6 +72,7 @@ public abstract class DividesLight : AllTracker<DividesLight> {
         Debug.Assert(!initialized);
         initialized = true;
         this.lightSource = lightSource;
+        this.initialIlluminatedSide = illuminatedSide;
         this.illuminatedSide = illuminatedSide;
 
         //joint = gameObject.AddComponent<HingeJoint2D>();
@@ -78,13 +92,23 @@ public abstract class DividesLight : AllTracker<DividesLight> {
     }
 
     protected void AddSimpleForces() {
+        if (DEBUG) {
+            Debug.Log("Break point");
+        }
         if (target == LineSegment.zero) {
             return;
         }
         var targetAngle = target.Angle();
         var deltaAngle = targetAngle - rb.rotation - lightSource.GetComponent<Rigidbody2D>().angularVelocity*Time.deltaTime;
-        joint.motor = new JointMotor2D{maxMotorTorque = maxTorque, motorSpeed = Mathf.Clamp(deltaAngle/Time.deltaTime*.5f, -maxAngularSpeed, maxAngularSpeed)};
-        joint.connectedAnchor = new Vector2(-(lightSource.GetComponent<Rigidbody2D>().position - target.p1).magnitude, 0);
+
+        var motorSpeed = deltaAngle/Time.deltaTime*.5f;
+        if (DEBUG) {
+            Debug.Log("Motor speed: " + motorSpeed);
+            Debug.Log("Target angle: " + targetAngle);
+            Debug.Log("Delta angle: " + targetAngle);
+        }
+        joint.motor = new JointMotor2D{maxMotorTorque = maxTorque, motorSpeed = Mathf.Clamp(motorSpeed, -maxAngularSpeed, maxAngularSpeed)};
+        //joint.connectedAnchor = new Vector2(-(lightSource.GetComponent<Rigidbody2D>().position - target.p1).magnitude, 0);
         //PhysicsHelper.GetForceAndTorque(rb, target, out Vector2 force, out float torque);
 
         //rb.AddForce(Vector2.ClampMagnitude(force, 10*rb.mass));
@@ -110,11 +134,18 @@ public abstract class DividesLight : AllTracker<DividesLight> {
             float width = pieces[i].Length();
             // TODO: Maybe we shouldn't use the target here (<-- obsolete comment for now)
             // TODO: I feel like there is something important I'm missing here
-            //colliders[i].offset = new Vector2((pieces[i].p1 - lightSource.GetTargetPosition()).magnitude + width/2, 0);
-            colliders[i].offset = new Vector2((pieces[i].p1 - GetDivider().p1).magnitude + width/2, 0);
+            colliders[i].offset = new Vector2((pieces[i].p1 - lightSource.GetTargetPosition()).magnitude + width/2, 0);
             colliders[i].size = new Vector2(width, .01f);
             colliders[i].enabled = SegmentDividesLightAndDark(pieces[i]);
         }
+
+        // Moving the center of mass to rb.position, which is where the light
+        // source is. This makes things act nicer, for unclear reasons. But the
+        // code in AddSimpleForces totally breaks if this doesn't happen.
+        // Also, the inertia needs to be set manually because sometimes the
+        // physics system doesn't update the inertia.
+        rb.centerOfMass = Vector2.zero;
+        rb.inertia = PhysicsHelper.GetInertia(rb, colliders, Vector2.zero);
     }
 
 
@@ -133,7 +164,9 @@ public abstract class DividesLight : AllTracker<DividesLight> {
         // TODO: Is it a problem that the actual always has the same length as the target?
         var targetUnrotated = Vector2.right*target.Length();
         var targetRotated = (Vector2)(Quaternion.Euler(0,0,rb.rotation)*targetUnrotated);
-        return new LineSegment(rb.position, rb.position + targetRotated);
+
+        var actualP1 = rb.position + (Vector2)(targetRotated.normalized*((target.p1 - lightSource.GetTargetPosition()).magnitude));
+        return new LineSegment(actualP1, actualP1 + targetRotated);
     }
 
     protected void OnDrawGizmos() {

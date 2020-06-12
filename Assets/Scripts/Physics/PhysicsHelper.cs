@@ -111,4 +111,25 @@ class PhysicsHelper {
         var angleDifference = rbAngle - springAngle;
         return -angleDifference * springConstant - body.angularVelocity*damping;
     }
+
+    public static float GetInertia(Rigidbody2D body, List<BoxCollider2D> boxes, Vector2 pivot) {
+        float totalArea = 0;
+        foreach (var box in boxes) {
+            if (box.enabled) {
+                totalArea += box.size.x*box.size.y;
+            }
+        }
+
+        float inertia = 0;
+        foreach (var box in boxes) {
+            if (box.enabled) {
+                var boxMass = (body.mass / totalArea) * box.size.x*box.size.y;
+                // Parallel axis theorem
+                var inertiaAroundCentroid = boxMass * (box.size.y*box.size.y + box.size.x*box.size.x) / 12;
+                inertia += inertiaAroundCentroid + boxMass*box.offset.sqrMagnitude;
+            }
+        }
+
+        return inertia;
+    }
 }

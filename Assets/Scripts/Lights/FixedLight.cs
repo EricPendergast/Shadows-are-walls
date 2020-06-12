@@ -300,7 +300,7 @@ public class FixedLight : LightBase {
     void DoForces(LightEdge edge) {
         edge.MaxDifferenceFromTarget(out var point, out var difference);
     
-        Debug.Log("difference magnitude " + difference.magnitude);
+        //Debug.Log("difference magnitude " + difference.magnitude);
         if (difference.magnitude > .01) {
             // The angle change from actual to target
             var angleDelta = new LineSegment(body.position, point + difference).Angle(point);

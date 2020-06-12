@@ -3,9 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class LightEdge : DividesLight {
-    [SerializeField]
-    private bool DEBUG = false;
-
     protected override void Awake() {
         base.Awake();
 
@@ -29,9 +26,6 @@ public class LightEdge : DividesLight {
     //}
     //
     public override void DoFixedUpdate() {
-        if (DEBUG) {
-            Debug.Log("Break point");
-        }
         UpdateColliders();
         AddSimpleForces();
     }
