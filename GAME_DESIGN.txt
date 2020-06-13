@@ -32,5 +32,9 @@ I need to figure out what happens when a light compresses an object.
 
 Idea:
     Make object be made of 4 colliders, one at each corner, held together by
-    springs. This might be a good way to give feedback about crushing
+    springs. This might be a good way to give visual feedback about crushing
+
+    This may also be useful algorithmically, because you can tell to whwat
+    degree an object is being crushed. A light can detect when it is crushing
+    an object and act accordingly
     

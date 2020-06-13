@@ -9,6 +9,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2653933352807445335}
+  - component: {fileID: 197192551586185503}
+  - component: {fileID: 2936266651788608073}
   m_Layer: 0
   m_Name: Angleable light
   m_TagString: Untagged
@@ -23,55 +25,22 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2653933352807445334}
-  m_LocalRotation: {x: -0, y: -0, z: -0.74735755, w: 0.6644221}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 3.2, y: 3.91, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 286075417374860652}
-  - {fileID: 2653933353696417918}
   m_Father: {fileID: 0}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: -96.72401}
---- !u!1 &2653933353696417917
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 2653933353696417918}
-  - component: {fileID: 2653933353696417904}
-  - component: {fileID: 2653933353696417919}
-  m_Layer: 0
-  m_Name: Light 2 Angler
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &2653933353696417918
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2653933353696417917}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 2653933352807445335}
-  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!50 &2653933353696417904
+--- !u!50 &197192551586185503
 Rigidbody2D:
   serializedVersion: 4
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2653933353696417917}
+  m_GameObject: {fileID: 2653933352807445334}
   m_BodyType: 0
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
@@ -85,21 +54,22 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 7
---- !u!114 &2653933353696417919
+--- !u!114 &2936266651788608073
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2653933353696417917}
+  m_GameObject: {fileID: 2653933352807445334}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e881107dd20f0a2d79c07f1e8b9ee6f8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  angleLeft: 74
-  angleRight: 87
+  angleLeft: 45
+  angleRight: 45
   currentAngle: 0
+  apertureAngle: 35
   speed: 20
   controled: {fileID: 286075417374860649}
   gizmoLength: 1
@@ -128,7 +98,7 @@ PrefabInstance:
     - target: {fileID: 7909692603331570561, guid: 525e182bd728c0103a02b525d651d69d,
         type: 3}
       propertyPath: m_LocalRotation.x
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 7909692603331570561, guid: 525e182bd728c0103a02b525d651d69d,
         type: 3}
@@ -138,7 +108,7 @@ PrefabInstance:
     - target: {fileID: 7909692603331570561, guid: 525e182bd728c0103a02b525d651d69d,
         type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 7909692603331570561, guid: 525e182bd728c0103a02b525d651d69d,
         type: 3}

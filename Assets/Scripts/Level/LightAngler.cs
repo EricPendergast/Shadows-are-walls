@@ -1,5 +1,6 @@
 using UnityEngine;
 
+[ExecuteAlways]
 [RequireComponent(typeof(Rigidbody2D))]
 public class LightAngler : MonoBehaviour, SimpleLeverControlable, SimpleButtonControlable {
 
@@ -11,14 +12,16 @@ public class LightAngler : MonoBehaviour, SimpleLeverControlable, SimpleButtonCo
     private float angleRight = 90;
     [SerializeField]
     private float currentAngle = 0;
-    private float? _initialAngle;
-    private float initialAngle {
-        get => _initialAngle == null ? controled.GetActualAngle() - GetComponent<Rigidbody2D>().rotation: (float)_initialAngle;
+    [SerializeField]
+    private float apertureAngle = 35;
+    private Rigidbody2D _body;
+    private Rigidbody2D body {
+        get => _body == null ? GetComponent<Rigidbody2D>() : _body;
     }
     [SerializeField]
     private float speed = 10;
     [SerializeField]
-    private FixedLight controled;
+    public FixedLight controled;
     private SimpleButton.State? buttonState = null;
     [SerializeField]
     private float gizmoLength = 1;
@@ -26,16 +29,18 @@ public class LightAngler : MonoBehaviour, SimpleLeverControlable, SimpleButtonCo
     private RelativeJoint2D myJoint;
 
     public void Start() {
-        _initialAngle = initialAngle;
-        myJoint = gameObject.AddComponent<RelativeJoint2D>();
-        myJoint.connectedBody = controled.GetComponent<Rigidbody2D>();
-        myJoint.maxForce = 10;
-        myJoint.maxTorque = 10;
-        myJoint.autoConfigureOffset = false;
-        currentAngle = 0;
-        myJoint.angularOffset = initialAngle + currentAngle;
+        if (Application.IsPlaying(gameObject)) {
+            _body = body;
+            myJoint = gameObject.AddComponent<RelativeJoint2D>();
+            myJoint.connectedBody = controled.GetComponent<Rigidbody2D>();
+            myJoint.maxForce = 10;
+            myJoint.maxTorque = 10;
+            myJoint.autoConfigureOffset = false;
+            currentAngle = 0;
+            myJoint.angularOffset = currentAngle;
 
-        MovePosition(0);
+            MovePosition(0);
+        }
     }
 
     public void MovePosition(int direction) {
@@ -45,20 +50,15 @@ public class LightAngler : MonoBehaviour, SimpleLeverControlable, SimpleButtonCo
             direction = -direction;
         }
 
-        var newCurrentAngle = Mathf.Clamp(currentAngle + direction*speed*Time.deltaTime, minAngle, maxAngle);
+        var delta = direction*speed*Time.deltaTime;
+        var actualAngle = myJoint.connectedBody.rotation - body.rotation;
+        var newCurrentAngle = Mathf.Clamp(currentAngle + delta, minAngle, maxAngle);
 
-        //var targetAngle = initialAngle + newCurrentAngle;
-        //
-        //var actualAngle = controled.GetActualAngle() - GetComponent<Rigidbody2D>().rotation;
-        //
-        //var differenceFromTarget = Mathf.Abs(Mathf.DeltaAngle(actualAngle, targetAngle));
-        //if (differenceFromTarget > 2*speed*Time.deltaTime) {
-        //    if (Mathf.Abs(Mathf.DeltaAngle(actualAngle, currentAngle)) <= differenceFromTarget) {
-        //        return;
-        //    }
-        //}
+      
+        newCurrentAngle = Mathf.Clamp(newCurrentAngle, actualAngle - Mathf.Abs(2*delta), actualAngle + Mathf.Abs(2*delta));
+
         currentAngle = newCurrentAngle;
-        myJoint.angularOffset = initialAngle + currentAngle;
+        myJoint.angularOffset = currentAngle;
     }
 
     public void SetState(SimpleButton.State state) {
@@ -66,20 +66,32 @@ public class LightAngler : MonoBehaviour, SimpleLeverControlable, SimpleButtonCo
     }
 
     void FixedUpdate() {
-        if (buttonState == SimpleButton.State.unpressed) {
-            MovePosition(-1);
-        } else if (buttonState == SimpleButton.State.pressed) {
-            MovePosition(1);
+        if (Application.IsPlaying(gameObject)) {
+            if (buttonState == SimpleButton.State.unpressed) {
+                MovePosition(-1);
+            } else if (buttonState == SimpleButton.State.pressed) {
+                MovePosition(1);
+            }
         }
     }
 
     void OnDrawGizmos() {
         Gizmos.color = Color.red;
-        Gizmos.DrawRay(controled.GetActualPosition(), Quaternion.Euler(0,0,initialAngle - angleLeft - controled.GetTargetApertureAngle()/2)*Vector2.right*gizmoLength);
-        Gizmos.DrawRay(controled.GetActualPosition(), Quaternion.Euler(0,0,initialAngle + angleRight + controled.GetTargetApertureAngle()/2)*Vector2.right*gizmoLength);
+        Gizmos.DrawRay(controled.GetActualPosition(), Quaternion.Euler(0,0,body.rotation - angleLeft - controled.GetTargetApertureAngle()/2)*Vector2.right*gizmoLength);
+        Gizmos.DrawRay(controled.GetActualPosition(), Quaternion.Euler(0,0,body.rotation + angleRight + controled.GetTargetApertureAngle()/2)*Vector2.right*gizmoLength);
 
         Gizmos.color = Color.yellow;
-        Gizmos.DrawRay(controled.GetActualPosition(), Quaternion.Euler(0,0,initialAngle - angleLeft + controled.GetTargetApertureAngle()/2)*Vector2.right*gizmoLength);
-        Gizmos.DrawRay(controled.GetActualPosition(), Quaternion.Euler(0,0,initialAngle + angleRight - controled.GetTargetApertureAngle()/2)*Vector2.right*gizmoLength);
+        Gizmos.DrawRay(controled.GetActualPosition(), Quaternion.Euler(0,0,body.rotation - angleLeft + controled.GetTargetApertureAngle()/2)*Vector2.right*gizmoLength);
+        Gizmos.DrawRay(controled.GetActualPosition(), Quaternion.Euler(0,0,body.rotation + angleRight - controled.GetTargetApertureAngle()/2)*Vector2.right*gizmoLength);
+    }
+
+
+    public void Update() {
+        if (!Application.IsPlaying(gameObject)) {
+            currentAngle = Mathf.Clamp(currentAngle, -angleLeft, angleRight);
+            controled.transform.rotation = Quaternion.Euler(0,0,currentAngle)*transform.rotation;
+            controled.SetTargetApertureAngle(apertureAngle);
+            controled.transform.localPosition = Vector3.zero;
+        }
     }
 }

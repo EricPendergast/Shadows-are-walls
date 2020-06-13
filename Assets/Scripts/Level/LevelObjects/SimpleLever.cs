@@ -36,4 +36,9 @@ public class SimpleLever : Lever {
             controled.MovePosition(direction);
         }
     }
+
+    void OnDrawGizmosSelected() {
+        Gizmos.color = Color.magenta;
+        Gizmos.DrawLine(transform.position, controledGameObject.transform.position);
+    }
 }
