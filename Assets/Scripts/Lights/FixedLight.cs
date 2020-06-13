@@ -300,11 +300,12 @@ public class FixedLight : LightBase {
     void DoForces(LightEdge edge) {
         edge.MaxDifferenceFromTarget(out var point, out var difference);
     
-        Debug.Log("difference magnitude " + difference.magnitude);
-        if (difference.magnitude >= .13) {
-            difference = difference.normalized * (difference.magnitude - .13f);
+        //if (difference.magnitude != 0) {
+            //Debug.Log("difference magnitude " + difference.magnitude);
+            //difference = difference.normalized * (difference.magnitude - .13f);
             // The angle change from actual to target
-            var angleDelta = new LineSegment(body.position, point + difference).Angle(point);
+            var angleDelta = new LineSegment(body.position, point + difference).Angle(point) + body.angularVelocity*Time.deltaTime*1f;
+            //Debug.Log("angle delta " + angleDelta);
             //var torque = PhysicsHelper.GetRotateToTorque(body, 0, angleDelta*.1f)*.5f;
             //var torque = PhysicsHelper.GetRotateToTorque(body, 0, 0);
             //Debug.Log("test1 " + torque);
@@ -314,7 +315,7 @@ public class FixedLight : LightBase {
             //body.AddTorque(torque);
             //body.angularVelocity *= .9f;
             body.AddTorque(PhysicsHelper.GetSpringTorque(body, angleDelta, 0, correctionSpringConstant, correctionDampingConstant));
-        }
+        //}
     }
 
     List<System.Tuple<LineSegment, Shadow>> GetShadowData() {

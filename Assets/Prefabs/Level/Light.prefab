@@ -46,8 +46,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   targetAngle: 60
   distance: 19.28
-  correctionSpringConstant: 60
-  correctionDampingConstant: 1.1
+  correctionSpringConstant: 20
+  correctionDampingConstant: 0.1
   shadowParent: {fileID: 0}
 --- !u!50 &7909692603331570575
 Rigidbody2D:

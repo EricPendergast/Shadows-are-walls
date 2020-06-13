@@ -27,8 +27,8 @@ public class Positioner : MonoBehaviour, SimpleLeverControlable, SimpleButtonCon
         myJoint = gameObject.AddComponent<RelativeJoint2D>();
 
         myJoint.connectedBody = controled.GetComponent<Rigidbody2D>();
-        myJoint.maxForce = 1000;
-        myJoint.maxTorque = 1000;
+        myJoint.maxForce = 100000;
+        myJoint.maxTorque = 100000;
         myJoint.autoConfigureOffset = false;
         myJoint.angularOffset = 0;
 

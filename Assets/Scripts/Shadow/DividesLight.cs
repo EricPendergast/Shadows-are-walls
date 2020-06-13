@@ -64,7 +64,7 @@ public abstract class DividesLight : AllTracker<DividesLight> {
         gameObject.layer = PhysicsHelper.shadowEdgeLayer;
         rb = gameObject.AddComponent<Rigidbody2D>();
         rb.gravityScale = 0;
-        rb.mass = 5;
+        rb.mass = 25;
         rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
     }
 
