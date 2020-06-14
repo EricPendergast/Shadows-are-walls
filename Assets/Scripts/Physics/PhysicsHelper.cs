@@ -106,10 +106,10 @@ class PhysicsHelper {
         GetForceAndTorque(body, target, out force, out torque);
     }
 
-    public static float GetSpringTorque(Rigidbody2D body, float rbAngle, float springAngle, float springConstant, float damping) {
+    public static float GetSpringTorque(float rbAngle, float springAngle, float rbAngVel, float springAngVel, float springConstant, float damping) {
         // Using the equation F = -k*x - b*v
         var angleDifference = rbAngle - springAngle;
-        return -angleDifference * springConstant - body.angularVelocity*damping;
+        return -angleDifference * springConstant - (rbAngVel - springAngVel)*damping;
     }
 
     public static float GetInertia(Rigidbody2D body, List<BoxCollider2D> boxes, Vector2 pivot) {

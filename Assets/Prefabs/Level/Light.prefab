@@ -44,10 +44,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 034cc4912f88eb426b27d36c1b9322be, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  DEBUG: 0
   targetAngle: 60
-  distance: 19.28
-  correctionSpringConstant: 20
-  correctionDampingConstant: 0.1
+  distance: 50.1
+  correctionSpringConstant: 80
+  correctionDampingConstant: 0
   shadowParent: {fileID: 0}
 --- !u!50 &7909692603331570575
 Rigidbody2D:

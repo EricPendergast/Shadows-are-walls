@@ -70,7 +70,7 @@ MonoBehaviour:
   angleRight: 45
   currentAngle: 0
   apertureAngle: 35
-  speed: 20
+  speed: 40
   controled: {fileID: 286075417374860649}
   gizmoLength: 1
 --- !u!1001 &7943372897459195629
@@ -103,7 +103,7 @@ PrefabInstance:
     - target: {fileID: 7909692603331570561, guid: 525e182bd728c0103a02b525d651d69d,
         type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 7909692603331570561, guid: 525e182bd728c0103a02b525d651d69d,
         type: 3}
@@ -148,12 +148,7 @@ PrefabInstance:
     - target: {fileID: 7909692603331570564, guid: 525e182bd728c0103a02b525d651d69d,
         type: 3}
       propertyPath: targetAngle
-      value: 36.81
-      objectReference: {fileID: 0}
-    - target: {fileID: 7909692603331570564, guid: 525e182bd728c0103a02b525d651d69d,
-        type: 3}
-      propertyPath: distance
-      value: 61.7
+      value: 35
       objectReference: {fileID: 0}
     - target: {fileID: 7909692603331570565, guid: 525e182bd728c0103a02b525d651d69d,
         type: 3}

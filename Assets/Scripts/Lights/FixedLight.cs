@@ -10,6 +10,8 @@ using UnityEngine;
 //      direction of the light
 [RequireComponent(typeof(Rigidbody2D))]
 public class FixedLight : LightBase {
+    [SerializeField]
+    private bool DEBUG = false;
 
     private class DebugSnapshot {
         public Triangle actualViewTriangle;
@@ -304,7 +306,9 @@ public class FixedLight : LightBase {
             //Debug.Log("difference magnitude " + difference.magnitude);
             //difference = difference.normalized * (difference.magnitude - .13f);
             // The angle change from actual to target
-            var angleDelta = new LineSegment(body.position, point + difference).Angle(point) + body.angularVelocity*Time.deltaTime*1f;
+
+            var angleDelta = new LineSegment(body.position, point + difference).Angle(point) + body.angularVelocity*Time.deltaTime*2f;
+            //angleDelta = Mathf.Clamp(angleDelta, -.5f, .5f);
             //Debug.Log("angle delta " + angleDelta);
             //var torque = PhysicsHelper.GetRotateToTorque(body, 0, angleDelta*.1f)*.5f;
             //var torque = PhysicsHelper.GetRotateToTorque(body, 0, 0);
@@ -314,7 +318,7 @@ public class FixedLight : LightBase {
             //Debug.Log("test5 " + angleDelta);
             //body.AddTorque(torque);
             //body.angularVelocity *= .9f;
-            body.AddTorque(PhysicsHelper.GetSpringTorque(body, angleDelta, 0, correctionSpringConstant, correctionDampingConstant));
+            body.AddTorque(PhysicsHelper.GetSpringTorque(angleDelta, 0, body.angularVelocity, /*edge.AngularVelocity()*/0, correctionSpringConstant, correctionDampingConstant));
         //}
     }
 

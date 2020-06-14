@@ -75,11 +75,8 @@ public abstract class DividesLight : AllTracker<DividesLight> {
         this.initialIlluminatedSide = illuminatedSide;
         this.illuminatedSide = illuminatedSide;
 
-        //joint = gameObject.AddComponent<HingeJoint2D>();
         joint = lightSource.GetEdgeMountPoint().gameObject.AddComponent<HingeJoint2D>();
         joint.autoConfigureConnectedAnchor = false;
-        // TODO: Connected anchor is improperly set
-        //joint.connectedBody = lightSource.GetComponent<Rigidbody2D>();
         joint.connectedBody = rb;
         joint.connectedAnchor = Vector2.zero;
         joint.useMotor = true;
@@ -99,7 +96,7 @@ public abstract class DividesLight : AllTracker<DividesLight> {
             return;
         }
         var targetAngle = target.Angle();
-        var deltaAngle = Mathf.DeltaAngle(rb.rotation, targetAngle) - lightSource.GetComponent<Rigidbody2D>().angularVelocity*Time.deltaTime;
+        var deltaAngle = Mathf.DeltaAngle(rb.rotation, targetAngle);
 
         var motorSpeed = deltaAngle/Time.deltaTime;
         if (DEBUG) {

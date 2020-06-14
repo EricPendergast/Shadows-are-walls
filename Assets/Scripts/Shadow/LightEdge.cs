@@ -30,6 +30,10 @@ public class LightEdge : DividesLight {
         AddSimpleForces();
     }
 
+    public float AngularVelocity() {
+        return rb.angularVelocity;
+    }
+
     // 'point' lies on the target
     // point+difference is the point on the actual light edge
     public void MaxDifferenceFromTarget(out Vector2 point, out Vector2 difference) {
