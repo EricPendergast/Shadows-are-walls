@@ -47,8 +47,10 @@ MonoBehaviour:
   DEBUG: 0
   targetAngle: 60
   distance: 50.1
-  correctionSpringConstant: 80
-  correctionDampingConstant: 0
+  velocityCorrectionConstant: 0.5
+  maxCorrectionTorque: 245.8
+  correctionSpringConstant: 256.7
+  correctionDampingConstant: 0.2
   shadowParent: {fileID: 0}
 --- !u!50 &7909692603331570575
 Rigidbody2D:

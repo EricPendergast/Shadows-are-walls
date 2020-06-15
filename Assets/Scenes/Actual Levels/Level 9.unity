@@ -1228,7 +1228,7 @@ PrefabInstance:
     - target: {fileID: 286075417374860649, guid: 15bd302424c602f83a2efec63265fb02,
         type: 3}
       propertyPath: targetAngle
-      value: 104.6
+      value: 100
       objectReference: {fileID: 0}
     - target: {fileID: 286075417374860649, guid: 15bd302424c602f83a2efec63265fb02,
         type: 3}
@@ -1363,7 +1363,7 @@ PrefabInstance:
     - target: {fileID: 2936266651788608073, guid: 15bd302424c602f83a2efec63265fb02,
         type: 3}
       propertyPath: angleRight
-      value: 38
+      value: 46.2
       objectReference: {fileID: 0}
     - target: {fileID: 2936266651788608073, guid: 15bd302424c602f83a2efec63265fb02,
         type: 3}

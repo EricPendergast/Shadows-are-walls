@@ -33,8 +33,8 @@ public class LightAngler : MonoBehaviour, SimpleLeverControlable, SimpleButtonCo
             _body = body;
             myJoint = gameObject.AddComponent<RelativeJoint2D>();
             myJoint.connectedBody = controled.GetComponent<Rigidbody2D>();
-            myJoint.maxForce = 40;
-            myJoint.maxTorque = 40;
+            myJoint.maxForce = 80;
+            myJoint.maxTorque = 80;
             myJoint.autoConfigureOffset = false;
             currentAngle = 0;
             myJoint.angularOffset = currentAngle;
