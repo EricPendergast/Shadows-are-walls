@@ -53,6 +53,7 @@ public abstract class DividesLight : AllTracker<DividesLight> {
         if (firstSetTarget) {
             rb.position = lightSource.GetTargetPosition();
             rb.rotation = this.target.Angle();
+            GetComponent<PlatformEffector2D>().rotationalOffset = illuminatedSide == Side.left ? 0 : 180;
             firstSetTarget = false;
         }
     }
@@ -66,6 +67,14 @@ public abstract class DividesLight : AllTracker<DividesLight> {
         rb.gravityScale = 0;
         rb.mass = 5;
         rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
+
+        var platformEffector = gameObject.AddComponent<PlatformEffector2D>();
+
+        platformEffector.rotationalOffset = 0;
+        platformEffector.useOneWay = true;
+        platformEffector.useSideBounce = false;
+        platformEffector.useSideFriction = false;
+        platformEffector.colliderMask = Physics2D.GetLayerCollisionMask(gameObject.layer);
     }
 
     public void Init(LightBase lightSource, Side illuminatedSide) {
@@ -134,6 +143,7 @@ public abstract class DividesLight : AllTracker<DividesLight> {
             colliders[i].offset = new Vector2((pieces[i].p1 - lightSource.GetTargetPosition()).magnitude + width/2, 0);
             colliders[i].size = new Vector2(width, .01f);
             colliders[i].enabled = SegmentDividesLightAndDark(pieces[i]);
+            colliders[i].usedByEffector = true;
         }
 
         // Moving the center of mass to rb.position, which is where the light
