@@ -50,6 +50,10 @@ public class Player : MonoBehaviour {
         if (inputForce != Vector3.zero) {
             inputForce = PhysicsHelper.TruncateForce(rb, maxSpeed, inputForce);
             rb.AddForce(inputForce);
+            var standingOn = GetStandingOn();
+            foreach (var col in standingOn) {
+                col.attachedRigidbody.AddForce(-inputForce/standingOn.Count);
+            }
         }
 
         if (current == State.jumping) {
@@ -99,14 +103,16 @@ public class Player : MonoBehaviour {
         current = IsOnGround() ? State.onGround : State.inAir;
     }
 
-    bool IsOnGround() {
+    List<Collider2D> GetStandingOn() {
         var colliders = new List<Collider2D>();
         groundDetector.GetContacts(colliders);
-        foreach (var col in colliders) {
-            if (col != mainCollider && col != interactableDetector && !col.isTrigger) {
-                return true;
-            }
-        }
-        return false;
+
+        colliders.RemoveAll(col => col == mainCollider || col == interactableDetector || col.isTrigger);
+
+        return colliders;
+    }
+
+    bool IsOnGround() {
+        return GetStandingOn().Count > 0;
     }
 }

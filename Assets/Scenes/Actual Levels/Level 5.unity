@@ -705,7 +705,12 @@ PrefabInstance:
     - target: {fileID: 286075417374860649, guid: 15bd302424c602f83a2efec63265fb02,
         type: 3}
       propertyPath: targetAngle
-      value: 45.2
+      value: 35
+      objectReference: {fileID: 0}
+    - target: {fileID: 286075417374860649, guid: 15bd302424c602f83a2efec63265fb02,
+        type: 3}
+      propertyPath: distance
+      value: 30
       objectReference: {fileID: 0}
     - target: {fileID: 2653933352807445334, guid: 15bd302424c602f83a2efec63265fb02,
         type: 3}

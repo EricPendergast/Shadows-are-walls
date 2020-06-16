@@ -29,6 +29,7 @@ public class LightAngler : MonoBehaviour, SimpleLeverControlable, SimpleButtonCo
     private RelativeJoint2D myJoint;
 
     public void Start() {
+        ApplySettings();
         if (Application.IsPlaying(gameObject)) {
             _body = body;
             myJoint = gameObject.AddComponent<RelativeJoint2D>();
@@ -85,13 +86,18 @@ public class LightAngler : MonoBehaviour, SimpleLeverControlable, SimpleButtonCo
         Gizmos.DrawRay(controled.GetActualPosition(), Quaternion.Euler(0,0,body.rotation + angleRight - controled.GetTargetApertureAngle()/2)*Vector2.right*gizmoLength);
     }
 
+    void ApplySettings() {
+        var minAngle = Mathf.Min(-angleLeft, angleRight);
+        var maxAngle = Mathf.Max(-angleLeft, angleRight);
+        currentAngle = Mathf.Clamp(currentAngle, minAngle, maxAngle);
+        controled.transform.rotation = Quaternion.Euler(0,0,currentAngle)*transform.rotation;
+        controled.SetTargetApertureAngle(apertureAngle);
+        controled.transform.localPosition = Vector3.zero;
+    }
 
     public void Update() {
         if (!Application.IsPlaying(gameObject)) {
-            currentAngle = Mathf.Clamp(currentAngle, -angleLeft, angleRight);
-            controled.transform.rotation = Quaternion.Euler(0,0,currentAngle)*transform.rotation;
-            controled.SetTargetApertureAngle(apertureAngle);
-            controled.transform.localPosition = Vector3.zero;
+            ApplySettings();
         }
     }
 }
