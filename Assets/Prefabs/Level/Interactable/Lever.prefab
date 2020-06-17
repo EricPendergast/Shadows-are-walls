@@ -45,6 +45,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3b554705806e0858b95de4cd304c5942, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  snapToGrid: 1
+  gridSize: 0.25
+  snapPoint: {x: 0, y: -0.5}
   controledGameObject: {fileID: 0}
 --- !u!33 &1325032037878620005
 MeshFilter:

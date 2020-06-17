@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class PositionerPoint : MonoBehaviour {
+public class PositionerPoint : SnappableObject {
 
     public Positioner myPositioner;
 

@@ -55,4 +55,17 @@ public class Util {
             v2 = null;
         }
     }
+
+    public static Vector2 Round(Vector2 vec) {
+        return new Vector2(
+                Mathf.Round(vec.x),
+                Mathf.Round(vec.y));
+    }
+
+    public static Vector3 Round(Vector3 vec) {
+        return new Vector3(
+                Mathf.Round(vec.x),
+                Mathf.Round(vec.y),
+                Mathf.Round(vec.z));
+    }
 }

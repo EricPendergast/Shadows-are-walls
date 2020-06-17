@@ -138,15 +138,20 @@ PrefabInstance:
       propertyPath: controledGameObject
       value: 
       objectReference: {fileID: 1625038265}
+    - target: {fileID: 5363106461772989931, guid: ebf17bf1e1a73956ab915b1f0aace848,
+        type: 3}
+      propertyPath: snapToGrid
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7149968815826932932, guid: ebf17bf1e1a73956ab915b1f0aace848,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 21.09
+      value: 21
       objectReference: {fileID: 0}
     - target: {fileID: 7149968815826932932, guid: ebf17bf1e1a73956ab915b1f0aace848,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.14999998
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 7149968815826932932, guid: ebf17bf1e1a73956ab915b1f0aace848,
         type: 3}
@@ -205,12 +210,12 @@ PrefabInstance:
     - target: {fileID: 3925993344884474903, guid: f7c5cd974b51bb58b95dd03b09632202,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 18.279999
+      value: 19
       objectReference: {fileID: 0}
     - target: {fileID: 3925993344884474903, guid: f7c5cd974b51bb58b95dd03b09632202,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.86
+      value: -0.5
       objectReference: {fileID: 0}
     - target: {fileID: 3925993344884474903, guid: f7c5cd974b51bb58b95dd03b09632202,
         type: 3}
@@ -260,7 +265,17 @@ PrefabInstance:
     - target: {fileID: 3925993344884474903, guid: f7c5cd974b51bb58b95dd03b09632202,
         type: 3}
       propertyPath: m_LocalScale.x
-      value: 12.054799
+      value: 13
+      objectReference: {fileID: 0}
+    - target: {fileID: 3925993344884474903, guid: f7c5cd974b51bb58b95dd03b09632202,
+        type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3925993344884474904, guid: f7c5cd974b51bb58b95dd03b09632202,
+        type: 3}
+      propertyPath: gridSize
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3925993344884474905, guid: f7c5cd974b51bb58b95dd03b09632202,
         type: 3}
@@ -348,12 +363,12 @@ PrefabInstance:
     - target: {fileID: 3925993344884474903, guid: f7c5cd974b51bb58b95dd03b09632202,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 27.079998
+      value: 27.5
       objectReference: {fileID: 0}
     - target: {fileID: 3925993344884474903, guid: f7c5cd974b51bb58b95dd03b09632202,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: -4.3599997
+      value: -4.5
       objectReference: {fileID: 0}
     - target: {fileID: 3925993344884474903, guid: f7c5cd974b51bb58b95dd03b09632202,
         type: 3}
@@ -403,7 +418,17 @@ PrefabInstance:
     - target: {fileID: 3925993344884474903, guid: f7c5cd974b51bb58b95dd03b09632202,
         type: 3}
       propertyPath: m_LocalScale.x
-      value: 12.054799
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 3925993344884474903, guid: f7c5cd974b51bb58b95dd03b09632202,
+        type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3925993344884474904, guid: f7c5cd974b51bb58b95dd03b09632202,
+        type: 3}
+      propertyPath: gridSize
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3925993344884474905, guid: f7c5cd974b51bb58b95dd03b09632202,
         type: 3}

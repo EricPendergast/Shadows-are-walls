@@ -65,7 +65,8 @@ public class SimpleButton : LevelObject {
         }
     }
 
-    void OnDrawGizmosSelected() {
+    protected override void OnDrawGizmosSelected() {
+        base.OnDrawGizmosSelected();
         Gizmos.color = Color.magenta;
         Gizmos.DrawLine(transform.position, controledGameObject.transform.position);
     }

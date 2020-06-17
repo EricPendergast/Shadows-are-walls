@@ -1,7 +1,8 @@
 using UnityEngine;
 
+[ExecuteAlways]
 [RequireComponent(typeof(Rigidbody2D))]
-public class Positioner : MonoBehaviour, SimpleLeverControlable, SimpleButtonControlable {
+public class Positioner : SnappableObject, SimpleLeverControlable, SimpleButtonControlable {
 
     [SerializeField]
     private PositionerPoint left;
@@ -19,20 +20,22 @@ public class Positioner : MonoBehaviour, SimpleLeverControlable, SimpleButtonCon
     private SimpleButton.State? buttonState = null;
 
     void Start() {
-        Debug.Assert(controled != null);
-        position = (controled.position - left.Position()).magnitude/(right.Position() - left.Position()).magnitude;
-        left.myPositioner = this;
-        right.myPositioner = this;
+        ApplySettings();
+        if (Application.isPlaying) {
+            Debug.Assert(controled != null);
+            left.myPositioner = this;
+            right.myPositioner = this;
 
-        myJoint = gameObject.AddComponent<RelativeJoint2D>();
+            myJoint = gameObject.AddComponent<RelativeJoint2D>();
 
-        myJoint.connectedBody = controled.GetComponent<Rigidbody2D>();
-        myJoint.maxForce = 100000;
-        myJoint.maxTorque = 100000;
-        myJoint.autoConfigureOffset = false;
-        myJoint.angularOffset = 0;
+            myJoint.connectedBody = controled.GetComponent<Rigidbody2D>();
+            myJoint.maxForce = 100000;
+            myJoint.maxTorque = 100000;
+            myJoint.autoConfigureOffset = false;
+            myJoint.angularOffset = 0;
 
-        MovePosition(0);
+            MovePosition(0);
+        }
     }
 
     public void MovePosition(int direction) {
@@ -49,10 +52,12 @@ public class Positioner : MonoBehaviour, SimpleLeverControlable, SimpleButtonCon
     }
 
     void FixedUpdate() {
-        if (buttonState == SimpleButton.State.unpressed) {
-            MovePosition(-1);
-        } else if (buttonState == SimpleButton.State.pressed) {
-            MovePosition(1);
+        if (Application.isPlaying) {
+            if (buttonState == SimpleButton.State.unpressed) {
+                MovePosition(-1);
+            } else if (buttonState == SimpleButton.State.pressed) {
+                MovePosition(1);
+            }
         }
     }
 
@@ -76,8 +81,16 @@ public class Positioner : MonoBehaviour, SimpleLeverControlable, SimpleButtonCon
         if (left != null && right != null) {
             Gizmos.DrawLine(left.Position(), right.Position());
         }
-        if (controled != null) {
-            GizmosUtil.DrawConstantWidthSphere(controled.position, .05f);
+    }
+
+    void ApplySettings() {
+        position = Mathf.Clamp01(position);
+        controled.transform.position = Vector2.Lerp(left.Position(), right.Position(), position);
+    }
+
+    void Update() {
+        if (!Application.isPlaying) {
+            ApplySettings();
         }
     }
 }

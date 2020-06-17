@@ -68,6 +68,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 81837a9c9b63118b89cee7bef484716e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  snapToGrid: 0
+  gridSize: 1
+  snapPoint: {x: -0.5, y: -0.5}
   left: {fileID: 8473380976341536437}
   right: {fileID: 5189401114594595543}
   position: 0
@@ -116,6 +119,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4cea9b9ca073c189c9ee80b778c8e83a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  snapToGrid: 1
+  gridSize: 0.25
+  snapPoint: {x: 0, y: 0}
   myPositioner: {fileID: 7969332919216541204}
 --- !u!1 &9152861682243089159
 GameObject:
@@ -160,6 +166,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4cea9b9ca073c189c9ee80b778c8e83a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  snapToGrid: 1
+  gridSize: 0.25
+  snapPoint: {x: 0, y: 0}
   myPositioner: {fileID: 7969332919216541204}
 --- !u!1001 &2661002775124664842
 PrefabInstance:
@@ -237,6 +246,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalScale.y
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3925993344884474904, guid: f7c5cd974b51bb58b95dd03b09632202,
+        type: 3}
+      propertyPath: snapToGrid
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3925993344884474905, guid: f7c5cd974b51bb58b95dd03b09632202,
         type: 3}

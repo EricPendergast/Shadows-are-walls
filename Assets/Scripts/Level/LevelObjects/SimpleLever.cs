@@ -41,4 +41,10 @@ public class SimpleLever : Lever {
         Gizmos.color = Color.magenta;
         Gizmos.DrawLine(transform.position, controledGameObject.transform.position);
     }
+
+    public override void DoSnapping() {
+        if (snapToGrid) {
+            SnapPoint(transform.TransformPoint(snapPoint));
+        }
+    }
 }
