@@ -8,7 +8,6 @@ public abstract class DividesLight : AllTracker<DividesLight> {
     private static List<LineSegment> pieces = new List<LineSegment>();
 
     private readonly float maxTorque = 1000000000;
-    //private readonly float maxAngularAccel = 20;
     private readonly float maxAngularSpeed = 120;
 
     public enum Side {
@@ -68,7 +67,6 @@ public abstract class DividesLight : AllTracker<DividesLight> {
         rb.gravityScale = 0;
         rb.mass = 10;
         rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
-        //rb.constraints = RigidbodyConstraints2D.FreezePosition;
 
         var platformEffector = gameObject.AddComponent<PlatformEffector2D>();
 
@@ -117,10 +115,8 @@ public abstract class DividesLight : AllTracker<DividesLight> {
         }
         joint.motor = new JointMotor2D{maxMotorTorque = maxTorque, motorSpeed = Mathf.Clamp(motorSpeed, -maxAngularSpeed, maxAngularSpeed)};
         //joint.connectedAnchor = new Vector2(-(lightSource.GetComponent<Rigidbody2D>().position - target.p1).magnitude, 0);
-        //PhysicsHelper.GetForceAndTorque(rb, target, out Vector2 force, out float torque);
 
-        //rb.AddForce(Vector2.ClampMagnitude(force, 10*rb.mass));
-        //rb.AddTorque(Mathf.Clamp(torque, -10*rb.inertia, 10*rb.inertia));
+        //PhysicsHelper.GetForceAndTorque(rb, target, out Vector2 force, out float torque);
         //rb.AddForce(force);
         //rb.AddTorque(torque);
     }
@@ -140,8 +136,6 @@ public abstract class DividesLight : AllTracker<DividesLight> {
 
         for (int i = 0; i < pieces.Count; i++) {
             float width = pieces[i].Length();
-            // TODO: Maybe we shouldn't use the target here (<-- obsolete comment for now)
-            // TODO: I feel like there is something important I'm missing here
             colliders[i].offset = new Vector2((pieces[i].p1 - lightSource.GetTargetPosition()).magnitude + width/2, 0);
             colliders[i].size = new Vector2(width, .01f);
             colliders[i].enabled = SegmentDividesLightAndDark(pieces[i]);

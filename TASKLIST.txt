@@ -84,10 +84,6 @@ Possible things to do:
 
     Make light anglers also do the aperture angle (have leftAperture and rightAperture fields)
 
-    Change names of things:
-        DividesLight to LightDivider
-        FixedLight to ...?
-
     Make shadow edges use PlatformEffector2D. I think this will make their
     behavior cleaner in some edge cases
         This would require having two platform effectors for each edge; on the
@@ -99,3 +95,10 @@ Visuals:
         - They would each have a shader
         - also decide whether that shader gets applied by their script, or if
           they are in a prefab
+
+
+Cleaning:
+    Change names of things:
+        DividesLight to LightDivider
+        FixedLight to ...?
+             (FixedLight is definitely not fixed anymore)

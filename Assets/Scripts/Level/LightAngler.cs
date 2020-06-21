@@ -47,7 +47,7 @@ public class LightAngler : LevelObject, SimpleLeverControlable, SimpleButtonCont
         }
 
         var delta = direction*speed*Time.deltaTime;
-        var actualAngle = controled.GetActualAngle() - body.rotation;
+        var actualAngle = myJoint.connectedBody.rotation - body.rotation;
         var newCurrentAngle = Mathf.Clamp(currentAngle + delta, minAngle, maxAngle);
 
       

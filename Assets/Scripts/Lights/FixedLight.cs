@@ -78,18 +78,6 @@ public class FixedLight : LightBase {
         return apertureAngle;
     }
 
-    public float GetActualApertureAngle() {
-        return ActualLeftEdge().UnsignedAngle(ActualRightEdge());
-    }
-
-    public float GetActualAngle() {
-        var left = ActualLeftEdge();
-        var right = ActualRightEdge();
-        if (left.p1 == left.p2 || right.p1 == right.p2) {
-            return GetTargetAngle();
-        }
-        return new LineSegment((left.p1 + right.p1)/2, (left.p2 + right.p2)/2).Angle();
-    }
 
     public float GetTargetAngle() {
         return body.rotation;
@@ -105,27 +93,6 @@ public class FixedLight : LightBase {
 
     public override Vector2 GetTargetPosition() {
         return body.position;
-    }
-
-    public Vector2 GetActualPosition() {
-        var left = ActualLeftEdge();
-        var right = ActualRightEdge();
-        if (left.p1 == left.p2 || right.p1 == right.p2) {
-            return GetTargetPosition();
-        }
-        return (left.p1 + right.p1)/2;
-    }
-
-    public LineSegment ActualFarEdge() {
-        return new LineSegment(actualViewTriangle.p2, actualViewTriangle.p3);
-    }
-
-    public LineSegment ActualRightEdge() {
-        return new LineSegment(actualViewTriangle.p1, actualViewTriangle.p3);
-    }
-
-    public LineSegment ActualLeftEdge() {
-        return new LineSegment(actualViewTriangle.p1, actualViewTriangle.p2);
     }
 
     public LineSegment TargetFarEdge() {
@@ -221,7 +188,6 @@ public class FixedLight : LightBase {
     protected override void Awake() {
         base.Awake();
 
-        //shadowParent = new GameObject(gameObject.name + " shadows");
         shadowParent = gameObject;
 
         SetUpLightEdges();
@@ -273,9 +239,6 @@ public class FixedLight : LightBase {
     }
 
     public override void DoFixedUpdate() {
-        //transform.rotation = Quaternion.Euler(0,0,body.rotation);
-        //transform.position = body.position;
-        
         DoForces();
 
         CacheViewTriangles();
@@ -292,9 +255,6 @@ public class FixedLight : LightBase {
 
         SendDataToShadows(shadowData);
         SendDataToLightEdges(shadowData);
-
-        //DEBUG.Clear();
-        //DEBUG.AddRange(shadows.Keys);
     }
 
     void Update() {
@@ -302,7 +262,6 @@ public class FixedLight : LightBase {
     }
 
     void DoForces() {
-        //body.rotation = targetAngle;
         //return;
         DoForces(rightShadowEdge);
         DoForces(leftShadowEdge);
@@ -356,14 +315,6 @@ public class FixedLight : LightBase {
             //var torque2 = PhysicsHelper.GetSpringTorque(body.rotation, targetAngle, body.angularVelocity, [>edge.AngularVelocity()<]0, toTargetSpringConstant, toTargetDampingConstant);
             //body.AddTorque(Mathf.Clamp(torque2, -maxToTargetTorque, maxToTargetTorque));
         //}
-    }
-
-    IEnumerator SlowVelocityCoroutine() {
-        body.angularVelocity *= .5f;
-        for (int i = 0; i < 5; i++) {
-            yield return new WaitForFixedUpdate();
-            body.angularVelocity *= .5f;
-        }
     }
 
     List<System.Tuple<LineSegment, Shadow>> GetShadowData() {
@@ -437,20 +388,11 @@ public class FixedLight : LightBase {
     }
 
     private void SendDataToLightEdges(List<System.Tuple<LineSegment, Shadow>> shadowData) {
-        //rightShadowEdge.SetTarget(TargetRightEdge());
-        //leftShadowEdge.SetTarget(TargetLeftEdge());
-        //farShadowEdge.SetTarget(TargetFarEdge());
 
         var rightExtent = shadowData[0].Item1.p1;
         var leftExtent = shadowData[shadowData.Count-1].Item1.p2;
         rightShadowEdge.SetTarget(new LineSegment(GetTargetPosition(), rightExtent));
         leftShadowEdge.SetTarget(new LineSegment(GetTargetPosition(), leftExtent));
-        //rightShadowEdge.SetTargetLength(Mathf.Min(
-        //            (rightExtent - GetActualPosition()).magnitude,
-        //            (rightExtent - GetTargetPosition()).magnitude));
-        //leftShadowEdge.SetTargetLength(Mathf.Min(
-        //            (leftExtent - GetActualPosition()).magnitude,
-        //            (leftExtent - GetTargetPosition()).magnitude));
     }
 
     float Angle(Vector2 p) {
