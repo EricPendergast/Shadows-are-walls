@@ -8,6 +8,7 @@ public class ShadowEdge : DividesLight {
     protected override void Awake() {
         base.Awake();
         collidersEnabled = true;
+        rb.mass = 1000;
     }
     //public override void Init(LightBase lightSource, Side illuminatedSide) {
     //  Debug.Assert(false);

@@ -37,14 +37,11 @@ public class SimpleLever : Lever {
         }
     }
 
-    void OnDrawGizmosSelected() {
+    protected override void OnDrawGizmosSelected() {
+        base.OnDrawGizmosSelected();
         Gizmos.color = Color.magenta;
-        Gizmos.DrawLine(transform.position, controledGameObject.transform.position);
-    }
-
-    public override void DoSnapping() {
-        if (snapToGrid) {
-            SnapPoint(transform.TransformPoint(snapPoint));
+        if (controledGameObject != null) {
+            Gizmos.DrawLine(transform.position, controledGameObject.transform.position);
         }
     }
 }

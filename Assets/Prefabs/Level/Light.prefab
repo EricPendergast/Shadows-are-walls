@@ -45,12 +45,25 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   DEBUG: 0
-  targetAngle: 60
+  apertureAngle: 0
   distance: 50.1
-  velocityCorrectionConstant: 0.5
-  maxCorrectionTorque: 245.8
-  correctionSpringConstant: 256.7
-  correctionDampingConstant: 0.2
+  targetAngle: 60
+  settings:
+    velocityCorrectionConstant: 0
+    maxCorrectionTorque: 100000000
+    correctionSpringConstant: 10
+    correctionDampingConstant: 0.2
+    velocityMultiplier: 1
+    mass: 0
+  plasticModeSettings:
+    velocityCorrectionConstant: 1
+    maxCorrectionTorque: 10000000
+    correctionSpringConstant: 100
+    correctionDampingConstant: 0.2
+    velocityMultiplier: 1
+    mass: 0
+  plasticMode: -1
+  plasticModeDuration: 0.1
   shadowParent: {fileID: 0}
 --- !u!50 &7909692603331570575
 Rigidbody2D:

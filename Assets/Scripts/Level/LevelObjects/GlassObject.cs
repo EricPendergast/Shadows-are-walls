@@ -7,4 +7,11 @@ public class GlassObject : LevelObject {
 
         gameObject.layer = PhysicsHelper.glassLayer;
     }
+
+    public override void DoSnapping() {
+        if (snapToGrid) {
+            SnapScale();
+            SnapPosition();
+        }
+    }
 }

@@ -50,6 +50,7 @@ public class LightEdge : DividesLight {
             var thisDifference = actual.Closest(contact.point) - targetClosest;
             if (thisDifference.sqrMagnitude > difference.sqrMagnitude) {
                 difference = thisDifference;
+                difference -= ((Vector2)Vector3.Project(contact.normal, difference).normalized)*contact.separation;
                 point = targetClosest;
             }
         }

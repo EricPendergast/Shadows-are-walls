@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 // General idea: Light finds all opaque objects in the scene, calculates all
@@ -19,13 +20,16 @@ public class FixedLight : LightBase {
     }
     private DebugSnapshot lastSnapshot;
 
-    public float targetAngle;
+    public float apertureAngle;
     public float distance;
 
-    public float velocityCorrectionConstant;
-    public float maxCorrectionTorque;
-    public float correctionSpringConstant;
-    public float correctionDampingConstant;
+    [SerializeField]
+    public LightSettings settings;
+    [SerializeField]
+    public LightSettings plasticModeSettings;
+
+    public float plasticMode = -1;
+    public float plasticModeDuration = 1;
 
     private Mesh castLightMesh;
 
@@ -56,8 +60,7 @@ public class FixedLight : LightBase {
 
     private Rigidbody2D _edgeMountPoint;
 
-    public override Rigidbody2D GetEdgeMountPoint() {
-        if (_edgeMountPoint == null) {
+    public override Rigidbody2D GetEdgeMountPoint() { if (_edgeMountPoint == null) {
             _edgeMountPoint = Util.CreateChild<Rigidbody2D>(transform);
             //_edgeMountPoint.constraints = RigidbodyConstraints2D.FreezeRotation;
             _edgeMountPoint.constraints = RigidbodyConstraints2D.FreezeAll;
@@ -68,11 +71,11 @@ public class FixedLight : LightBase {
     }
 
     public void SetTargetApertureAngle(float v) {
-        targetAngle = v;
+        apertureAngle = v;
     }
 
     public float GetTargetApertureAngle() {
-        return targetAngle;
+        return apertureAngle;
     }
 
     public float GetActualApertureAngle() {
@@ -144,8 +147,8 @@ public class FixedLight : LightBase {
 
     public Triangle CalculateTargetLocalViewTriangle() {
         Vector3 origin = Vector3.zero;
-        Vector3 leftCorner = Quaternion.Euler(0f,0f, targetAngle/2) * Vector2.right;
-        Vector3 rightCorner = Quaternion.Euler(0f,0f, -targetAngle/2) * Vector2.right;
+        Vector3 leftCorner = Quaternion.Euler(0f,0f, apertureAngle/2) * Vector2.right;
+        Vector3 rightCorner = Quaternion.Euler(0f,0f, -apertureAngle/2) * Vector2.right;
         leftCorner *= distance;
         rightCorner *= distance;
         
@@ -181,6 +184,9 @@ public class FixedLight : LightBase {
 
     void OnDrawGizmos() {
         foreach (var side in CalculateTargetViewTriangle().GetSides()) {
+            if (DEBUG) {
+                Debug.Log(side.Angle());
+            }
             Gizmos.DrawLine(side.p1, side.p2);
         }
         //DrawSnapshot(lastSnapshot);
@@ -296,6 +302,7 @@ public class FixedLight : LightBase {
     }
 
     void DoForces() {
+        //body.rotation = targetAngle;
         //return;
         DoForces(rightShadowEdge);
         DoForces(leftShadowEdge);
@@ -303,16 +310,28 @@ public class FixedLight : LightBase {
 
     void DoForces(LightEdge edge) {
         edge.MaxDifferenceFromTarget(out var point, out var difference);
+        if (difference.magnitude > .01) {
+            plasticMode = plasticModeDuration;
+        }
+
+        var currentSettings = plasticMode > 0 ? plasticModeSettings : settings;
+        plasticMode -= Time.deltaTime;
     
         //if (difference.magnitude != 0) {
             //Debug.Log("difference magnitude " + difference.magnitude);
             //difference = difference.normalized * (difference.magnitude - .13f);
             // The angle change from actual to target
 
-            var angleDelta = new LineSegment(body.position, point + difference).Angle(point) + body.angularVelocity*Time.deltaTime*velocityCorrectionConstant;
+            var simpleAngleDelta = new LineSegment(body.position, point + difference).Angle(point);
+            var angleDelta = simpleAngleDelta + body.angularVelocity*Time.deltaTime*currentSettings.velocityCorrectionConstant;
+            //if (DEBUG) {
+            //    Debug.Log(difference.magnitude);
+            //}
+            //Debug.Log("Simpleangledelta" + simpleAngleDelta);
+            //Debug.Log(angleDelta);
             //angleDelta = Mathf.Clamp(angleDelta, -.5f, .5f);
             //Debug.Log("angle delta " + angleDelta);
-            //var torque = PhysicsHelper.GetRotateToTorque(body, 0, angleDelta*.1f)*.5f;
+            //var torque = PhysicsHelper.GetRotateToTorque(body, 0, angleDelta);
             //var torque = PhysicsHelper.GetRotateToTorque(body, 0, 0);
             //Debug.Log("test1 " + torque);
             //Debug.Log("test2 " + point);
@@ -320,9 +339,31 @@ public class FixedLight : LightBase {
             //Debug.Log("test5 " + angleDelta);
             //body.AddTorque(torque);
             //body.angularVelocity *= .9f;
-            var torque = PhysicsHelper.GetSpringTorque(angleDelta, 0, body.angularVelocity, /*edge.AngularVelocity()*/0, correctionSpringConstant, correctionDampingConstant);
-            body.AddTorque(Mathf.Clamp(torque, -maxCorrectionTorque, maxCorrectionTorque));
+            var torque = PhysicsHelper.GetSpringTorque(angleDelta, 0, 0, 0, currentSettings.correctionSpringConstant, currentSettings.correctionDampingConstant);
+            body.AddTorque(torque);
+            body.angularVelocity *= currentSettings.velocityMultiplier;
+            //body.AddTorque(Mathf.Clamp(torque, -maxCorrectionTorque, maxCorrectionTorque));
+            //body.angularVelocity *= Mathf.Lerp(1, .3f, difference.magnitude*5);
+            //body.angularVelocity += edge.AngularVelocity();
+            //body.angularVelocity /= 2;
+            //if (difference.magnitude > .01) {
+            //    body.angularVelocity *= .5f;
+            //}
+            //if (simpleAngleDelta * body.angularVelocity > 0) {
+            //    StartCoroutine(SlowVelocityCoroutine());
+            //    Debug.Log("Uh oh" + simpleAngleDelta);
+            //}
+            //var torque2 = PhysicsHelper.GetSpringTorque(body.rotation, targetAngle, body.angularVelocity, [>edge.AngularVelocity()<]0, toTargetSpringConstant, toTargetDampingConstant);
+            //body.AddTorque(Mathf.Clamp(torque2, -maxToTargetTorque, maxToTargetTorque));
         //}
+    }
+
+    IEnumerator SlowVelocityCoroutine() {
+        body.angularVelocity *= .5f;
+        for (int i = 0; i < 5; i++) {
+            yield return new WaitForFixedUpdate();
+            body.angularVelocity *= .5f;
+        }
     }
 
     List<System.Tuple<LineSegment, Shadow>> GetShadowData() {

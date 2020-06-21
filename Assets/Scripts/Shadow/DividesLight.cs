@@ -8,6 +8,7 @@ public abstract class DividesLight : AllTracker<DividesLight> {
     private static List<LineSegment> pieces = new List<LineSegment>();
 
     private readonly float maxTorque = 1000000000;
+    //private readonly float maxAngularAccel = 20;
     private readonly float maxAngularSpeed = 120;
 
     public enum Side {
@@ -65,8 +66,9 @@ public abstract class DividesLight : AllTracker<DividesLight> {
         gameObject.layer = PhysicsHelper.shadowEdgeLayer;
         rb = gameObject.AddComponent<Rigidbody2D>();
         rb.gravityScale = 0;
-        rb.mass = 5;
+        rb.mass = 10;
         rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
+        //rb.constraints = RigidbodyConstraints2D.FreezePosition;
 
         var platformEffector = gameObject.AddComponent<PlatformEffector2D>();
 
@@ -89,7 +91,7 @@ public abstract class DividesLight : AllTracker<DividesLight> {
         joint.connectedBody = rb;
         joint.connectedAnchor = Vector2.zero;
         joint.useMotor = true;
-        joint.motor = new JointMotor2D{maxMotorTorque = maxTorque, motorSpeed = 0};
+        joint.motor = new JointMotor2D{maxMotorTorque = 0, motorSpeed = 0};
     }
 
     private bool initialized = false;
@@ -144,6 +146,7 @@ public abstract class DividesLight : AllTracker<DividesLight> {
             colliders[i].size = new Vector2(width, .01f);
             colliders[i].enabled = SegmentDividesLightAndDark(pieces[i]);
             colliders[i].usedByEffector = true;
+            colliders[i].sharedMaterial = Refs.instance.frictionlessMaterial;
         }
 
         // Moving the center of mass to rb.position, which is where the light
