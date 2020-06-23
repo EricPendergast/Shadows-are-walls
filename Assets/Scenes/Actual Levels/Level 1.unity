@@ -532,6 +532,11 @@ PrefabInstance:
       propertyPath: targetAngle
       value: 46.4
       objectReference: {fileID: 0}
+    - target: {fileID: 286075417374860649, guid: 15bd302424c602f83a2efec63265fb02,
+        type: 3}
+      propertyPath: apertureAngle
+      value: 35
+      objectReference: {fileID: 0}
     - target: {fileID: 2653933352807445334, guid: 15bd302424c602f83a2efec63265fb02,
         type: 3}
       propertyPath: m_Name
@@ -540,12 +545,12 @@ PrefabInstance:
     - target: {fileID: 2653933352807445335, guid: 15bd302424c602f83a2efec63265fb02,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 19.431953
+      value: 18.999212
       objectReference: {fileID: 0}
     - target: {fileID: 2653933352807445335, guid: 15bd302424c602f83a2efec63265fb02,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 8.583861
+      value: 8.970011
       objectReference: {fileID: 0}
     - target: {fileID: 2653933352807445335, guid: 15bd302424c602f83a2efec63265fb02,
         type: 3}

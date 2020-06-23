@@ -77,12 +77,12 @@ public class LightAngler : LevelObject, SimpleLeverControlable, SimpleButtonCont
     }
     void DrawGizmos(float gizmoLength) {
         Gizmos.color = Color.red;
-        Gizmos.DrawRay(body.position, Quaternion.Euler(0,0,body.rotation - angleLeft - controled.GetTargetApertureAngle()/2)*Vector2.right*gizmoLength);
-        Gizmos.DrawRay(body.position, Quaternion.Euler(0,0,body.rotation - angleLeft + controled.GetTargetApertureAngle()/2)*Vector2.right*gizmoLength);
+        Gizmos.DrawRay(body.position, Quaternion.Euler(0,0,body.rotation - angleLeft - apertureAngle/2)*Vector2.right*gizmoLength);
+        Gizmos.DrawRay(body.position, Quaternion.Euler(0,0,body.rotation - angleLeft + apertureAngle/2)*Vector2.right*gizmoLength);
 
         Gizmos.color = Color.yellow;
-        Gizmos.DrawRay(body.position, Quaternion.Euler(0,0,body.rotation + angleRight - controled.GetTargetApertureAngle()/2)*Vector2.right*gizmoLength);
-        Gizmos.DrawRay(body.position, Quaternion.Euler(0,0,body.rotation + angleRight + controled.GetTargetApertureAngle()/2)*Vector2.right*gizmoLength);
+        Gizmos.DrawRay(body.position, Quaternion.Euler(0,0,body.rotation + angleRight - apertureAngle/2)*Vector2.right*gizmoLength);
+        Gizmos.DrawRay(body.position, Quaternion.Euler(0,0,body.rotation + angleRight + apertureAngle/2)*Vector2.right*gizmoLength);
     }
 
     public void ApplySettings() {
@@ -96,8 +96,10 @@ public class LightAngler : LevelObject, SimpleLeverControlable, SimpleButtonCont
 
     public override void DoSnapping() {
         if (!Application.isPlaying) {
-            SnapPosition();
-            body.position = transform.position;
+            if (base.snapToGrid) {
+                SnapPosition();
+                body.position = transform.position;
+            }
         }
     }
 }

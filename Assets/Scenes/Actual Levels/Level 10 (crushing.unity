@@ -630,6 +630,11 @@ PrefabInstance:
       propertyPath: toTargetDampingConstant
       value: 0.2
       objectReference: {fileID: 0}
+    - target: {fileID: 286075417374860649, guid: 15bd302424c602f83a2efec63265fb02,
+        type: 3}
+      propertyPath: apertureAngle
+      value: 35
+      objectReference: {fileID: 0}
     - target: {fileID: 286075417374860652, guid: 15bd302424c602f83a2efec63265fb02,
         type: 3}
       propertyPath: m_LocalPosition.x

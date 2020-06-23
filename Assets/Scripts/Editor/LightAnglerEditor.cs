@@ -10,6 +10,7 @@ public class LightAnglerEditor : Editor {
 
     public void OnSceneGUI() {
         if (!Application.isPlaying) {
+            Undo.RecordObject((target as LightAngler).controled, "Automatically set light aperture angle");
             (target as LightAngler).DoSnapping();
             (target as LightAngler).ApplySettings();
         }
