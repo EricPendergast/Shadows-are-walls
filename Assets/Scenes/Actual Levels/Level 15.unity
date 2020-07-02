@@ -1894,6 +1894,26 @@ PrefabInstance:
       propertyPath: m_Enabled
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3322613788685646346, guid: 4f05789591d9df2168affc45998baf68,
+        type: 3}
+      propertyPath: blurScale
+      value: 0.22
+      objectReference: {fileID: 0}
+    - target: {fileID: 3322613788685646346, guid: 4f05789591d9df2168affc45998baf68,
+        type: 3}
+      propertyPath: blurHeight
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 3322613788685646346, guid: 4f05789591d9df2168affc45998baf68,
+        type: 3}
+      propertyPath: blurWidth
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 3322613788685646346, guid: 4f05789591d9df2168affc45998baf68,
+        type: 3}
+      propertyPath: blurStdev
+      value: 0.01
+      objectReference: {fileID: 0}
     - target: {fileID: 8123340718301943662, guid: 4f05789591d9df2168affc45998baf68,
         type: 3}
       propertyPath: m_Name

@@ -3,12 +3,6 @@ using UnityEngine;
 public class CameraEffects : MonoBehaviour {
     [SerializeField]
     private Material blurMaterial;
-    [SerializeField]
-    private int blurWidth;
-    [SerializeField]
-    private int blurHeight;
-    [SerializeField]
-    private float blurScale;
 
     [SerializeField]
     private Material isolateBrightMaterial;
@@ -24,16 +18,17 @@ public class CameraEffects : MonoBehaviour {
     private RenderTexture colorCorrectTex;
 
     void OnRenderImage(RenderTexture source, RenderTexture destination) {
-        InitRenderTexture(ref blur1, (int)(source.width*blurScale), (int)(source.height*blurScale));
-        InitRenderTexture(ref blur2, (int)(source.width*blurScale), (int)(source.height*blurScale));
+        int scale = 4;
+        InitRenderTexture(ref blur1, source.width/scale, source.height/scale);
+        InitRenderTexture(ref blur2, source.width/scale, source.height/scale);
         InitRenderTexture(ref colorCorrectTex, source.width, source.height);
 
         Graphics.Blit(source, blur1, isolateBrightMaterial);
 
-        SetBlurParams(source, blurWidth, 0);
+        SetBlurParams(source, true);
         Graphics.Blit(blur1, blur2, blurMaterial);
         
-        SetBlurParams(source, 0, blurHeight);
+        SetBlurParams(source, false);
         Graphics.Blit(blur2, blur1, blurMaterial);
         
         SetBloomBlendParams(blur1);
@@ -48,11 +43,10 @@ public class CameraEffects : MonoBehaviour {
         }
     }
 
-    void SetBlurParams(RenderTexture source, int blurWidth, int blurHeight) {
+    void SetBlurParams(RenderTexture source, bool horizontal) {
         blurMaterial.SetFloat("_texelWidth", 1.0f/source.width);
         blurMaterial.SetFloat("_texelHeight", 1.0f/source.height);
-        blurMaterial.SetInt("_width", blurWidth);
-        blurMaterial.SetInt("_height", blurHeight);
+        blurMaterial.SetInt("_horizontal", horizontal ? 1 : 0);
     }
 
     void SetBloomBlendParams(RenderTexture lightTex) {

@@ -7,8 +7,8 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Blur Material
-  m_Shader: {fileID: 4800000, guid: d6d1afefb117f97618daa959de600230, type: 3}
+  m_Name: BlurPass1
+  m_Shader: {fileID: 4800000, guid: d02496c6e8844651ebdbd88ccf1c1a57, type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
@@ -72,10 +72,13 @@ Material:
     - _SrcBlend: 1
     - _UVSec: 0
     - _ZWrite: 1
-    - _height: 14
-    - _texelHeight: 0.00095057033
-    - _texelWidth: 0.00053475937
-    - _width: 0
+    - _height: 10
+    - _horizontal: 0
+    - _scale: 5.5
+    - _stdev: 0.01
+    - _texelHeight: 0.0009487666
+    - _texelWidth: 0.00043478262
+    - _width: 10
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
