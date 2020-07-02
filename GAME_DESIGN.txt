@@ -38,3 +38,13 @@ Idea:
     degree an object is being crushed. A light can detect when it is crushing
     an object and act accordingly
     
+
+Interaction
+    How does the player interact with the world
+    Idea: Various things are grabbable. Only one thing can be grabbed at a
+    time. The current grabbed object will react to the players movements. For
+    example:
+        - When a lever is grabbed, the A and D keys make the lever go left or right
+            The player also will hold on to the lever, even if the floor drops from below them
+        - When a block is grabbed, the player will be able to move the block
+        

@@ -152,6 +152,11 @@ PrefabInstance:
       propertyPath: targetAngle
       value: 35
       objectReference: {fileID: 0}
+    - target: {fileID: 7909692603331570564, guid: 525e182bd728c0103a02b525d651d69d,
+        type: 3}
+      propertyPath: apertureAngle
+      value: 35
+      objectReference: {fileID: 0}
     - target: {fileID: 7909692603331570565, guid: 525e182bd728c0103a02b525d651d69d,
         type: 3}
       propertyPath: m_Name

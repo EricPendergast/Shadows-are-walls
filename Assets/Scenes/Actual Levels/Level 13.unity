@@ -676,6 +676,10 @@ PrefabInstance:
       propertyPath: orthographic size
       value: 9.310294
       objectReference: {fileID: 0}
+    - target: {fileID: 732283228, guid: 4f05789591d9df2168affc45998baf68, type: 3}
+      propertyPath: m_CullingMask.m_Bits
+      value: 15159
+      objectReference: {fileID: 0}
     - target: {fileID: 732283229, guid: 4f05789591d9df2168affc45998baf68, type: 3}
       propertyPath: m_LocalPosition.y
       value: 2.57
@@ -1132,7 +1136,7 @@ PrefabInstance:
     - target: {fileID: 2653933352807445335, guid: 15bd302424c602f83a2efec63265fb02,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 9.977177
+      value: 9.477177
       objectReference: {fileID: 0}
     - target: {fileID: 2653933352807445335, guid: 15bd302424c602f83a2efec63265fb02,
         type: 3}
@@ -1203,6 +1207,11 @@ PrefabInstance:
         type: 3}
       propertyPath: apertureAngle
       value: 23.9
+      objectReference: {fileID: 0}
+    - target: {fileID: 2936266651788608073, guid: 15bd302424c602f83a2efec63265fb02,
+        type: 3}
+      propertyPath: gridSize
+      value: 0.5
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 15bd302424c602f83a2efec63265fb02, type: 3}

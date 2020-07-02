@@ -194,7 +194,7 @@ public class FixedLight : LightBase {
 
         CacheViewTriangles();
 
-        castLightMesh = Util.CreateMeshWithNewMaterial(gameObject, Refs.instance.lightMaterial);
+        castLightMesh = Util.CreateMeshWithSharedMaterial(gameObject, Refs.instance.lightMaterial);
 
         visibleCollider = gameObject.AddComponent<PolygonCollider2D>();
         visibleCollider.isTrigger = true;

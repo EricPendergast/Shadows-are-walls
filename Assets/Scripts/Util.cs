@@ -1,6 +1,14 @@
 using UnityEngine;
 
 public class Util {
+    public static Mesh CreateMeshWithSharedMaterial(GameObject go, Material mat) {
+        var filter = go.AddComponent<MeshFilter>();
+        filter.mesh = new Mesh();
+        var renderer = go.AddComponent<MeshRenderer>();
+        renderer.sharedMaterials = new Material[]{mat};
+        return filter.mesh;
+    }
+
     public static Mesh CreateMeshWithNewMaterial(GameObject go, Material mat) {
         var filter = go.AddComponent<MeshFilter>();
         filter.mesh = new Mesh();

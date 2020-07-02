@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 732283228}
   - component: {fileID: 732283227}
   - component: {fileID: 732283230}
+  - component: {fileID: 3322613788685646346}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -99,6 +100,27 @@ MonoBehaviour:
   trackedObject: {fileID: 0}
   trackSpeed: 0
   maxDistance: 0
+--- !u!114 &3322613788685646346
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 732283226}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e30235033086d342fb94b0130941ef00, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  blurMaterial: {fileID: 2100000, guid: b025866826de3f7b48703222ecb848b3, type: 2}
+  blurWidth: 2
+  blurHeight: 2
+  blurScale: 1
+  isolateBrightMaterial: {fileID: 2100000, guid: 385007fc71d402e20bee12d508dede7e,
+    type: 2}
+  bloomBlendMaterial: {fileID: 2100000, guid: e5f96391acd6200e7a89ae352f375fbd, type: 2}
+  colorCorrectMaterial: {fileID: 2100000, guid: 8564dcb88b3f0d72a93ab192b524d0a9,
+    type: 2}
 --- !u!1 &8123340718301943662
 GameObject:
   m_ObjectHideFlags: 0
