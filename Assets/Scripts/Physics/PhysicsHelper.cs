@@ -11,6 +11,13 @@ class PhysicsHelper {
     public static int interactableLayer = LayerMask.NameToLayer("Interactable");
     public static int glassLayer = LayerMask.NameToLayer("Glass");
 
+    public static int shadowEdgeLayerMask = 2 << shadowEdgeLayer - 1;
+    public static int lightLayerMask = 2 << lightLayer - 1;
+    public static int opaqueLayerMask = 2 << opaqueLayer - 1;
+    public static int freeObjectLayerMask = 2 << freeObjectLayer - 1;
+    public static int interactableLayerMask = 2 << interactableLayer - 1;
+    public static int glassLayerMask = 2 << glassLayer - 1;
+
     // Truncates 'force' so that when applied to 'body', it will not go over
     // maxSpeed in the next tick
     public static Vector3 TruncateForce(Rigidbody2D body, float maxSpeed, Vector3 force) {
