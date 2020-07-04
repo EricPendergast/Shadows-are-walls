@@ -269,11 +269,15 @@ public class FixedLight : LightBase {
 
     void DoForces(LightEdge edge) {
         edge.MaxDifferenceFromTarget(out var point, out var difference);
-        if (difference.magnitude > .01) {
+
+        var currentSettings = plasticMode > 0 ? plasticModeSettings : settings;
+
+        if (difference.magnitude > currentSettings.plasticModeDifferenceThreshold) {
             plasticMode = plasticModeDuration;
         }
 
-        var currentSettings = plasticMode > 0 ? plasticModeSettings : settings;
+        currentSettings = plasticMode > 0 ? plasticModeSettings : settings;
+        edge.GetComponent<Rigidbody2D>().mass = currentSettings.mass;
         plasticMode -= Time.deltaTime;
     
         //if (difference.magnitude != 0) {

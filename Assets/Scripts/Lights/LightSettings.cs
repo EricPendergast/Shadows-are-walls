@@ -8,4 +8,5 @@ public class LightSettings {
     public float correctionDampingConstant;
     public float velocityMultiplier = 1;
     public float mass;
+    public float plasticModeDifferenceThreshold = .01f;
 }

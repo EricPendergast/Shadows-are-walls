@@ -47,21 +47,22 @@ MonoBehaviour:
   DEBUG: 0
   apertureAngle: 0
   distance: 50.1
-  targetAngle: 60
   settings:
     velocityCorrectionConstant: 0
     maxCorrectionTorque: 100000000
     correctionSpringConstant: 10
     correctionDampingConstant: 0.2
     velocityMultiplier: 1
-    mass: 0
+    mass: 10
+    plasticModeDifferenceThreshold: 0.05
   plasticModeSettings:
     velocityCorrectionConstant: 1
     maxCorrectionTorque: 10000000
     correctionSpringConstant: 100
     correctionDampingConstant: 0.2
     velocityMultiplier: 1
-    mass: 0
+    mass: 10
+    plasticModeDifferenceThreshold: 0.01
   plasticMode: -1
   plasticModeDuration: 0.1
   shadowParent: {fileID: 0}
