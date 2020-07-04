@@ -74,10 +74,11 @@ Material:
     - _ZWrite: 1
     - _height: 5
     - _horizontal: 0
-    - _scale: 1.88
-    - _stdev: 0.007
-    - _texelHeight: 0.00095057033
-    - _texelWidth: 0.00053475937
+    - _scale: 0.025
+    - _stdev: 0.05
+    - _texelHeight: 0.0013020834
+    - _texelWidth: 0.0009765625
+    - _texelsPerUnit: 31.161438
     - _width: 5
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}

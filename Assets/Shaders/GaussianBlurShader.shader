@@ -7,6 +7,7 @@
         _width ("Width", int) = 1
         _texelWidth ("Texel Width", float) = .0001
         _texelHeight ("Texel Height", float) = .0001
+        _texelsPerUnit ("Texels per unit", float) = 100
         _stdev ("Standard Deviation", float) = .1
         _scale ("Blur Scale", float) = 1
         _horizontal ("Horizontal pass (0 or 1)", int) = 1
@@ -40,6 +41,7 @@
             int _height;
             float _texelWidth;
             float _texelHeight;
+            float _texelsPerUnit;
             float _stdev;
             float _scale;
             int _horizontal;
@@ -62,13 +64,13 @@
                 float weightSum = 0;
                 for (int x = -width; x <= width; x++) {
                     for (int y = -height; y <= height; y++) {
-                        float actualX = x*_texelWidth*_scale;
-                        float actualY = y*_texelHeight*_scale;
+                        float actualX = x*_scale;
+                        float actualY = y*_scale;
                         /*float weight = 1.0/(x*x+y*y + 1);*/
                         float variance = _stdev*_stdev;
                         float weight = 1.0/(2*3.141*variance) * exp(-(actualX*actualX + actualY*actualY)/(2*variance));
                         weightSum += weight;
-                        col += weight*fixed4(tex2D(_MainTex, i.uv + float4(actualX, actualY, 0, 0)));
+                        col += weight*fixed4(tex2D(_MainTex, i.uv + float4(actualX*_texelsPerUnit*_texelWidth, actualY*_texelsPerUnit*_texelHeight, 0, 0)));
                     }
                 }
 

@@ -60,9 +60,12 @@ Shader "Unlit/ColorCorrect"
             }
 
             float4 correct(float4 color) {
-                float mc = maxChannel(color);
-                return float4(applyCurve(color.r), applyCurve(color.g), applyCurve(color.b), color.a);
+                float luminanceIn = luminance(color);
+                float luminanceOut = luminance(float4(applyCurve(color.r), applyCurve(color.g), applyCurve(color.b), color.a));
+                /*float mc = maxChannel(color);*/
+                /*return float4(applyCurve(color.r), applyCurve(color.g), applyCurve(color.b), color.a);*/
                 /*return applyCurve(luminance(color))*(color/mc);*/
+                return color/luminanceIn*luminanceOut;
             }
 
             fixed4 frag (v2f i) : SV_Target {
