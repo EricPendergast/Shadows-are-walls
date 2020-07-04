@@ -94,6 +94,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   snapToGrid: 1
   gridSize: 0.25
-  snapPoint: {x: 0, y: -0.55}
+  snapPoint: {x: 0, y: 0}
   controledGameObject: {fileID: 0}
   numObjectsPressing: 0

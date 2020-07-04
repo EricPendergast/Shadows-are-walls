@@ -2,7 +2,10 @@ using UnityEngine;
 
 public class CameraEffects : MonoBehaviour {
     [SerializeField]
-    private Material blurMaterial;
+    private Material blurPass1;
+
+    [SerializeField]
+    private Material blurPass2;
 
     [SerializeField]
     private Material isolateBrightMaterial;
@@ -25,11 +28,15 @@ public class CameraEffects : MonoBehaviour {
 
         Graphics.Blit(source, blur1, isolateBrightMaterial);
 
-        SetBlurParams(source, true);
-        Graphics.Blit(blur1, blur2, blurMaterial);
-        
-        SetBlurParams(source, false);
-        Graphics.Blit(blur2, blur1, blurMaterial);
+        SetBlurParams(blurPass1, source, true);
+        Graphics.Blit(blur1, blur2, blurPass1);
+        SetBlurParams(blurPass1, source, false);
+        Graphics.Blit(blur2, blur1, blurPass1);
+
+        SetBlurParams(blurPass2, source, true);
+        Graphics.Blit(blur1, blur2, blurPass2);
+        SetBlurParams(blurPass2, source, false);
+        Graphics.Blit(blur2, blur1, blurPass2);
         
         SetBloomBlendParams(blur1);
         Graphics.Blit(source, colorCorrectTex, bloomBlendMaterial);
@@ -43,7 +50,7 @@ public class CameraEffects : MonoBehaviour {
         }
     }
 
-    void SetBlurParams(RenderTexture source, bool horizontal) {
+    void SetBlurParams(Material blurMaterial, RenderTexture source, bool horizontal) {
         blurMaterial.SetFloat("_texelWidth", 1.0f/source.width);
         blurMaterial.SetFloat("_texelHeight", 1.0f/source.height);
         blurMaterial.SetInt("_horizontal", horizontal ? 1 : 0);

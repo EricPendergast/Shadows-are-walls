@@ -112,7 +112,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e30235033086d342fb94b0130941ef00, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  blurMaterial: {fileID: 2100000, guid: 60e96a320402af20e917b9c646fd453b, type: 2}
+  blurPass1: {fileID: 2100000, guid: 60e96a320402af20e917b9c646fd453b, type: 2}
+  blurPass2: {fileID: 2100000, guid: 482a033ff1c7b3dc4a574a2947c5bdc2, type: 2}
   isolateBrightMaterial: {fileID: 2100000, guid: 385007fc71d402e20bee12d508dede7e,
     type: 2}
   bloomBlendMaterial: {fileID: 2100000, guid: e5f96391acd6200e7a89ae352f375fbd, type: 2}

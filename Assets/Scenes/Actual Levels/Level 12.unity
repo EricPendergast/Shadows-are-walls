@@ -230,12 +230,12 @@ PrefabInstance:
     - target: {fileID: 1662313319738566219, guid: 2b104ab35fd621c5d9a48445b041718c,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: -8.81
+      value: 0.18
       objectReference: {fileID: 0}
     - target: {fileID: 1662313319738566219, guid: 2b104ab35fd621c5d9a48445b041718c,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: -4.24
+      value: 2.67
       objectReference: {fileID: 0}
     - target: {fileID: 1662313319738566219, guid: 2b104ab35fd621c5d9a48445b041718c,
         type: 3}
@@ -888,7 +888,7 @@ PrefabInstance:
     - target: {fileID: 286075417374860649, guid: 15bd302424c602f83a2efec63265fb02,
         type: 3}
       propertyPath: apertureAngle
-      value: 35.3
+      value: 19.9
       objectReference: {fileID: 0}
     - target: {fileID: 286075417374860652, guid: 15bd302424c602f83a2efec63265fb02,
         type: 3}
@@ -898,12 +898,12 @@ PrefabInstance:
     - target: {fileID: 286075417374860652, guid: 15bd302424c602f83a2efec63265fb02,
         type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0.13009354
+      value: 0.24868988
       objectReference: {fileID: 0}
     - target: {fileID: 286075417374860652, guid: 15bd302424c602f83a2efec63265fb02,
         type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.9915017
+      value: 0.9685832
       objectReference: {fileID: 0}
     - target: {fileID: 2653933352807445334, guid: 15bd302424c602f83a2efec63265fb02,
         type: 3}
@@ -983,7 +983,7 @@ PrefabInstance:
     - target: {fileID: 2936266651788608073, guid: 15bd302424c602f83a2efec63265fb02,
         type: 3}
       propertyPath: apertureAngle
-      value: 35.3
+      value: 19.9
       objectReference: {fileID: 0}
     - target: {fileID: 2936266651788608073, guid: 15bd302424c602f83a2efec63265fb02,
         type: 3}
@@ -993,17 +993,17 @@ PrefabInstance:
     - target: {fileID: 2936266651788608073, guid: 15bd302424c602f83a2efec63265fb02,
         type: 3}
       propertyPath: angleLeft
-      value: -5.57
+      value: -28.7
       objectReference: {fileID: 0}
     - target: {fileID: 2936266651788608073, guid: 15bd302424c602f83a2efec63265fb02,
         type: 3}
       propertyPath: angleRight
-      value: 14.95
+      value: 28.8
       objectReference: {fileID: 0}
     - target: {fileID: 2936266651788608073, guid: 15bd302424c602f83a2efec63265fb02,
         type: 3}
       propertyPath: currentAngle
-      value: 15.16
+      value: 28.8
       objectReference: {fileID: 0}
     - target: {fileID: 2936266651788608073, guid: 15bd302424c602f83a2efec63265fb02,
         type: 3}
