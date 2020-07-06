@@ -16,9 +16,8 @@ public class CameraEffects : MonoBehaviour {
     [SerializeField]
     private Material colorCorrectMaterial;
 
-    private RenderTexture blur1;
-    private RenderTexture blur2;
-    private RenderTexture colorCorrectTex;
+    [SerializeField]
+    private Material sketchyEffectMaterial;
 
     private Camera lightCamera;
 
@@ -27,48 +26,57 @@ public class CameraEffects : MonoBehaviour {
     //    lightCamera.enabled = false;
     //}
 
-    void OnRenderImage(RenderTexture source, RenderTexture destination) {
-        int scale = 1;
-        InitTexture(ref blur1, source.width/scale, source.height/scale);
-        InitTexture(ref blur2, source.width/scale, source.height/scale);
-        InitTexture(ref colorCorrectTex, source.width, source.height);
+    void ApplyMaterial(ref RenderTexture source, Material mat) {
+        RenderTexture dest = RenderTexture.GetTemporary(source.descriptor);
+        Graphics.Blit(source, dest, mat);
+        RenderTexture.ReleaseTemporary(source);
+        source = dest;
+    }
 
+    void ApplyBlur(ref RenderTexture source, Material blurMat, bool horizontal) {
+        SetBlurParams(ref blurMat, source, horizontal);
+        ApplyMaterial(ref source, blurMat);
+    }
+
+    void Clear(RenderTexture tex) {
+        RenderTexture rt = UnityEngine.RenderTexture.active;
+        UnityEngine.RenderTexture.active = tex;
+        GL.Clear(true, true, Color.clear);
+        UnityEngine.RenderTexture.active = rt;
+    }
+
+    void OnRenderImage(RenderTexture source, RenderTexture destination) {
+
+        var bloomTexture = RenderTexture.GetTemporary(source.descriptor);
+        Graphics.Blit(source, bloomTexture, isolateBrightMaterial);
+
+        ApplyBlur(ref bloomTexture, blurPass1, true);
+        ApplyBlur(ref bloomTexture, blurPass1, false);
+
+        ApplyBlur(ref bloomTexture, blurPass2, true);
+        ApplyBlur(ref bloomTexture, blurPass2, false);
         //lightCamera.CopyFrom(GetComponent<Camera>());
         //lightCamera.targetTexture = blur2;
         //lightCamera.cullingMask = PhysicsHelper.lightLayerMask;
         //lightCamera.Render();
         //Graphics.Blit(blur2, blur1, isolateBrightMaterial);
-        Graphics.Blit(source, blur1, isolateBrightMaterial);
-
-        SetBlurParams(ref blurPass1, source, true);
-        Graphics.Blit(blur1, blur2, blurPass1);
-        SetBlurParams(ref blurPass1, source, false);
-        Graphics.Blit(blur2, blur1, blurPass1);
-
-        SetBlurParams(ref blurPass2, source, true);
-        Graphics.Blit(blur1, blur2, blurPass2);
-        SetBlurParams(ref blurPass2, source, false);
-        Graphics.Blit(blur2, blur1, blurPass2);
         
-        SetBloomBlendParams(blur1);
-        Graphics.Blit(source, colorCorrectTex, bloomBlendMaterial);
+        SetSketchyEffectParams(bloomTexture);
+        ApplyMaterial(ref source, sketchyEffectMaterial);
+        SetBloomBlendParams(null);
+        RenderTexture.ReleaseTemporary(bloomTexture);
         
-        Graphics.Blit(colorCorrectTex, destination, colorCorrectMaterial);
+        Graphics.Blit(source, destination, colorCorrectMaterial);
+        RenderTexture.ReleaseTemporary(source);
     }
 
     void SetBloomBlendParams(RenderTexture lightTex) {
         bloomBlendMaterial.SetTexture("_lightTex", lightTex);
     }
 
-    void OnDestroy() {
-        RenderTexture.ReleaseTemporary(blur1);
-        RenderTexture.ReleaseTemporary(blur2);
-    }
-
-    public static void InitTexture(ref RenderTexture tex, int width, int height) {
-        if (tex == null || tex.width != width || tex.height != height) {
-            tex = RenderTexture.GetTemporary(width, height, 0, RenderTextureFormat.DefaultHDR);
-        }
+    void SetSketchyEffectParams(RenderTexture lightTex) {
+        sketchyEffectMaterial.SetTexture("_lightTex", lightTex);
+        //sketchyEffectMaterial.SetMatrix("cameraToWorld", GetComponent<Camera>().cameraToWorldMatrix.inverse);
     }
 
     public void SetBlurParams(ref Material blurMaterial, RenderTexture source, bool horizontal) {
@@ -77,5 +85,4 @@ public class CameraEffects : MonoBehaviour {
         blurMaterial.SetFloat("_texelsPerUnit", source.height/(2*GetComponent<Camera>().orthographicSize));
         blurMaterial.SetInt("_horizontal", horizontal ? 1 : 0);
     }
-
 }

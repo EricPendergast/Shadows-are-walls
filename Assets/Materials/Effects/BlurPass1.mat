@@ -72,14 +72,14 @@ Material:
     - _SrcBlend: 1
     - _UVSec: 0
     - _ZWrite: 1
-    - _height: 0
+    - _height: 5
     - _horizontal: 0
-    - _scale: 0.03
-    - _stdev: 0.06
-    - _texelHeight: 0.0013020834
-    - _texelWidth: 0.0009765625
-    - _texelsPerUnit: 31.161438
-    - _width: 0
+    - _scale: 0.2
+    - _stdev: 0.52
+    - _texelHeight: 0.0015923567
+    - _texelWidth: 0.00090009003
+    - _texelsPerUnit: 30.589663
+    - _width: 5
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}

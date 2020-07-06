@@ -119,6 +119,8 @@ MonoBehaviour:
   bloomBlendMaterial: {fileID: 2100000, guid: e5f96391acd6200e7a89ae352f375fbd, type: 2}
   colorCorrectMaterial: {fileID: 2100000, guid: 8564dcb88b3f0d72a93ab192b524d0a9,
     type: 2}
+  sketchyEffectMaterial: {fileID: 2100000, guid: 8738cb78b621d46c2a68a5c07ff02c14,
+    type: 2}
 --- !u!1 &8123340718301943662
 GameObject:
   m_ObjectHideFlags: 0
