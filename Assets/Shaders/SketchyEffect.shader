@@ -17,6 +17,7 @@ Shader "Unlit/SketchyEffect"
             #pragma fragment frag
 
             #include "UnityCG.cginc"
+            #include "perlin_helpers.glsl"
 
             struct appdata
             {
@@ -41,7 +42,7 @@ Shader "Unlit/SketchyEffect"
                 v2f o;
                 o.vertex = UnityObjectToClipPos(v.vertex);
                 o.uv = v.uv;
-                v.vertex = float4(v.vertex.x*unity_OrthoParams.x*2, v.vertex.y*unity_OrthoParams.y*2, 0, 1);
+                v.vertex = float4(o.vertex.x*unity_OrthoParams.x, o.vertex.y*unity_OrthoParams.y, 0, 1);
                 o.world_position = mul(unity_CameraToWorld, v.vertex);
                 /*o.world_position = v.vertex;*/
                 return o;
@@ -75,11 +76,18 @@ Shader "Unlit/SketchyEffect"
                 fixed4 brightColor = tex2D(_MainTex, i.uv);
                 fixed4 lightValue = tex2D(_lightTex, i.uv);
 
-                float scale = 50;
+                float scale = 1;
                 float intensity = lightValue.r + lightValue.g + lightValue.b;
                 intensity = clamp(1.1 - 1.2/(1+intensity*intensity), 0, 1);
-                float striration = (strirationFcn(i.world_position.x, .0025*scale, intensity) +
-                                 strirationFcn((i.world_position.x + i.world_position.y)/2, .025*scale, intensity))/2;
+                
+                float s1 = strirationFcn(i.world_position.x + i.world_position.y, .2, intensity);
+                i.world_position = float4(perlin2D(i.world_position.xy/20), 0, 0);
+                float s2 = strirationFcn(i.world_position.x + i.world_position.y, .5, intensity);
+
+                /*float s2 = strirationFcn(pow(pow(i.world_position.x,2) + pow(i.world_position.y,2), .5), .3, intensity);*/
+
+                float striration = (s1+ s2)/2;
+                /*float striration = s2;*/
 
                 /*if (trueMod(i.world_position.x ,intensity) < .5) {*/
                 /*    */
@@ -94,11 +102,11 @@ Shader "Unlit/SketchyEffect"
                 /*    return col1;*/
                 /*}*/
                 fixed4 darkColor = brightColor/2;
-                if (brightColor.a != 0) {
+                /*if (brightColor.a != 0) {*/
                     return lerp(darkColor, brightColor, striration);
-                } else {
-                    return brightColor + lightValue/2;
-                }
+                /*} else {*/
+                /*    return brightColor + lightValue/2;*/
+                /*}*/
             }
             ENDCG
         }
