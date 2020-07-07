@@ -81,12 +81,14 @@ Shader "Unlit/SketchyEffect"
                 intensity = clamp(1.1 - 1.2/(1+intensity*intensity), 0, 1);
                 
                 float s1 = strirationFcn(i.world_position.x + i.world_position.y, .2, intensity);
-                i.world_position = float4(perlin2D(i.world_position.xy/20), 0, 0);
+                /*i.world_position = float4(perlin2D(i.world_position.xy/20), 0, 0);*/
                 float s2 = strirationFcn(i.world_position.x + i.world_position.y, .5, intensity);
 
+                /*float s3 = strirationFcn(i.world_position.x - i.world_position.y, .5, pow(intensity, 1));*/
                 /*float s2 = strirationFcn(pow(pow(i.world_position.x,2) + pow(i.world_position.y,2), .5), .3, intensity);*/
 
-                float striration = (s1+ s2)/2;
+                float striration = min(s1, s2);
+                /*float striration = (s1 + s2)/2;*/
                 /*float striration = s2;*/
 
                 /*if (trueMod(i.world_position.x ,intensity) < .5) {*/
