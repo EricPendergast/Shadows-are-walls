@@ -34,6 +34,6 @@ public abstract class AllTracker<T> : MonoBehaviour where T : AllTracker<T> {
         if (!destroyedDirectly) {
             all.Remove((T)this);
         }
-        Debug.Assert(destroyedDirectly, "Error: Object was not destroyed directly");
+        Debug.Assert(destroyedDirectly, "Error: Object was not destroyed directly. Use <object>.Destroy() instead of Destroy(<object>)");
     }
 }

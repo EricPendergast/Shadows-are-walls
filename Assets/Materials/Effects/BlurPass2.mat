@@ -76,9 +76,9 @@ Material:
     - _horizontal: 0
     - _scale: 0.05
     - _stdev: 0.1
-    - _texelHeight: 0.0008143322
-    - _texelWidth: 0.0004580852
-    - _texelsPerUnit: 122.8
+    - _texelHeight: 0.0008291874
+    - _texelWidth: 0.0004664179
+    - _texelsPerUnit: 39.20676
     - _width: 5
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}

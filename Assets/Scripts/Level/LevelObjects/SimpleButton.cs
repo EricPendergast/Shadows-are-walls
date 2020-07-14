@@ -48,7 +48,7 @@ public class SimpleButton : LevelObject {
         transform.localScale = new Vector3(transform.localScale.x, transform.localScale.y*2, 1);
     }
     void OnTriggerEnter2D(Collider2D collider) {
-        if (!collider.isTrigger) {
+        if (!ShouldIgnore(collider)) {
             numObjectsPressing++;
             if (numObjectsPressing == 1) {
                 Press();
@@ -57,12 +57,16 @@ public class SimpleButton : LevelObject {
     }
 
     void OnTriggerExit2D(Collider2D collider) {
-        if (!collider.isTrigger) {
+        if (!ShouldIgnore(collider)) {
             numObjectsPressing--;
             if (numObjectsPressing == 0) {
                 Unpress();
             }
         }
+    }
+
+    bool ShouldIgnore(Collider2D collider) {
+        return collider.isTrigger || collider.attachedRigidbody.constraints == RigidbodyConstraints2D.FreezeAll || collider.attachedRigidbody.bodyType == RigidbodyType2D.Static;
     }
 
     protected override void OnDrawGizmosSelected() {
