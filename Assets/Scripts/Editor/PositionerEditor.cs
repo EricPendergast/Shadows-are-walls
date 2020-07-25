@@ -19,6 +19,7 @@ public class PositionerEditor : Editor {
                  positioner.right = newPos;
             } 
             positioner.ApplySettings();
+            positioner.DoSnapping();
         }
     }
 }
