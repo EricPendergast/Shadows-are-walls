@@ -27,9 +27,9 @@ public class Shadow : AllTracker<Shadow> {
     // Notice that this isn't an array of fields; this value indicates the
     // illuminated side for all passed in line segments
     [SerializeField]
-    DividesLight.Side illuminatedSide;
+    ShadowEdgeBase.Side illuminatedSide;
 
-    public void Init(LightBase lightSource, DividesLight.Side illuminatedSide, Opaque caster) {
+    public void Init(LightBase lightSource, ShadowEdgeBase.Side illuminatedSide, Opaque caster) {
         this.caster = caster;
         this.lightSource = lightSource;
         this.illuminatedSide = illuminatedSide;

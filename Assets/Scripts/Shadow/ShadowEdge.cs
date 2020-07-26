@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class ShadowEdge : DividesLight {
+public class ShadowEdge : ShadowEdgeBase {
     [SerializeField]
     private Opaque caster;
     private bool collidersEnabled;

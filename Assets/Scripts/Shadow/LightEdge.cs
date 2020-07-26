@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class LightEdge : DividesLight {
+public class LightEdge : ShadowEdgeBase {
     protected override void Awake() {
         base.Awake();
 

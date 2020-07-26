@@ -1,6 +1,5 @@
 using UnityEngine;
 using System.Collections.Generic;
-using RigidbodyExtensions;
 
 class PhysicsHelper {
 
@@ -139,4 +138,25 @@ class PhysicsHelper {
 
         return inertia;
     }
+
+    public static void ShrinkOrExpandTo(GameObject owner, List<BoxCollider2D> colliders, int numColliders) {
+        for (int i = numColliders; i < colliders.Count; i++) {
+            colliders[i].enabled = false;
+        }
+        for (int i = colliders.Count; i < numColliders; i++) {
+            var toAdd = owner.AddComponent<BoxCollider2D>();
+            colliders.Add(toAdd);
+        }
+    }
+
+    // This theoretically works, but has not been tested, and is not used
+    //public static void CopyBoxCollider(ref BoxCollider2D copyTo, in BoxCollider2D copyFrom) {
+    //    Debug.Assert(copyTo != null);
+    //    copyTo.offset = copyFrom.offset;
+    //    copyTo.size = copyFrom.size;
+    //    copyTo.enabled = copyFrom.enabled;
+    //    copyTo.usedByEffector = copyFrom.usedByEffector;
+    //    copyTo.sharedMaterial = copyFrom.sharedMaterial;
+    //    copyTo.isTrigger = copyFrom.isTrigger;
+    //}
 }

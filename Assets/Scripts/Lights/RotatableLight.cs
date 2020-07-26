@@ -10,7 +10,7 @@ using UnityEngine;
 //      "right" and "left" are refered to as if you are facing in the
 //      direction of the light
 [RequireComponent(typeof(Rigidbody2D))]
-public class FixedLight : LightBase {
+public class RotatableLight : LightBase {
     [SerializeField]
     private bool DEBUG = false;
 
@@ -384,9 +384,9 @@ public class FixedLight : LightBase {
 
     private void SetUpLightEdges() {
         rightShadowEdge = Util.CreateChild<LightEdge>(shadowParent.transform);
-        rightShadowEdge.Init(this, DividesLight.Side.left);
+        rightShadowEdge.Init(this, ShadowEdgeBase.Side.left);
         leftShadowEdge = Util.CreateChild<LightEdge>(shadowParent.transform);
-        leftShadowEdge.Init(this, DividesLight.Side.right);
+        leftShadowEdge.Init(this, ShadowEdgeBase.Side.right);
         //farShadowEdge = Util.CreateChild<LightEdge>(shadowParent.transform);
         //farShadowEdge.Init(this, DividesLight.Side.left);
     }
@@ -439,7 +439,7 @@ public class FixedLight : LightBase {
         foreach (var opaque in opaqueSet) {
             if (!shadows.ContainsKey(opaque)) {
                 Shadow s = Util.CreateChild<Shadow>(shadowParent.transform);
-                s.Init(this, DividesLight.Side.left, opaque);
+                s.Init(this, ShadowEdgeBase.Side.left, opaque);
                 shadows.Add(opaque, s);
             }
         }

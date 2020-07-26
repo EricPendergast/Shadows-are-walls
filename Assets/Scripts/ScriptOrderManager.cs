@@ -16,7 +16,7 @@ public class ScriptOrderManager : AllTracker<ScriptOrderManager> {
             shadow.DoFixedUpdate();
         }
 
-        foreach (var lightDivider in DividesLight.GetAll()) {
+        foreach (var lightDivider in ShadowEdgeBase.GetAll()) {
             lightDivider.DoFixedUpdate();
         }
     }

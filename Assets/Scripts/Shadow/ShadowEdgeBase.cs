@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-public abstract class DividesLight : AllTracker<DividesLight> {
+public abstract class ShadowEdgeBase : AllTracker<ShadowEdgeBase> {
     [SerializeField]
     protected bool DEBUG = false;
 
@@ -53,7 +53,8 @@ public abstract class DividesLight : AllTracker<DividesLight> {
         if (firstSetTarget) {
             rb.position = lightSource.GetTargetPosition();
             rb.rotation = this.target.Angle();
-            GetComponent<PlatformEffector2D>().rotationalOffset = illuminatedSide == Side.left ? 0 : 180;
+            // See the note in Awake() about platform effectors.
+            //GetComponent<PlatformEffector2D>().rotationalOffset = illuminatedSide == Side.left ? 0 : 180;
             firstSetTarget = false;
         }
     }
@@ -68,13 +69,23 @@ public abstract class DividesLight : AllTracker<DividesLight> {
         rb.mass = 10;
         rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
 
-        var platformEffector = gameObject.AddComponent<PlatformEffector2D>();
+        // For now, we will not use platform effectors since the edge case they
+        // were trying to fix no longer seems to happen. And also they make it
+        // difficult to have collisions on both sides of a shadow edge.
+        //var lightPlatEffector = SetUpPlatformEffector();
+        //lightPlatEffector.rotationalOffset = 0;
+        //lightPlatEffector.colliderMask = PhysicsHelper.freeObjectLayerMask;//Physics2D.GetLayerCollisionMask(gameObject.layer);
+    }
 
+    private PlatformEffector2D SetUpPlatformEffector() {
+        var platformEffector = gameObject.AddComponent<PlatformEffector2D>();
         platformEffector.rotationalOffset = 0;
         platformEffector.useOneWay = true;
-        platformEffector.useSideBounce = false;
+        platformEffector.useSideBounce = true;
         platformEffector.useSideFriction = false;
-        platformEffector.colliderMask = Physics2D.GetLayerCollisionMask(gameObject.layer);
+        platformEffector.surfaceArc = 180;
+        platformEffector.sideArc = 30;
+        return platformEffector;
     }
 
     public void Init(LightBase lightSource, Side illuminatedSide) {
@@ -126,22 +137,7 @@ public abstract class DividesLight : AllTracker<DividesLight> {
 
         var colliders = new List<BoxCollider2D>(GetComponents<BoxCollider2D>());
 
-        for (int i = pieces.Count; i < colliders.Count; i++) {
-            colliders[i].enabled = false;
-        }
-        for (int i = colliders.Count; i < pieces.Count; i++) {
-            var toAdd = gameObject.AddComponent<BoxCollider2D>();
-            colliders.Add(toAdd);
-        }
-
-        for (int i = 0; i < pieces.Count; i++) {
-            float width = pieces[i].Length();
-            colliders[i].offset = new Vector2((pieces[i].p1 - lightSource.GetTargetPosition()).magnitude + width/2, 0);
-            colliders[i].size = new Vector2(width, .01f);
-            colliders[i].enabled = SegmentDividesLightAndDark(pieces[i]);
-            colliders[i].usedByEffector = true;
-            colliders[i].sharedMaterial = Refs.instance.frictionlessMaterial;
-        }
+        ConfigureColliders(colliders, pieces);
 
         // Moving the center of mass to rb.position, which is where the light
         // source is. This makes things act nicer, for unclear reasons. But the
@@ -152,9 +148,32 @@ public abstract class DividesLight : AllTracker<DividesLight> {
         rb.inertia = PhysicsHelper.GetInertia(rb, colliders, Vector2.zero);
     }
 
+    private void ConfigureColliders(List<BoxCollider2D> colliders, List<LineSegment> pieces) {
+        PhysicsHelper.ShrinkOrExpandTo(gameObject, colliders, pieces.Count);
 
+        for (int i = 0; i < pieces.Count; i++) {
+            float width = pieces[i].Length();
+            colliders[i].offset = new Vector2((pieces[i].p1 - lightSource.GetTargetPosition()).magnitude + width/2, 0);
+            colliders[i].size = new Vector2(width, .01f);
+            colliders[i].enabled = SegmentDividesLightAndDark(pieces[i]);
+            colliders[i].usedByEffector = true;
+            colliders[i].sharedMaterial = Refs.instance.frictionlessMaterial;
+        }
+    }
+
+    //private void CopyCollidersTo(GameObject copyTo, List<BoxCollider2D> colliders) {
+    //    var copyToColliders = new List<BoxCollider2D>(copyTo.GetComponents<BoxCollider2D>());
+    //    PhysicsHelper.ShrinkOrExpandTo(gameObject, colliders, colliders.Count);
+    //
+    //    for (int i = 0; i < colliders.Count; i++) {
+    //        var copyToCollider = copyToColliders[i];
+    //        var copyFromCollider = colliders[i];
+    //        PhysicsHelper.CopyBoxCollider(ref copyToCollider, in copyFromCollider);
+    //    }
+    //}
+    //
     IEnumerable<LineSegment> GetIntersectionCandidates() {
-        foreach (DividesLight edge in GetAll()) {
+        foreach (ShadowEdgeBase edge in GetAll()) {
             // TODO: This can be optimized, if its a bottleneck
             if (edge.lightSource == this.lightSource) {
                 continue;

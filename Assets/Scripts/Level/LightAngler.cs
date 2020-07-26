@@ -19,7 +19,7 @@ public class LightAngler : LevelObject, SimpleLeverControlable, SimpleButtonCont
     [SerializeField]
     private float speed = 10;
     [SerializeField]
-    public FixedLight controled;
+    public RotatableLight controled;
     private SimpleButton.State? buttonState = null;
     //[SerializeField]
     //private float gizmoLength = 1;
