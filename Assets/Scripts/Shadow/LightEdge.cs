@@ -48,7 +48,7 @@ public class LightEdge : ShadowEdgeBase {
         foreach (var contact in contacts) {
             var targetClosest = target.Closest(contact.point);
             var thisDifference = actual.Closest(contact.point) - targetClosest;
-            if (thisDifference.sqrMagnitude > difference.sqrMagnitude) {
+            if (thisDifference.sqrMagnitude > difference.sqrMagnitude && (contact.point - rb.position).magnitude > 2) {
                 difference = thisDifference;
                 difference -= ((Vector2)Vector3.Project(contact.normal, difference).normalized)*contact.separation;
                 point = targetClosest;
