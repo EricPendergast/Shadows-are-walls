@@ -27,7 +27,6 @@ public class Positioner : SnappableObject, SimpleLeverControlable, SimpleButtonC
     private SimpleButton.State? buttonState = null;
 
     void Start() {
-        ApplySettings();
         Debug.Assert(controled != null);
 
         myJoint = gameObject.AddComponent<RelativeJoint2D>();
@@ -91,7 +90,7 @@ public class Positioner : SnappableObject, SimpleLeverControlable, SimpleButtonC
         }
     }
 
-    public void ApplySettings() {
+    public void EditorUpdate() {
         position = Mathf.Clamp01(position);
         if (controled != null) {
             controled.transform.position = Vector2.Lerp(left, right, position);

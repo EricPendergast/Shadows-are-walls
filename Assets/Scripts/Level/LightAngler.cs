@@ -4,6 +4,8 @@ using UnityEngine;
 public class LightAngler : LevelObject, SimpleLeverControlable, SimpleButtonControlable {
 
     [SerializeField]
+    private bool useConstraints = true;
+    [SerializeField]
     [Range(-180,180)]
     private float angleLeft = 90;
     [SerializeField]
@@ -48,8 +50,10 @@ public class LightAngler : LevelObject, SimpleLeverControlable, SimpleButtonCont
 
         var delta = direction*speed*Time.deltaTime;
         var actualAngle = myJoint.connectedBody.rotation - body.rotation;
-        var newCurrentAngle = Mathf.Clamp(currentAngle + delta, minAngle, maxAngle);
-
+        var newCurrentAngle = currentAngle + delta;
+        if (useConstraints) {
+            newCurrentAngle = Mathf.Clamp(newCurrentAngle, minAngle, maxAngle);
+        }
       
         newCurrentAngle = Mathf.Clamp(newCurrentAngle, actualAngle - Mathf.Abs(2*delta), actualAngle + Mathf.Abs(2*delta));
 

@@ -3,12 +3,12 @@ using UnityEditor;
 
 [CustomEditor(typeof(Positioner), true)]
 [CanEditMultipleObjects]
-public class PositionerEditor : Editor {
+public class PositionerEditor : SnappableObjectEditor {
     public override void OnInspectorGUI() {
-        base.DrawDefaultInspector();
+        base.OnInspectorGUI();
     }
 
-    public void OnSceneGUI() {
+    public override void OnSceneGUI() {
         if (!Application.isPlaying) {
             var positioner = target as Positioner;
 
@@ -18,8 +18,9 @@ public class PositionerEditor : Editor {
                  Undo.RecordObject(positioner, "Change movement path");
                  positioner.right = newPos;
             } 
-            positioner.ApplySettings();
-            positioner.DoSnapping();
+            positioner.EditorUpdate();
         }
+
+        base.OnSceneGUI();
     }
 }
