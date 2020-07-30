@@ -10,7 +10,10 @@ public class LightAnglerEditor : LevelObjectEditor {
 
     public override void OnSceneGUI() {
         if (!Application.isPlaying) {
-            Undo.RecordObject((target as LightAngler).controled, "Automatically set light aperture angle");
+            var controled = (target as LightAngler).controled;
+            if (controled != null) {
+                Undo.RecordObject(controled, "Automatically set light aperture angle");
+            }
             (target as LightAngler).ApplySettings();
         }
         base.OnSceneGUI();

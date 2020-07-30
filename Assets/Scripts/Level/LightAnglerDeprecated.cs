@@ -1,13 +1,16 @@
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody2D))]
-public class LightAngler : LevelObject, SimpleLeverControlable, SimpleButtonControlable {
+public class LightAnglerDeprecated : LevelObject, SimpleLeverControlable, SimpleButtonControlable {
 
     [SerializeField]
-    private bool unconstrained = false;
+    private bool useConstraints = true;
     [SerializeField]
-    [Range(0,180)]
-    private float angleConstraint = 90;
+    [Range(-180,180)]
+    private float angleLeft = 90;
+    [SerializeField]
+    [Range(-180,180)]
+    private float angleRight = 90;
     [SerializeField]
     private float currentAngle = 0;
     [SerializeField]
@@ -20,6 +23,8 @@ public class LightAngler : LevelObject, SimpleLeverControlable, SimpleButtonCont
     [SerializeField]
     public RotatableLight controled;
     private SimpleButton.State? buttonState = null;
+    //[SerializeField]
+    //private float gizmoLength = 1;
 
     private RelativeJoint2D myJoint;
 
@@ -37,20 +42,22 @@ public class LightAngler : LevelObject, SimpleLeverControlable, SimpleButtonCont
     }
 
     public void MovePosition(int direction) {
-        // TODO: The edge cases are important here, and also not addressed
-        // Maybe this shouldn't be a permanent solution
-        if (Mathf.Abs(Mathf.DeltaAngle(GetComponent<Rigidbody2D>().rotation, -90)) > 90) {
+        var minAngle = Mathf.Min(-angleLeft, angleRight);
+        var maxAngle = Mathf.Max(-angleLeft, angleRight);
+        if (-angleLeft > angleRight) {
             direction = -direction;
         }
+
         var delta = direction*speed*Time.deltaTime;
         var actualAngle = myJoint.connectedBody.rotation - body.rotation;
-
-        currentAngle += delta;
-
-        currentAngle = ClampToConstraints(currentAngle);
+        var newCurrentAngle = currentAngle + delta;
+        if (useConstraints) {
+            newCurrentAngle = Mathf.Clamp(newCurrentAngle, minAngle, maxAngle);
+        }
       
-        currentAngle = Mathf.Clamp(currentAngle, actualAngle - Mathf.Abs(2*delta), actualAngle + Mathf.Abs(2*delta));
+        newCurrentAngle = Mathf.Clamp(newCurrentAngle, actualAngle - Mathf.Abs(2*delta), actualAngle + Mathf.Abs(2*delta));
 
+        currentAngle = newCurrentAngle;
         myJoint.angularOffset = currentAngle;
     }
 
@@ -74,30 +81,21 @@ public class LightAngler : LevelObject, SimpleLeverControlable, SimpleButtonCont
     }
     void DrawGizmos(float gizmoLength) {
         Gizmos.color = Color.red;
-        Gizmos.DrawRay(body.position, Quaternion.Euler(0,0,body.rotation - angleConstraint)*Vector2.right*gizmoLength);
-        Gizmos.DrawRay(body.position, Quaternion.Euler(0,0,body.rotation - (angleConstraint - apertureAngle))*Vector2.right*gizmoLength);
+        Gizmos.DrawRay(body.position, Quaternion.Euler(0,0,body.rotation - angleLeft - apertureAngle/2)*Vector2.right*gizmoLength);
+        Gizmos.DrawRay(body.position, Quaternion.Euler(0,0,body.rotation - angleLeft + apertureAngle/2)*Vector2.right*gizmoLength);
 
-        Gizmos.color = Color.green;
-        Gizmos.DrawRay(body.position, Quaternion.Euler(0,0,body.rotation + angleConstraint)*Vector2.right*gizmoLength);
-        Gizmos.DrawRay(body.position, Quaternion.Euler(0,0,body.rotation + (angleConstraint - apertureAngle))*Vector2.right*gizmoLength);
-    }
-
-    private float ClampToConstraints(float lightAngle) {
-        if (!unconstrained) {
-            return Mathf.Clamp(lightAngle, -(angleConstraint - apertureAngle/2), angleConstraint - apertureAngle/2);
-        } else {
-            return lightAngle;
-        }
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawRay(body.position, Quaternion.Euler(0,0,body.rotation + angleRight - apertureAngle/2)*Vector2.right*gizmoLength);
+        Gizmos.DrawRay(body.position, Quaternion.Euler(0,0,body.rotation + angleRight + apertureAngle/2)*Vector2.right*gizmoLength);
     }
 
     public void ApplySettings() {
-        angleConstraint = Mathf.Max(angleConstraint, apertureAngle/2);
-        currentAngle = ClampToConstraints(currentAngle);
-        if (controled != null) {
-            controled.transform.rotation = Quaternion.Euler(0,0,currentAngle)*transform.rotation;
-            controled.SetTargetApertureAngle(apertureAngle);
-            controled.transform.localPosition = Vector3.zero;
-        }
+        var minAngle = Mathf.Min(-angleLeft, angleRight);
+        var maxAngle = Mathf.Max(-angleLeft, angleRight);
+        currentAngle = Mathf.Clamp(currentAngle, minAngle, maxAngle);
+        controled.transform.rotation = Quaternion.Euler(0,0,currentAngle)*transform.rotation;
+        controled.SetTargetApertureAngle(apertureAngle);
+        controled.transform.localPosition = Vector3.zero;
     }
 
     public override void DoSnapping() {

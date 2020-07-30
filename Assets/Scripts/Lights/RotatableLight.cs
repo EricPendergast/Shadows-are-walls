@@ -15,7 +15,7 @@ public class RotatableLight : LightBase {
     private bool DEBUG = false;
 
     private class DebugSnapshot {
-        public Triangle actualViewTriangle;
+        //public Triangle actualViewTriangle;
         public Triangle targetViewTriangle;
     }
     private DebugSnapshot lastSnapshot;
@@ -45,7 +45,7 @@ public class RotatableLight : LightBase {
     // sometimes shadows get split into multiple line segments
     private List<LineSegment> trimmedShadows = new List<LineSegment>();
 
-    private Triangle actualViewTriangle;
+    //private Triangle actualViewTriangle;
     private Triangle targetViewTriangle;
 
     [SerializeField]
@@ -109,7 +109,7 @@ public class RotatableLight : LightBase {
 
     void CacheViewTriangles() {
         targetViewTriangle = CalculateTargetViewTriangle();
-        actualViewTriangle = CalculateActualViewTriangle();
+        //actualViewTriangle = CalculateActualViewTriangle();
     }
 
     public Triangle CalculateTargetLocalViewTriangle() {
@@ -168,9 +168,9 @@ public class RotatableLight : LightBase {
             Gizmos.DrawLine(seg.p1, seg.p2);
         }
         Gizmos.color = Color.white;
-        foreach (var seg in snap.actualViewTriangle.GetSides()) {
-            Gizmos.DrawLine(seg.p1, seg.p2);
-        }
+        //foreach (var seg in snap.actualViewTriangle.GetSides()) {
+        //    Gizmos.DrawLine(seg.p1, seg.p2);
+        //}
     }
 
     //void OnDrawGizmosSelected() {
@@ -464,7 +464,7 @@ public class RotatableLight : LightBase {
             lastSnapshot = new DebugSnapshot();
         }
 
-        lastSnapshot.actualViewTriangle = actualViewTriangle;
+        //lastSnapshot.actualViewTriangle = actualViewTriangle;
         lastSnapshot.targetViewTriangle = targetViewTriangle;
     }
 }
