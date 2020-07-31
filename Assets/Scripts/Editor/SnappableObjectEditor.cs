@@ -11,6 +11,8 @@ public class SnappableObjectEditor : Editor {
 
     public virtual void OnSceneGUI() {
         if (!Application.isPlaying) {
+            Undo.RecordObject(target as SnappableObject, "Snap object");
+            Undo.RecordObject((target as SnappableObject).transform, "Snap object");
             (target as SnappableObject).DoSnapping();
         }
     }
