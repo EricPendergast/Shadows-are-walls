@@ -5,7 +5,7 @@ public interface SimpleLeverControlable {
     void MovePosition(int direction);
 }
 
-public class SimpleLever : Lever {
+public class SimpleLever : LevelObject, Lever {
     [SerializeField]
     private GameObject controledGameObject;
     private SimpleLeverControlable controled;
@@ -31,7 +31,7 @@ public class SimpleLever : Lever {
         }
     }
 
-    public override void MovePosition(int direction) {
+    public void MovePosition(int direction) {
         if (controled != null) {
             controled.MovePosition(direction);
         }

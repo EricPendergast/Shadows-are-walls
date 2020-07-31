@@ -1,7 +1,7 @@
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody2D))]
-public class LightAngler : LevelObject, SimpleLeverControlable, SimpleButtonControlable {
+public class LightAngler : LevelObject, Lever, SimpleLeverControlable, SimpleButtonControlable {
 
     [SerializeField]
     private bool unconstrained = false;
