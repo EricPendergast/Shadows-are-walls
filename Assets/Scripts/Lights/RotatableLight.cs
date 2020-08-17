@@ -20,8 +20,10 @@ public class RotatableLight : LightBase {
     }
     private DebugSnapshot lastSnapshot;
 
-    public float apertureAngle;
-    public float distance;
+    [SerializeField]
+    private float apertureAngle;
+    [SerializeField]
+    private float distance;
 
     [SerializeField]
     public LightSettings settings;
@@ -32,6 +34,8 @@ public class RotatableLight : LightBase {
     public float plasticModeDuration = 1;
 
     private Mesh castLightMesh;
+    [SerializeField]
+    private LampshadeRenderer lampshadeRenderer;
 
 
     private Dictionary<Opaque, Shadow> shadows = new Dictionary<Opaque, Shadow>();
@@ -72,12 +76,14 @@ public class RotatableLight : LightBase {
 
     public void SetTargetApertureAngle(float v) {
         apertureAngle = v;
+        if (lampshadeRenderer) {
+            lampshadeRenderer.OnApertureAngleChange(apertureAngle);
+        }
     }
 
     public float GetTargetApertureAngle() {
         return apertureAngle;
     }
-
 
     public float GetTargetAngle() {
         return body.rotation;

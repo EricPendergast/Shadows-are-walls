@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Collections;
 using UnityEngine;
 
 public class Util {
@@ -75,5 +77,14 @@ public class Util {
                 Mathf.Round(vec.x),
                 Mathf.Round(vec.y),
                 Mathf.Round(vec.z));
+    }
+
+    public static IEnumerable<GameObject> AllChildrenIter(GameObject gameObject) {
+        foreach (Transform child in gameObject.transform) {
+            yield return child.gameObject;
+            foreach (GameObject subChild in AllChildrenIter(child.gameObject)) {
+                yield return subChild;
+            }
+        }
     }
 }

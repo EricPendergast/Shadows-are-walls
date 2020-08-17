@@ -10,9 +10,9 @@ public class LightAnglerEditor : LevelObjectEditor {
 
     public override void OnSceneGUI() {
         if (!Application.isPlaying) {
-            var controled = (target as LightAngler).controled;
-            if (controled != null) {
-                Undo.RecordObject(controled, "Automatically set light aperture angle");
+            // TODO: This is trying to make the editor save changes to the lampshade renderer, but it doesn't actually work.
+            foreach (GameObject child in Util.AllChildrenIter((target as LightAngler).gameObject)) {
+                Undo.RecordObject(child, "Automatically set light aperture angle");
             }
             (target as LightAngler).ApplySettings();
         }

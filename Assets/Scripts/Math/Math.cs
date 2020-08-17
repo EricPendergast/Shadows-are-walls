@@ -25,4 +25,10 @@ public class Math {
     public static Vector3 Extend(Vector2 origin, Vector2 toExtend, float newDistance) {
         return origin + (toExtend - origin).normalized*newDistance;
     }
+
+    public static Vector2 Rotate(Vector2 toRotate, float angle) {
+        // This may not be the most efficient way to rotate a
+        // Vector2, since Quaternions are for 3D rotations
+        return Quaternion.Euler(0,0,angle)*toRotate;
+    }
 }
