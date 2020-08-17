@@ -31,6 +31,8 @@ public class Player : MonoBehaviour {
     private float jumpSpeed;
     [SerializeField]
     private float jumpTime;
+    [SerializeField]
+    private float forceTransferRatio;
 
     private float timeOfLastJump;
 
@@ -52,7 +54,7 @@ public class Player : MonoBehaviour {
             rb.AddForce(inputForce);
             var standingOn = GetStandingOn();
             foreach (var col in standingOn) {
-                col.attachedRigidbody.AddForce(-inputForce/standingOn.Count);
+                col.attachedRigidbody.AddForce(-forceTransferRatio*inputForce/standingOn.Count);
             }
         }
 

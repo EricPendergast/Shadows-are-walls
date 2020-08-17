@@ -212,6 +212,7 @@ MonoBehaviour:
   mainCollider: {fileID: 7235870076155195135}
   jumpSpeed: 10
   jumpTime: 0.2
+  forceTransferRatio: 0.7
 --- !u!61 &7235870076155195135
 BoxCollider2D:
   m_ObjectHideFlags: 0
