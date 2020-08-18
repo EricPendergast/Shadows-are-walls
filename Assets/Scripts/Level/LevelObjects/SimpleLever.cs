@@ -1,11 +1,13 @@
 using UnityEngine;
 
 public interface SimpleLeverControlable {
-    // TODO: Is this a good name?
+    // TODO: Decide whether this should work with the old or new interaction
+    // interface. This is not an obvious decision because levers have only one
+    // axis of movement, so this interface still may be intuitive.
     void MovePosition(int direction);
 }
 
-public class SimpleLever : LevelObject, Lever {
+public class SimpleLever : LevelObject, Lever, Interactable {
     [SerializeField]
     private GameObject controledGameObject;
     private SimpleLeverControlable controled;
@@ -28,6 +30,18 @@ public class SimpleLever : LevelObject, Lever {
         }
         if (controled == null) {
             Debug.LogError("Warning: controledGameObject has no SimpleLeverControlable component");
+        }
+    }
+
+    public Vector2 GetPosition() {
+        return transform.position;
+    }
+
+    public void Interact(Vector2 direction) {
+        if (direction.x < 0) {
+            MovePosition(-1);
+        } else if (direction.x > 0) {
+            MovePosition(1);
         }
     }
 

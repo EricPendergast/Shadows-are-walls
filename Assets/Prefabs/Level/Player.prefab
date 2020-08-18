@@ -201,18 +201,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2e53cf647d235d8a68b754fd62cf625d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  current: 2
   airAccel: 20
   airFriction: 5
   groundAccel: 50
   groundFriction: 20
   maxSpeed: 7
   groundDetector: {fileID: 7235870076345219020}
-  interactableDetector: {fileID: 7235870075377882479}
   mainCollider: {fileID: 7235870076155195135}
   jumpSpeed: 10
   jumpTime: 0.2
   forceTransferRatio: 0.7
+  sm:
+    current: 0
+  interactionHandler:
+    interactionBreakDistance: 0.5
+    interactableDetector: {fileID: 7235870075377882479}
+    springConstant: 100
+    springDampingConstant: 10
 --- !u!61 &7235870076155195135
 BoxCollider2D:
   m_ObjectHideFlags: 0

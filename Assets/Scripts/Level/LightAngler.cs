@@ -1,8 +1,10 @@
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody2D))]
-public class LightAngler : LevelObject, Lever, SimpleLeverControlable, SimpleButtonControlable {
+public class LightAngler : LevelObject, Lever, SimpleLeverControlable, SimpleButtonControlable, Interactable {
 
+    [SerializeField]
+    private bool DEBUG = false;
     [SerializeField]
     private bool unconstrained = false;
     [SerializeField]
@@ -36,7 +38,22 @@ public class LightAngler : LevelObject, Lever, SimpleLeverControlable, SimpleBut
         MovePosition(0);
     }
 
+    public void Interact(Vector2 direction) {
+        if (direction.x < 0) {
+            MovePosition(-1);
+        } else if (direction.x > 0) {
+            MovePosition(1);
+        }
+    }
+
+    public Vector2 GetPosition() {
+        return transform.position;
+    }
+
     public void MovePosition(int direction) {
+        if (DEBUG) {
+            Debug.Log("LightAngler.MovePosition() called");
+        }
         // TODO: The edge cases are important here, and also not addressed
         // Maybe this shouldn't be a permanent solution
         if (Mathf.Abs(Mathf.DeltaAngle(GetComponent<Rigidbody2D>().rotation, -90)) > 90) {
