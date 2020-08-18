@@ -44,10 +44,11 @@ public class LightAngler : LevelObject, SimpleButtonControlable, Interactable {
         if (direction == Vector2.zero || Vector2.Angle(direction, lightDirection) < 1) {
             return;
         }
-        if (Vector2.SignedAngle(direction, lightDirection) < 0) {
-            Rotate(1);
-        } else {
+        var angle = Vector2.SignedAngle(lightDirection, direction);
+        if (Vector2.SignedAngle(lightDirection, direction) < 0) {
             Rotate(-1);
+        } else {
+            Rotate(1);
         }
     }
 
@@ -108,7 +109,7 @@ public class LightAngler : LevelObject, SimpleButtonControlable, Interactable {
         angleConstraint = Mathf.Max(angleConstraint, apertureAngle/2);
         currentAngle = ClampToConstraints(currentAngle);
         if (controled != null) {
-            controled.transform.rotation = Quaternion.Euler(0,0,currentAngle)*transform.rotation;
+            SetControledAngle(currentAngle);
             controled.SetTargetApertureAngle(apertureAngle);
             controled.transform.localPosition = Vector3.zero;
         }
@@ -121,5 +122,16 @@ public class LightAngler : LevelObject, SimpleButtonControlable, Interactable {
                 body.position = transform.position;
             }
         }
+    }
+
+    private float GetControledAngle() {
+        return controled.GetComponent<Rigidbody2D>().rotation;
+    }
+
+    private void SetControledAngle(float angle) {
+        controled.GetComponent<Rigidbody2D>().rotation = body.rotation + angle;
+        // When this is called in the editor, the transform doesn't update
+        // automatically, so we need to change it manually.
+        controled.transform.localRotation = Quaternion.Euler(0,0,angle);
     }
 }

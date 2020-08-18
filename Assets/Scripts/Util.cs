@@ -79,6 +79,14 @@ public class Util {
                 Mathf.Round(vec.z));
     }
 
+    public static IEnumerable<Component> AllChildrenComponentsIter(GameObject gameObject) {
+        foreach (GameObject child in AllChildrenIter(gameObject)) {
+            foreach (Component component in child.GetComponents<Component>()) {
+                yield return component;
+            }
+        }
+    }
+
     public static IEnumerable<GameObject> AllChildrenIter(GameObject gameObject) {
         foreach (Transform child in gameObject.transform) {
             yield return child.gameObject;
