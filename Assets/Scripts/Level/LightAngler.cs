@@ -1,7 +1,7 @@
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody2D))]
-public class LightAngler : LevelObject, Lever, SimpleLeverControlable, SimpleButtonControlable, Interactable {
+public class LightAngler : LevelObject, SimpleButtonControlable, Interactable {
 
     [SerializeField]
     private bool DEBUG = false;
@@ -35,14 +35,19 @@ public class LightAngler : LevelObject, Lever, SimpleLeverControlable, SimpleBut
         currentAngle = 0;
         myJoint.angularOffset = currentAngle;
 
-        MovePosition(0);
+        Rotate(0);
     }
 
     public void Interact(Vector2 direction) {
-        if (direction.x < 0) {
-            MovePosition(-1);
-        } else if (direction.x > 0) {
-            MovePosition(1);
+        var lightDirection = controled.transform.right;
+
+        if (direction == Vector2.zero || Vector2.Angle(direction, lightDirection) < 1) {
+            return;
+        }
+        if (Vector2.SignedAngle(direction, lightDirection) < 0) {
+            Rotate(1);
+        } else {
+            Rotate(-1);
         }
     }
 
@@ -50,15 +55,7 @@ public class LightAngler : LevelObject, Lever, SimpleLeverControlable, SimpleBut
         return transform.position;
     }
 
-    public void MovePosition(int direction) {
-        if (DEBUG) {
-            Debug.Log("LightAngler.MovePosition() called");
-        }
-        // TODO: The edge cases are important here, and also not addressed
-        // Maybe this shouldn't be a permanent solution
-        if (Mathf.Abs(Mathf.DeltaAngle(GetComponent<Rigidbody2D>().rotation, -90)) > 90) {
-            direction = -direction;
-        }
+    private void Rotate(int direction) {
         var delta = direction*speed*Time.deltaTime;
         var actualAngle = myJoint.connectedBody.rotation - body.rotation;
 
@@ -77,9 +74,9 @@ public class LightAngler : LevelObject, Lever, SimpleLeverControlable, SimpleBut
 
     void FixedUpdate() {
         if (buttonState == SimpleButton.State.unpressed) {
-            MovePosition(-1);
+            Rotate(-1);
         } else if (buttonState == SimpleButton.State.pressed) {
-            MovePosition(1);
+            Rotate(1);
         }
     }
 

@@ -1,7 +1,7 @@
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody2D))]
-public class Positioner : SnappableObject, SimpleLeverControlable, SimpleButtonControlable {
+public class Positioner : SnappableObject, Interactable, SimpleButtonControlable {
 
     public Vector2 left {
         get => transform.position;
@@ -38,6 +38,21 @@ public class Positioner : SnappableObject, SimpleLeverControlable, SimpleButtonC
         myJoint.angularOffset = rotation;
 
         MovePosition(0);
+    }
+
+    public void Interact(Vector2 direction) {
+        if (direction.x < 0) {
+            MovePosition(-1);
+        } else if (direction.x > 0) {
+            MovePosition(1);
+        }
+    }
+
+    public Vector2 GetPosition() {
+        // This makes it so direct interaction is impossible. Theoretically,
+        // this method should never even get called, since this object doesn't
+        // have a collider.
+        return Vector2.positiveInfinity;
     }
 
     public void MovePosition(int direction) {

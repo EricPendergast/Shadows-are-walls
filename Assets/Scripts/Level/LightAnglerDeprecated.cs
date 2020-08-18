@@ -1,7 +1,9 @@
 using UnityEngine;
 
+// This class shouldn't be used in new levels. Use LightAngler. Really this
+// should be removed soon.
 [RequireComponent(typeof(Rigidbody2D))]
-public class LightAnglerDeprecated : LevelObject, SimpleLeverControlable, SimpleButtonControlable {
+public class LightAnglerDeprecated : LevelObject, Interactable, SimpleButtonControlable {
 
     [SerializeField]
     private bool useConstraints = true;
@@ -39,6 +41,19 @@ public class LightAnglerDeprecated : LevelObject, SimpleLeverControlable, Simple
         myJoint.angularOffset = currentAngle;
 
         MovePosition(0);
+    }
+
+    public void Interact(Vector2 direction) {
+        if (direction.x < 0) {
+            MovePosition(-1);
+        } else if (direction.x > 0) {
+            MovePosition(1);
+        }
+    }
+
+    // This can't be interacted with directly
+    public Vector2 GetPosition() {
+        return Vector2.positiveInfinity;
     }
 
     public void MovePosition(int direction) {

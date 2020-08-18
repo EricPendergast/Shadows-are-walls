@@ -1,16 +1,9 @@
 using UnityEngine;
 
-public interface SimpleLeverControlable {
-    // TODO: Decide whether this should work with the old or new interaction
-    // interface. This is not an obvious decision because levers have only one
-    // axis of movement, so this interface still may be intuitive.
-    void MovePosition(int direction);
-}
-
-public class SimpleLever : LevelObject, Lever, Interactable {
+public class SimpleLever : LevelObject, Interactable {
     [SerializeField]
     private GameObject controledGameObject;
-    private SimpleLeverControlable controled;
+    private Interactable controled;
 
     protected override void Awake() {
         base.Awake();
@@ -21,7 +14,7 @@ public class SimpleLever : LevelObject, Lever, Interactable {
 
     void Start() {
         controled = null;
-        foreach (var controlable in controledGameObject.GetComponentsInChildren<SimpleLeverControlable>()) {
+        foreach (var controlable in controledGameObject.GetComponentsInChildren<Interactable>()) {
             if (controled == null) {
                 controled = controlable;
             } else {
@@ -38,17 +31,7 @@ public class SimpleLever : LevelObject, Lever, Interactable {
     }
 
     public void Interact(Vector2 direction) {
-        if (direction.x < 0) {
-            MovePosition(-1);
-        } else if (direction.x > 0) {
-            MovePosition(1);
-        }
-    }
-
-    public void MovePosition(int direction) {
-        if (controled != null) {
-            controled.MovePosition(direction);
-        }
+        controled.Interact(direction);
     }
 
     protected override void OnDrawGizmosSelected() {
