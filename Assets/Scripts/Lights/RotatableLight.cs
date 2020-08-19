@@ -357,11 +357,13 @@ public class RotatableLight : LightBase {
             LineSegment seg = shadowData[i].Item1;
             Shadow shadow = shadowData[i].Item2;
 
-            if (shadow != null && seg.Length() > .0001) {
-                if (!frontFacing.ContainsKey(shadow)) {
-                    frontFacing.Add(shadow, new List<LineSegment>());
+            if (shadow != null) {
+                if (seg.Length() > .0001) {
+                    if (!frontFacing.ContainsKey(shadow)) {
+                        frontFacing.Add(shadow, new List<LineSegment>());
+                    }
+                    frontFacing[shadow].Add(seg);
                 }
-                frontFacing[shadow].Add(seg);
                 if (prevSeg is LineSegment prev) {
                     LineSegment right = new LineSegment(prev.p2, seg.p1);
                     if (right.Length() > .0001 && !right.GoesAwayFrom(GetTargetPosition())) {
