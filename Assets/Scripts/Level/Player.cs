@@ -41,7 +41,12 @@ namespace Player {
                     return;
                 }
             } else if (current == State.jumping) {
-                if (player.CanStillJump()) {
+                if (player.JumpTimeUp()) {
+                    if (player.JumpKeyPressed()) {
+                        current = State.initial;
+                        player.OnLastFrameOfJump();
+                    }
+                } else {
                     return;
                 }
             }
@@ -71,7 +76,9 @@ namespace Player {
         [SerializeField]
         private Collider2D mainCollider;
         [SerializeField]
-        private float jumpSpeed;
+        private float initialJumpSpeed;
+        [SerializeField]
+        private float secondaryJumpSpeed;
         [SerializeField]
         private float jumpTime;
         [SerializeField]
@@ -103,9 +110,9 @@ namespace Player {
 
                 ApplyForceToStandingOn(-playerForce*forceTransferRatio);
 
-                if (sm.Current() == State.jumping) {
-                    Jump();
-                }
+                //if (sm.Current() == State.jumping) {
+                //    Jump();
+                //}
 
                 rb.AddForce(GetFrictionForce(playerForce));
             }
@@ -142,9 +149,9 @@ namespace Player {
             return colliders;
         }
 
-        public void Jump() {
-            rb.AddForce(PhysicsHelper.GetNeededForce(rb, new Vector2(0,rb.velocity.y), Vector2.up*jumpSpeed));
-        }
+        //public void Jump() {
+        //    rb.AddForce(PhysicsHelper.GetNeededForce(rb, new Vector2(0,rb.velocity.y), Vector2.up*jumpSpeed));
+        //}
 
         private Vector2 GetFrictionForce(Vector2 forceAppliedToPlayer) {
             if (forceAppliedToPlayer.x * rb.velocity.x <= 0) {
@@ -179,13 +186,17 @@ namespace Player {
         }
 
         public void OnFirstFrameOfJump() {
+            rb.velocity = new Vector2(rb.velocity.x, initialJumpSpeed);
             timeOfLastJump = Time.time;
         }
 
-        public bool CanStillJump() {
-            return Time.time - timeOfLastJump < jumpTime && JumpKeyPressed();
+        public void OnLastFrameOfJump() {
+            rb.velocity = new Vector2(rb.velocity.x, secondaryJumpSpeed);
         }
 
+        public bool JumpTimeUp() {
+            return Time.time - timeOfLastJump > jumpTime;
+        }
     }
 
 

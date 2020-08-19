@@ -88,6 +88,9 @@ public class LightAngler : LevelObject, SimpleButtonControlable, Interactable {
         DrawGizmos(20);
     }
     void DrawGizmos(float gizmoLength) {
+        if (unconstrained) {
+            return;
+        }
         Gizmos.color = Color.red;
         Gizmos.DrawRay(body.position, Quaternion.Euler(0,0,body.rotation - angleConstraint)*Vector2.right*gizmoLength);
         Gizmos.DrawRay(body.position, Quaternion.Euler(0,0,body.rotation - (angleConstraint - apertureAngle))*Vector2.right*gizmoLength);

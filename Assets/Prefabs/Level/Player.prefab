@@ -208,7 +208,9 @@ MonoBehaviour:
   maxSpeed: 7
   groundDetector: {fileID: 7235870076345219020}
   mainCollider: {fileID: 7235870076155195135}
-  jumpSpeed: 10
+  jumpSpeed: 13
+  initialJumpSpeed: 13
+  secondaryJumpSpeed: 10
   jumpTime: 0.2
   forceTransferRatio: 0.7
   sm:
