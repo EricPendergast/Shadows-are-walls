@@ -6,6 +6,10 @@ public class CameraTracker2D : MonoBehaviour
     public GameObject trackedObject;
     public float trackSpeed;
     public float maxDistance;
+    //public float springConstant;
+    //public float springDampingConstant;
+
+    private Rigidbody2D rb;
 
     void Start() {
         if (instance != null) {
@@ -14,21 +18,27 @@ public class CameraTracker2D : MonoBehaviour
         instance = this;
     }
 
-    void LateUpdate() {
+    void FixedUpdate() {
         if (trackedObject == null) {
             return;
         }
-        Vector3 currPos = transform.position - trackedObject.transform.position;
-        Vector2 currPos2D = currPos;
-        if (currPos2D.magnitude > maxDistance) {
-            currPos2D.Normalize();
-            currPos2D *= maxDistance;
+        if (rb == null) {
+            rb = gameObject.AddComponent<Rigidbody2D>();
+            rb.gravityScale = 0;
         }
 
-        currPos2D *= 1-trackSpeed;
+        Vector2 relPos = rb.position - (Vector2)trackedObject.transform.position;
+        
+        if (relPos.magnitude > maxDistance) {
+            relPos = relPos.normalized * maxDistance;
+            rb.position = (Vector2)trackedObject.transform.position + relPos;
+        }
+        
+        //rb.AddForce(-relPos*springConstant);
+        //rb.velocity -= springDampingConstant*rb.velocity*Time.deltaTime;
 
-        currPos.x = currPos2D.x;
-        currPos.y = currPos2D.y;
-        transform.position = currPos + trackedObject.transform.position;
+        relPos = relPos - relPos*trackSpeed*Time.deltaTime;
+
+        rb.position = relPos + (Vector2)trackedObject.transform.position;
     }
 }
