@@ -217,8 +217,8 @@ Mesh:
     firstVertex: 0
     vertexCount: 3
     localAABB:
-      m_Center: {x: -0.38358256, y: 0, z: 0}
-      m_Extent: {x: 0.38358256, y: 0.64144963, z: 0}
+      m_Center: {x: -0.4047648, y: 0, z: 0}
+      m_Extent: {x: 0.4047648, y: 0.58707905, z: 0}
   m_Shapes:
     vertices: []
     shapes: []
@@ -297,7 +297,7 @@ Mesh:
       format: 0
       dimension: 0
     m_DataSize: 36
-    _typelessdata: 000000000000000000000000ef6444bf0b3624bf00000000ef6444bf0b36243f00000000
+    _typelessdata: 000000000000000000000000553d4fbfd04a16bf00000000553d4fbfd04a163f00000000
   m_CompressedMesh:
     m_Vertices:
       m_NumItems: 0
@@ -935,11 +935,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 172423370, guid: b42b24622b52cf39e93f0b582dfcc5ec, type: 3}
       propertyPath: currentAngle
-      value: -50.1
+      value: -54.05
       objectReference: {fileID: 0}
     - target: {fileID: 172423370, guid: b42b24622b52cf39e93f0b582dfcc5ec, type: 3}
       propertyPath: apertureAngle
-      value: 79.8
+      value: 71.9
       objectReference: {fileID: 0}
     - target: {fileID: 1973197721580949891, guid: b42b24622b52cf39e93f0b582dfcc5ec,
         type: 3}
@@ -954,22 +954,22 @@ PrefabInstance:
     - target: {fileID: 1973197721580949891, guid: b42b24622b52cf39e93f0b582dfcc5ec,
         type: 3}
       propertyPath: m_LocalRotation.z
-      value: -0.42340901
+      value: -0.45437923
       objectReference: {fileID: 0}
     - target: {fileID: 1973197721580949891, guid: b42b24622b52cf39e93f0b582dfcc5ec,
         type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.9059387
+      value: 0.89080834
       objectReference: {fileID: 0}
     - target: {fileID: 1973197721580949894, guid: b42b24622b52cf39e93f0b582dfcc5ec,
         type: 3}
       propertyPath: apertureAngle
-      value: 79.8
+      value: 71.9
       objectReference: {fileID: 0}
     - target: {fileID: 2249340161031165758, guid: b42b24622b52cf39e93f0b582dfcc5ec,
         type: 3}
       propertyPath: apertureAngle
-      value: 79.8
+      value: 71.9
       objectReference: {fileID: 0}
     - target: {fileID: 4345629075089311672, guid: b42b24622b52cf39e93f0b582dfcc5ec,
         type: 3}
