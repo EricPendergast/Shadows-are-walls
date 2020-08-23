@@ -229,4 +229,11 @@ public abstract class ShadowEdgeBase : AllTracker<ShadowEdgeBase> {
         Gizmos.color = Color.white;
         //Gizmos.DrawSphere(target.p1, .1f);
     }
+
+    protected override void OnDestroy() {
+        base.OnDestroy();
+        Destroy(joint);
+    }
+
+
 }
