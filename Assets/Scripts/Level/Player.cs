@@ -110,10 +110,6 @@ namespace Player {
 
                 ApplyForceToStandingOn(-playerForce*forceTransferRatio);
 
-                //if (sm.Current() == State.jumping) {
-                //    Jump();
-                //}
-
                 rb.AddForce(GetFrictionForce(playerForce));
             }
         }
