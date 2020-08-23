@@ -32,7 +32,6 @@ public class LightAngler : LevelObject, SimpleButtonControlable, Interactable {
         myJoint.maxForce = 80;
         myJoint.maxTorque = 10;
         myJoint.autoConfigureOffset = false;
-        currentAngle = 0;
         myJoint.angularOffset = currentAngle;
 
         Rotate(0);
@@ -57,14 +56,19 @@ public class LightAngler : LevelObject, SimpleButtonControlable, Interactable {
     }
 
     private void Rotate(int direction) {
+        if (DEBUG) {
+            Debug.Log("In Rotate");
+        }
         var delta = direction*speed*Time.deltaTime;
         var actualAngle = myJoint.connectedBody.rotation - body.rotation;
 
         currentAngle += delta;
 
         currentAngle = ClampToConstraints(currentAngle);
+
+        float maxDiff = 2*speed*Time.deltaTime;
       
-        currentAngle = Mathf.Clamp(currentAngle, actualAngle - Mathf.Abs(2*delta), actualAngle + Mathf.Abs(2*delta));
+        currentAngle = Mathf.Clamp(currentAngle, actualAngle - maxDiff, actualAngle + maxDiff);
 
         myJoint.angularOffset = currentAngle;
     }
@@ -78,6 +82,8 @@ public class LightAngler : LevelObject, SimpleButtonControlable, Interactable {
             Rotate(-1);
         } else if (buttonState == SimpleButton.State.pressed) {
             Rotate(1);
+        } else {
+            Rotate(0);
         }
     }
 
@@ -102,7 +108,7 @@ public class LightAngler : LevelObject, SimpleButtonControlable, Interactable {
 
     private float ClampToConstraints(float lightAngle) {
         if (!unconstrained) {
-            return Mathf.Clamp(lightAngle, -(angleConstraint - apertureAngle/2), angleConstraint - apertureAngle/2);
+            return Mathf.Clamp(lightAngle, -(angleConstraint - apertureAngle/2) - .1f, angleConstraint - apertureAngle/2 + .1f);
         } else {
             return lightAngle;
         }
