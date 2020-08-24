@@ -54,7 +54,33 @@ public class RotatableLight : LightBase {
     private List<LineSegment> trimmedShadows = new List<LineSegment>();
 
     //private Triangle actualViewTriangle;
-    private Triangle targetViewTriangle;
+
+    private readonly struct LightViewTriangle {
+        public readonly Triangle viewTriangle;
+
+        public LightViewTriangle(Triangle viewTriangle) {
+            this.viewTriangle = viewTriangle;
+        }
+
+        public Vector2 GetOrigin() {
+            return viewTriangle.p1;
+        }
+
+        public LineSegment FarEdge() {
+            return new LineSegment(viewTriangle.p2, viewTriangle.p3);
+        }
+
+        public LineSegment RightEdge() {
+            return new LineSegment(viewTriangle.p1, viewTriangle.p3);
+        }
+
+        public LineSegment LeftEdge() {
+            return new LineSegment(viewTriangle.p1, viewTriangle.p2);
+        }
+    }
+
+    [SerializeField]
+    private LightViewTriangle targetTriangle;
 
     [SerializeField]
     private GameObject shadowParent;
@@ -89,20 +115,22 @@ public class RotatableLight : LightBase {
         return body.position;
     }
 
-    private LineSegment TargetFarEdge() {
-        return new LineSegment(targetViewTriangle.p2, targetViewTriangle.p3);
-    }
-
-    private LineSegment TargetRightEdge() {
-        return new LineSegment(targetViewTriangle.p1, targetViewTriangle.p3);
-    }
-
-    private LineSegment TargetLeftEdge() {
-        return new LineSegment(targetViewTriangle.p1, targetViewTriangle.p2);
-    }
+    //private LineSegment TargetFarEdge() {
+    //    return new LineSegment(targetViewTriangle.p2, targetViewTriangle.p3);
+    //}
+    //
+    //private LineSegment TargetRightEdge() {
+    //    return new LineSegment(targetViewTriangle.p1, targetViewTriangle.p3);
+    //}
+    //
+    //private LineSegment TargetLeftEdge() {
+    //    return new LineSegment(targetViewTriangle.p1, targetViewTriangle.p2);
+    //}
 
     private void CacheViewTriangles() {
-        targetViewTriangle = CalculateTargetViewTriangle();
+        // TODO: The order of the elements in the triangle are important, but
+        // that is not made explicit anywhere. Find a way to fix that.
+        targetTriangle = new LightViewTriangle(CalculateTargetViewTriangle());
         //actualViewTriangle = CalculateActualViewTriangle();
     }
 
@@ -195,15 +223,6 @@ public class RotatableLight : LightBase {
 
         body.inertia = 1;
     }
-
-    //void DrawLampshade() {
-    //    Vector3 v1 = Vector3.zero;
-    //    Vector3 v2 = Quaternion.Euler(0f,0f, angle/2) * Vector2.up;
-    //    Vector3 v3 = Quaternion.Euler(0f,0f, -angle/2) * Vector2.up;
-    //
-    //    myMesh.vertices = new []{v1, v2, v3};
-    //    myMesh.triangles = new []{0,1,2};
-    //}
 
     private void DrawCastedLight() {
 
@@ -320,12 +339,12 @@ public class RotatableLight : LightBase {
 
         foreach (Shadow s in shadows.Values) {
             if (s.caster.CrossSection(GetTargetPosition()) is LineSegment crossSec) {
-                if (crossSec.Intersect(targetViewTriangle) is LineSegment seg) {
+                if (crossSec.Intersect(targetTriangle.viewTriangle) is LineSegment seg) {
                     shadowCorrespondences.Add(System.Tuple.Create(seg, s));
                 }
             }
         }
-        shadowCorrespondences.Add(System.Tuple.Create(TargetFarEdge(), (Shadow)null));
+        shadowCorrespondences.Add(System.Tuple.Create(targetTriangle.FarEdge(), (Shadow)null));
 
         MinimalUnion<Shadow>.Calculate(ref shadowCorrespondences, GetTargetPosition(), Angle);
 
@@ -396,7 +415,7 @@ public class RotatableLight : LightBase {
     }
 
     private float Angle(Vector2 p) {
-        return TargetRightEdge().Angle(p);
+        return targetTriangle.RightEdge().Angle(p);
     }
 
     public override bool IsIlluminated(Vector2 point) {
@@ -404,7 +423,7 @@ public class RotatableLight : LightBase {
     }
 
     public override bool IsInDark(Vector2 point) {
-        if (!this.targetViewTriangle.Contains(point)) {
+        if (!this.targetTriangle.viewTriangle.Contains(point)) {
             return true;
         }
 
@@ -467,7 +486,7 @@ public class RotatableLight : LightBase {
         }
 
         //lastSnapshot.actualViewTriangle = actualViewTriangle;
-        lastSnapshot.targetViewTriangle = targetViewTriangle;
+        lastSnapshot.targetViewTriangle = targetTriangle.viewTriangle;
     }
 }
 
