@@ -26,12 +26,14 @@ public class RotatableLight : LightBase {
     private float distance;
 
     [SerializeField]
-    public LightSettings settings;
+    private LightSettings settings;
     [SerializeField]
-    public LightSettings plasticModeSettings;
+    private LightSettings plasticModeSettings;
 
-    public float plasticMode = -1;
-    public float plasticModeDuration = 1;
+    [SerializeField]
+    private float plasticMode = -1;
+    [SerializeField]
+    private float plasticModeDuration = 1;
 
     private Mesh castLightMesh;
     [SerializeField]
@@ -81,44 +83,28 @@ public class RotatableLight : LightBase {
         }
     }
 
-    public float GetTargetApertureAngle() {
-        return apertureAngle;
-    }
-
-    public float GetTargetAngle() {
-        return body.rotation;
-    }
-
-    public void SetTargetAngle(float v) {
-        body.rotation = v;
-    }
-
-    public void SetTargetPosition(Vector2 p) {
-        body.position = p;
-    }
-
     public override Vector2 GetTargetPosition() {
         return body.position;
     }
 
-    public LineSegment TargetFarEdge() {
+    private LineSegment TargetFarEdge() {
         return new LineSegment(targetViewTriangle.p2, targetViewTriangle.p3);
     }
 
-    public LineSegment TargetRightEdge() {
+    private LineSegment TargetRightEdge() {
         return new LineSegment(targetViewTriangle.p1, targetViewTriangle.p3);
     }
 
-    public LineSegment TargetLeftEdge() {
+    private LineSegment TargetLeftEdge() {
         return new LineSegment(targetViewTriangle.p1, targetViewTriangle.p2);
     }
 
-    void CacheViewTriangles() {
+    private void CacheViewTriangles() {
         targetViewTriangle = CalculateTargetViewTriangle();
         //actualViewTriangle = CalculateActualViewTriangle();
     }
 
-    public Triangle CalculateTargetLocalViewTriangle() {
+    private Triangle CalculateTargetLocalViewTriangle() {
         Vector3 origin = Vector3.zero;
         Vector3 leftCorner = Quaternion.Euler(0f,0f, apertureAngle/2) * Vector2.right;
         Vector3 rightCorner = Quaternion.Euler(0f,0f, -apertureAngle/2) * Vector2.right;
@@ -128,7 +114,7 @@ public class RotatableLight : LightBase {
         return new Triangle(origin, leftCorner, rightCorner);
     }
 
-    public Triangle CalculateTargetViewTriangle() {
+    private Triangle CalculateTargetViewTriangle() {
         // TODO SERIOUS: This shouldn't use transform, this will cause things to happen out of sync
         Triangle loc = CalculateTargetLocalViewTriangle();
         return new Triangle(
@@ -137,7 +123,7 @@ public class RotatableLight : LightBase {
                 transform.TransformPoint(loc.p3));
     }
 
-    public Triangle CalculateActualViewTriangle() {
+    private Triangle CalculateActualViewTriangle() {
         var leftSeg = leftShadowEdge.GetActual().WithLength(distance);
         var rightSeg = rightShadowEdge.GetActual().WithLength(distance);
         if (leftSeg.p1 == leftSeg.p2 || rightSeg.p1 == rightSeg.p2) {
@@ -146,7 +132,7 @@ public class RotatableLight : LightBase {
         return new Triangle((leftSeg.p1+rightSeg.p1)/2, leftSeg.p2, rightSeg.p2);
     }
 
-    public Triangle CalculateActualLocalViewTriangle() {
+    private Triangle CalculateActualLocalViewTriangle() {
         // TODO SERIOUS: This shouldn't use transform, this will cause things to happen out of sync
         Triangle loc = CalculateActualViewTriangle();
         return new Triangle(
@@ -155,7 +141,7 @@ public class RotatableLight : LightBase {
                 transform.InverseTransformPoint(loc.p3));
     }
 
-    void OnDrawGizmos() {
+    private void OnDrawGizmos() {
         foreach (var side in CalculateTargetViewTriangle().GetSides()) {
             if (DEBUG) {
                 Debug.Log(side.Angle());
@@ -165,7 +151,7 @@ public class RotatableLight : LightBase {
         //DrawSnapshot(lastSnapshot);
     }
 
-    void DrawSnapshot(DebugSnapshot snap) {
+    private void DrawSnapshot(DebugSnapshot snap) {
         if (snap == null) {
             return;
         }
@@ -217,7 +203,7 @@ public class RotatableLight : LightBase {
     //    myMesh.triangles = new []{0,1,2};
     //}
 
-    void DrawCastedLight() {
+    private void DrawCastedLight() {
 
         var vertices = new List<Vector3>();
         var triangles = new List<int>();
@@ -263,17 +249,17 @@ public class RotatableLight : LightBase {
         SendDataToLightEdges(shadowData);
     }
 
-    void Update() {
+    private void Update() {
         DrawCastedLight();
     }
 
-    void DoForces() {
+    private void DoForces() {
         //return;
         DoForces(rightShadowEdge);
         DoForces(leftShadowEdge);
     }
 
-    void DoForces(LightEdge edge) {
+    private void DoForces(LightEdge edge) {
         edge.MaxDifferenceFromTarget(out var point, out var difference);
 
         var currentSettings = plasticMode > 0 ? plasticModeSettings : settings;
@@ -327,7 +313,7 @@ public class RotatableLight : LightBase {
         //}
     }
 
-    List<System.Tuple<LineSegment, Shadow>> GetShadowData() {
+    private List<System.Tuple<LineSegment, Shadow>> GetShadowData() {
         var shadowCorrespondences = new List<System.Tuple<LineSegment, Shadow>>();
 
         foreach (Shadow s in shadows.Values) {
@@ -346,7 +332,7 @@ public class RotatableLight : LightBase {
         return shadowCorrespondences;
     }
 
-    void SendDataToShadows(List<System.Tuple<LineSegment, Shadow>> shadowData) {
+    private void SendDataToShadows(List<System.Tuple<LineSegment, Shadow>> shadowData) {
         var frontFacing = new Dictionary<Shadow, List<LineSegment>>();
         var leftFacing = new Dictionary<Shadow, LineSegment>();
         var rightFacing = new Dictionary<Shadow, LineSegment>();
@@ -407,7 +393,7 @@ public class RotatableLight : LightBase {
         leftShadowEdge.SetTarget(new LineSegment(GetTargetPosition(), leftExtent));
     }
 
-    float Angle(Vector2 p) {
+    private float Angle(Vector2 p) {
         return TargetRightEdge().Angle(p);
     }
 
@@ -428,21 +414,8 @@ public class RotatableLight : LightBase {
         return true;
     }
 
-    void UpdateKnownShadows() {
-        visibleCollider.SetPath(0, CalculateActualLocalViewTriangle().AsList());
-        var overlap = new List<Collider2D>();
-        visibleCollider.OverlapCollider(new ContactFilter2D{useTriggers=true, layerMask = PhysicsHelper.opaqueLayer}, overlap);
-
-        visibleCollider.SetPath(0, CalculateTargetLocalViewTriangle().AsList());
-        visibleCollider.OverlapCollider(new ContactFilter2D{useTriggers=true, layerMask = PhysicsHelper.opaqueLayer}, overlap);
-        
-        
-        var opaqueSet = new HashSet<Opaque>();
-        foreach (var hit in overlap) {
-            foreach (var opaque in hit.GetComponents<Opaque>()) {
-                opaqueSet.Add(opaque);
-            }
-        }
+    private void UpdateKnownShadows() {
+        var opaqueSet = GetOpaqueObjectsInView();
     
         foreach (var opaque in opaqueSet) {
             if (!shadows.ContainsKey(opaque)) {
@@ -467,7 +440,26 @@ public class RotatableLight : LightBase {
         }
     }
 
-    void TakeSnapshot() {
+    private HashSet<Opaque> GetOpaqueObjectsInView() {
+        visibleCollider.SetPath(0, CalculateActualLocalViewTriangle().AsList());
+        var overlap = new List<Collider2D>();
+        visibleCollider.OverlapCollider(new ContactFilter2D{useTriggers=true, layerMask = PhysicsHelper.opaqueLayer}, overlap);
+
+        visibleCollider.SetPath(0, CalculateTargetLocalViewTriangle().AsList());
+        visibleCollider.OverlapCollider(new ContactFilter2D{useTriggers=true, layerMask = PhysicsHelper.opaqueLayer}, overlap);
+        
+        
+        var opaqueSet = new HashSet<Opaque>();
+        foreach (var hit in overlap) {
+            foreach (var opaque in hit.GetComponents<Opaque>()) {
+                opaqueSet.Add(opaque);
+            }
+        }
+
+        return opaqueSet;
+    }
+
+    private void TakeSnapshot() {
         if (lastSnapshot == null) {
             lastSnapshot = new DebugSnapshot();
         }
