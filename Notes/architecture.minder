@@ -1,0 +1,208 @@
+<?xml version="1.0"?>
+<minder>
+  <theme name="Solarized Light" index="0"/>
+  <styles>
+    <style level="0" isset="true" linktype="straight" linkwidth="4" linkarrow="false" linkdash="solid" nodeborder="squared" nodewidth="200" nodeborderwidth="4" nodefill="false" nodemargin="8" nodepadding="6" nodefont="Sans 11" nodemarkup="true" connectiondash="dotted" connectionwidth="2" connectionarrow="fromto" connectionpadding="3" connectionfont="Sans 10"/>
+    <style level="1" isset="true" linktype="straight" linkwidth="4" linkarrow="false" linkdash="solid" nodeborder="squared" nodewidth="200" nodeborderwidth="4" nodefill="false" nodemargin="8" nodepadding="6" nodefont="Sans 11" nodemarkup="true" connectiondash="dotted" connectionwidth="2" connectionarrow="fromto" connectionpadding="3" connectionfont="Sans 10"/>
+    <style level="2" isset="true" linktype="straight" linkwidth="4" linkarrow="false" linkdash="solid" nodeborder="squared" nodewidth="200" nodeborderwidth="4" nodefill="false" nodemargin="8" nodepadding="6" nodefont="Sans 11" nodemarkup="true" connectiondash="dotted" connectionwidth="2" connectionarrow="fromto" connectionpadding="3" connectionfont="Sans 10"/>
+    <style level="3" isset="true" linktype="straight" linkwidth="4" linkarrow="false" linkdash="solid" nodeborder="squared" nodewidth="200" nodeborderwidth="4" nodefill="false" nodemargin="8" nodepadding="6" nodefont="Sans 11" nodemarkup="true" connectiondash="dotted" connectionwidth="2" connectionarrow="fromto" connectionpadding="3" connectionfont="Sans 10"/>
+    <style level="4" isset="true" linktype="straight" linkwidth="4" linkarrow="false" linkdash="solid" nodeborder="squared" nodewidth="200" nodeborderwidth="4" nodefill="false" nodemargin="8" nodepadding="6" nodefont="Sans 11" nodemarkup="true" connectiondash="dotted" connectionwidth="2" connectionarrow="fromto" connectionpadding="3" connectionfont="Sans 10"/>
+    <style level="5" isset="true" linktype="straight" linkwidth="4" linkarrow="false" linkdash="solid" nodeborder="squared" nodewidth="200" nodeborderwidth="4" nodefill="false" nodemargin="8" nodepadding="6" nodefont="Sans 11" nodemarkup="true" connectiondash="dotted" connectionwidth="2" connectionarrow="fromto" connectionpadding="3" connectionfont="Sans 10"/>
+    <style level="6" isset="true" linktype="straight" linkwidth="4" linkarrow="false" linkdash="solid" nodeborder="squared" nodewidth="200" nodeborderwidth="4" nodefill="false" nodemargin="8" nodepadding="6" nodefont="Sans 11" nodemarkup="true" connectiondash="dotted" connectionwidth="2" connectionarrow="fromto" connectionpadding="3" connectionfont="Sans 10"/>
+    <style level="7" isset="true" linktype="straight" linkwidth="4" linkarrow="false" linkdash="solid" nodeborder="squared" nodewidth="200" nodeborderwidth="4" nodefill="false" nodemargin="8" nodepadding="6" nodefont="Sans 11" nodemarkup="true" connectiondash="dotted" connectionwidth="2" connectionarrow="fromto" connectionpadding="3" connectionfont="Sans 10"/>
+    <style level="8" isset="true" linktype="straight" linkwidth="4" linkarrow="false" linkdash="solid" nodeborder="squared" nodewidth="200" nodeborderwidth="4" nodefill="false" nodemargin="8" nodepadding="6" nodefont="Sans 11" nodemarkup="true" connectiondash="dotted" connectionwidth="2" connectionarrow="fromto" connectionpadding="3" connectionfont="Sans 10"/>
+    <style level="9" isset="true" linktype="straight" linkwidth="4" linkarrow="false" linkdash="solid" nodeborder="squared" nodewidth="200" nodeborderwidth="4" nodefill="false" nodemargin="8" nodepadding="6" nodefont="Sans 11" nodemarkup="true" connectiondash="dotted" connectionwidth="2" connectionarrow="fromto" connectionpadding="3" connectionfont="Sans 10"/>
+    <style level="10" isset="true" linktype="straight" linkwidth="4" linkarrow="false" linkdash="solid" nodeborder="squared" nodewidth="200" nodeborderwidth="4" nodefill="false" nodemargin="8" nodepadding="6" nodefont="Sans 11" nodemarkup="true" connectiondash="dotted" connectionwidth="2" connectionarrow="fromto" connectionpadding="3" connectionfont="Sans 10"/>
+  </styles>
+  <drawarea x="-1153.080277263555" y="-612.03088114750403" scale="0.75"/>
+  <images/>
+  <nodes>
+    <node id="1" posx="1286.845999628307" posy="542.83485657068059" maxwidth="200" width="85" height="46" side="left" fold="false" treesize="46" layout="Horizontal">
+      <style linktype="straight" linkwidth="4" linkarrow="false" linkdash="solid" nodeborder="squared" nodewidth="200" nodeborderwidth="4" nodefill="false" nodemargin="8" nodepadding="6" nodefont="Sans 11" nodemarkup="true"/>
+      <nodename>Shadow</nodename>
+      <nodenote></nodenote>
+    </node>
+    <node id="3" posx="1016.8323480983556" posy="543.87321716638462" maxwidth="200" width="135" height="46" side="left" fold="false" treesize="46" layout="Horizontal">
+      <style linktype="straight" linkwidth="4" linkarrow="false" linkdash="solid" nodeborder="squared" nodewidth="200" nodeborderwidth="4" nodefill="false" nodemargin="8" nodepadding="6" nodefont="Sans 11" nodemarkup="true"/>
+      <nodename>RotatableLight</nodename>
+      <nodenote></nodenote>
+    </node>
+    <node id="5" posx="1151.6866978704927" posy="764.85658321811002" maxwidth="200" width="85" height="46" side="left" fold="false" treesize="46" layout="Horizontal">
+      <style linktype="straight" linkwidth="4" linkarrow="false" linkdash="solid" nodeborder="squared" nodewidth="200" nodeborderwidth="4" nodefill="false" nodemargin="8" nodepadding="6" nodefont="Sans 11" nodemarkup="true"/>
+      <nodename>Opaque</nodename>
+      <nodenote></nodenote>
+    </node>
+    <node id="7" posx="1693.7074745291791" posy="545.08529398930114" maxwidth="200" width="157" height="46" side="left" fold="false" treesize="46" layout="Horizontal">
+      <style linktype="straight" linkwidth="4" linkarrow="false" linkdash="solid" nodeborder="squared" nodewidth="200" nodeborderwidth="4" nodefill="false" nodemargin="8" nodepadding="6" nodefont="Sans 11" nodemarkup="true"/>
+      <nodename>ShadowEdgeBase</nodename>
+      <nodenote></nodenote>
+    </node>
+    <node id="9" posx="505.49490506450377" posy="953.60095781121186" maxwidth="200" width="107" height="46" side="left" fold="false" treesize="46" layout="Horizontal">
+      <style linktype="straight" linkwidth="4" linkarrow="false" linkdash="solid" nodeborder="squared" nodewidth="200" nodeborderwidth="4" nodefill="false" nodemargin="8" nodepadding="6" nodefont="Sans 11" nodemarkup="true"/>
+      <nodename>FreeObject</nodename>
+      <nodenote></nodenote>
+    </node>
+    <node id="11" posx="1496.7252924342949" posy="416.12590177916172" maxwidth="97.7301025390625" width="100" height="46" side="left" fold="false" treesize="46" layout="Horizontal">
+      <style linktype="straight" linkwidth="4" linkarrow="false" linkdash="solid" nodeborder="squared" nodewidth="200" nodeborderwidth="4" nodefill="false" nodemargin="8" nodepadding="6" nodefont="Sans 11" nodemarkup="true"/>
+      <nodename>LightEdge</nodename>
+      <nodenote></nodenote>
+    </node>
+    <node id="13" posx="1485.0331537624199" posy="545.89433439634922" maxwidth="118.3818359375" width="121" height="46" side="left" fold="false" treesize="46" layout="Horizontal">
+      <style linktype="straight" linkwidth="4" linkarrow="false" linkdash="solid" nodeborder="squared" nodewidth="200" nodeborderwidth="4" nodefill="false" nodemargin="8" nodepadding="6" nodefont="Sans 11" nodemarkup="true"/>
+      <nodename>ShadowEdge</nodename>
+      <nodenote></nodenote>
+    </node>
+    <node id="15" posx="448.34613695740381" posy="535.57065572432703" maxwidth="200" width="111" height="46" side="left" fold="false" treesize="46" layout="Horizontal">
+      <style linktype="straight" linkwidth="4" linkarrow="false" linkdash="solid" nodeborder="squared" nodewidth="200" nodeborderwidth="4" nodefill="false" nodemargin="8" nodepadding="6" nodefont="Sans 11" nodemarkup="true"/>
+      <nodename>LightAngler</nodename>
+      <nodenote></nodenote>
+    </node>
+    <node id="17" posx="210.98243863383732" posy="533.7029494254989" maxwidth="200" width="74" height="46" side="left" fold="false" treesize="46" layout="Horizontal">
+      <style linktype="straight" linkwidth="4" linkarrow="false" linkdash="solid" nodeborder="squared" nodewidth="200" nodeborderwidth="4" nodefill="false" nodemargin="8" nodepadding="6" nodefont="Sans 11" nodemarkup="true"/>
+      <nodename>Player</nodename>
+      <nodenote></nodenote>
+    </node>
+    <node id="19" posx="331.8472813665835" posy="690.52602698438682" maxwidth="200" width="77" height="46" side="left" fold="false" treesize="46" layout="Horizontal">
+      <style linktype="straight" linkwidth="4" linkarrow="false" linkdash="solid" nodeborder="squared" nodewidth="200" nodeborderwidth="4" nodefill="false" nodemargin="8" nodepadding="6" nodefont="Sans 11" nodemarkup="true"/>
+      <nodename>Levers</nodename>
+      <nodenote></nodenote>
+    </node>
+    <node id="21" posx="564.73068387309377" posy="696.24445146355447" maxwidth="200" width="85" height="46" side="left" fold="false" treesize="46" layout="Horizontal">
+      <style linktype="straight" linkwidth="4" linkarrow="false" linkdash="solid" nodeborder="squared" nodewidth="200" nodeborderwidth="4" nodefill="false" nodemargin="8" nodepadding="6" nodefont="Sans 11" nodemarkup="true"/>
+      <nodename>Buttons</nodename>
+      <nodenote></nodenote>
+    </node>
+    <node id="23" posx="528.78659207622127" posy="1060.0871028307379" maxwidth="140.28483072916663" width="168" height="46" side="left" fold="false" treesize="46" layout="Horizontal">
+      <style linktype="straight" linkwidth="4" linkarrow="false" linkdash="solid" nodeborder="squared" nodewidth="200" nodeborderwidth="4" nodefill="false" nodemargin="8" nodepadding="6" nodefont="Sans 11" nodemarkup="true"/>
+      <nodename>OpaqueSolidObject</nodename>
+      <nodenote></nodenote>
+    </node>
+    <node id="25" posx="401.68669787049225" posy="1046.6410985989701" maxwidth="200" width="116" height="46" side="left" fold="false" treesize="46" layout="Horizontal">
+      <style linktype="straight" linkwidth="4" linkarrow="false" linkdash="solid" nodeborder="squared" nodewidth="200" nodeborderwidth="4" nodefill="false" nodemargin="8" nodepadding="6" nodefont="Sans 11" nodemarkup="true"/>
+      <nodename>GlassObject</nodename>
+      <nodenote></nodenote>
+    </node>
+  </nodes>
+  <connections>
+    <connection from_id="3" to_id="5" drag_x="1138.7595229844251" drag_y="677.36490019225494" color="rgb(96,96,96)">
+      <style connectiondash="dotted" connectionwidth="2" connectionarrow="fromto" connectionpadding="3" connectionfont="Sans 10"/>
+      <title>Creates shadows with data from</title>
+      <note></note>
+    </connection>
+    <connection from_id="3" to_id="1" drag_x="1219.1302897135402" drag_y="548.34387207031227" color="rgb(96,96,96)">
+      <style connectiondash="dotted" connectionwidth="2" connectionarrow="fromto" connectionpadding="3" connectionfont="Sans 10"/>
+      <title>Owns</title>
+      <note></note>
+    </connection>
+    <connection from_id="7" to_id="9" drag_x="1378.9685942642382" drag_y="962.39485848570826" color="rgb(96,96,96)">
+      <style connectiondash="dotted" connectionwidth="2" connectionarrow="fromto" connectionpadding="3" connectionfont="Sans 10"/>
+      <title>Mutually collide</title>
+      <note></note>
+    </connection>
+    <connection from_id="3" to_id="11" drag_x="1315.9384765624986" drag_y="393.42846679687477" color="rgb(96,96,96)">
+      <style connectiondash="dotted" connectionwidth="2" connectionarrow="fromto" connectionpadding="3" connectionfont="Sans 10"/>
+      <title>Owns</title>
+      <note></note>
+    </connection>
+    <connection from_id="3" to_id="11" drag_x="1315.1590169270826" drag_y="332.89282226562489" color="rgb(96,96,96)">
+      <style connectiondash="dotted" connectionwidth="2" connectionarrow="fromto" connectionpadding="3" connectionfont="Sans 10"/>
+      <title>Applies rotational forces to itself based on</title>
+      <note></note>
+    </connection>
+    <connection from_id="17" to_id="19" drag_x="309.16486000023042" drag_y="635.11448820494479" color="rgb(96,96,96)">
+      <style connectiondash="dotted" connectionwidth="2" connectionarrow="fromto" connectionpadding="3" connectionfont="Sans 10"/>
+      <title>Interacts with</title>
+      <note></note>
+    </connection>
+    <connection from_id="17" to_id="9" drag_x="288.16656494140631" drag_y="816.76322428385402" color="rgb(96,96,96)">
+      <style connectiondash="dotted" connectionwidth="2" connectionarrow="fromto" connectionpadding="3" connectionfont="Sans 10"/>
+      <title>Has/Is a</title>
+      <note></note>
+    </connection>
+    <connection from_id="23" to_id="5" drag_x="917.36440840922705" drag_y="933.72119676976536" color="rgb(96,96,96)">
+      <style connectiondash="dotted" connectionwidth="2" connectionarrow="fromto" connectionpadding="3" connectionfont="Sans 10"/>
+      <title>Owns</title>
+      <note></note>
+    </connection>
+    <connection from_id="3" to_id="11" drag_x="1319.0420735677076" drag_y="429.39176432291629" color="rgb(96,96,96)">
+      <style connectiondash="dotted" connectionwidth="2" connectionarrow="fromto" connectionpadding="3" connectionfont="Sans 10"/>
+      <title>Sets targets of</title>
+      <note></note>
+    </connection>
+    <connection from_id="21" to_id="15" drag_x="555.53841041526402" drag_y="638.90755359394848" color="rgb(96,96,96)">
+      <style connectiondash="dotted" connectionwidth="2" connectionarrow="fromto" connectionpadding="3" connectionfont="Sans 10"/>
+      <title>Interacts with</title>
+      <note></note>
+    </connection>
+    <connection from_id="19" to_id="15" drag_x="437.09670916201162" drag_y="636.04834135435704" color="rgb(96,96,96)">
+      <style connectiondash="dotted" connectionwidth="2" connectionarrow="fromto" connectionpadding="3" connectionfont="Sans 10"/>
+      <title>Interacts with</title>
+      <note></note>
+    </connection>
+    <connection from_id="17" to_id="15" drag_x="357.24600649316244" drag_y="555.89747865652112" color="rgb(96,96,96)">
+      <style connectiondash="dotted" connectionwidth="2" connectionarrow="fromto" connectionpadding="3" connectionfont="Sans 10"/>
+      <title>Interacts with</title>
+      <note></note>
+    </connection>
+    <connection from_id="15" to_id="3" drag_x="783.38609623475168" drag_y="558.57615876165551" color="rgb(96,96,96)">
+      <style connectiondash="dotted" connectionwidth="2" connectionarrow="fromto" connectionpadding="3" connectionfont="Sans 10"/>
+      <title>Applies rotational forces to</title>
+      <note></note>
+    </connection>
+    <connection from_id="1" to_id="13" drag_x="1428.1383463541661" drag_y="527.95926920572879" color="rgb(96,96,96)">
+      <style connectiondash="dotted" connectionwidth="2" connectionarrow="fromto" connectionpadding="3" connectionfont="Sans 10"/>
+      <title>Owns</title>
+      <note></note>
+    </connection>
+    <connection from_id="3" to_id="1" drag_x="1219.9317220052071" drag_y="599.9225667317703" color="rgb(96,96,96)">
+      <style connectiondash="dotted" connectionwidth="2" connectionarrow="fromto" connectionpadding="3" connectionfont="Sans 10"/>
+      <title>Sends left, right, front targets</title>
+      <note></note>
+    </connection>
+    <connection from_id="1" to_id="13" drag_x="1430.0150553385411" drag_y="603.81164550781182" color="rgb(96,96,96)">
+      <style connectiondash="dotted" connectionwidth="2" connectionarrow="fromto" connectionpadding="3" connectionfont="Sans 10"/>
+      <title>Sets targets of</title>
+      <note></note>
+    </connection>
+    <connection from_id="1" to_id="5" drag_x="1278.9445800781255" drag_y="677.85982259114553" color="rgb(96,96,96)">
+      <style connectiondash="dotted" connectionwidth="2" connectionarrow="fromto" connectionpadding="3" connectionfont="Sans 10"/>
+      <title>References</title>
+      <note>This connection only exists so that shadows can disable front edges based on a setting in the Opaque object which the shadow was created from</note>
+    </connection>
+    <connection from_id="9" to_id="23" drag_x="613.00801595052121" drag_y="1022.6874186197917" color="rgb(96,96,96)">
+      <style connectiondash="dotted" connectionwidth="2" connectionarrow="fromto" connectionpadding="3" connectionfont="Sans 10"/>
+      <title>Collides with</title>
+      <note></note>
+    </connection>
+    <connection from_id="7" to_id="3" drag_x="1382.5764160156245" drag_y="158.35632324218756" color="rgb(96,96,96)">
+      <style connectiondash="dotted" connectionwidth="2" connectionarrow="fromto" connectionpadding="3" connectionfont="Sans 10"/>
+      <title>Performs shadow edge masking using data from</title>
+      <note>This occurs in ShadowEdgeBase.UpdateColliders(). This is the step that determines which sections of a shadow edge collider should be solid.</note>
+    </connection>
+    <connection from_id="25" to_id="23" drag_x="518.59116617838549" drag_y="1130.5327962239594" color="rgb(96,96,96)">
+      <style connectiondash="dotted" connectionwidth="2" connectionarrow="fromto" connectionpadding="3" connectionfont="Sans 10"/>
+      <title>Collides with</title>
+      <note></note>
+    </connection>
+    <connection from_id="11" to_id="7" drag_x="1659.4663834817352" drag_y="503.60559788423075" color="rgb(96,96,96)">
+      <style connectiondash="dotted" connectionwidth="2" connectionarrow="fromto" connectionpadding="3" connectionfont="Sans 10"/>
+      <title>Inherits</title>
+      <note></note>
+    </connection>
+    <connection from_id="13" to_id="7" drag_x="1644.7848307291656" drag_y="569.35965983072856" color="rgb(96,96,96)">
+      <style connectiondash="dotted" connectionwidth="2" connectionarrow="fromto" connectionpadding="3" connectionfont="Sans 10"/>
+      <title>Inherits</title>
+      <note></note>
+    </connection>
+    <connection from_id="25" to_id="9" drag_x="457.71276855468761" drag_y="1013.6425374348958" color="rgb(96,96,96)">
+      <style connectiondash="dotted" connectionwidth="2" connectionarrow="fromto" connectionpadding="3" connectionfont="Sans 10"/>
+      <title>Mutually collide</title>
+      <note></note>
+    </connection>
+    <connection from_id="9" to_id="21" drag_x="580.31827799479152" drag_y="825.71407063802076" color="rgb(96,96,96)">
+      <style connectiondash="dotted" connectionwidth="2" connectionarrow="fromto" connectionpadding="3" connectionfont="Sans 10"/>
+      <title>Activates</title>
+      <note></note>
+    </connection>
+  </connections>
+</minder>
