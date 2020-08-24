@@ -5,7 +5,52 @@ using UnityEngine;
 // General idea: Light finds all opaque objects in the scene, calculates all
 // their shadows, tells all its shadow edges where they should be based on
 // those calculations (setting their "targets"). It also handles rendering
-//
+
+
+public readonly struct LightViewTriangle {
+    private readonly Triangle viewTriangle;
+
+    public LightViewTriangle(Triangle viewTriangle) {
+        this.viewTriangle = viewTriangle;
+    }
+
+    public Vector2 GetOrigin() {
+        return viewTriangle.p1;
+    }
+
+    public LineSegment FarEdge() {
+        return new LineSegment(viewTriangle.p2, viewTriangle.p3);
+    }
+
+    public LineSegment RightEdge() {
+        return new LineSegment(viewTriangle.p1, viewTriangle.p3);
+    }
+
+    public LineSegment LeftEdge() {
+        return new LineSegment(viewTriangle.p1, viewTriangle.p2);
+    }
+
+    public LineSegment? CalculateFrontFace(Opaque opaque) {
+        if (opaque.CrossSection(GetOrigin()) is LineSegment crossSec) {
+            return crossSec.Intersect(viewTriangle);
+        }
+        return null;
+    }
+
+    public float Angle(Vector2 point) {
+        return RightEdge().Angle(point);
+    }
+
+    public int CompareAngles(LineSegment seg1, LineSegment seg2) {
+        return Angle(seg1.Midpoint()).CompareTo(Angle(seg2.Midpoint()));
+    }
+
+    public bool Contains(Vector2 point) {
+        return viewTriangle.Contains(point);
+    }
+}
+
+
 // Notes about coordinates/terminology:
 //      "right" and "left" are refered to as if you are facing in the
 //      direction of the light
@@ -13,12 +58,6 @@ using UnityEngine;
 public class RotatableLight : LightBase {
     [SerializeField]
     private bool DEBUG = false;
-
-    private class DebugSnapshot {
-        //public Triangle actualViewTriangle;
-        public Triangle targetViewTriangle;
-    }
-    private DebugSnapshot lastSnapshot;
 
     [SerializeField]
     private float apertureAngle;
@@ -54,49 +93,6 @@ public class RotatableLight : LightBase {
     private List<LineSegment> trimmedShadows = new List<LineSegment>();
 
     //private Triangle actualViewTriangle;
-
-    private readonly struct LightViewTriangle {
-        private readonly Triangle viewTriangle;
-
-        public LightViewTriangle(Triangle viewTriangle) {
-            this.viewTriangle = viewTriangle;
-        }
-
-        public Vector2 GetOrigin() {
-            return viewTriangle.p1;
-        }
-
-        public LineSegment FarEdge() {
-            return new LineSegment(viewTriangle.p2, viewTriangle.p3);
-        }
-
-        public LineSegment RightEdge() {
-            return new LineSegment(viewTriangle.p1, viewTriangle.p3);
-        }
-
-        public LineSegment LeftEdge() {
-            return new LineSegment(viewTriangle.p1, viewTriangle.p2);
-        }
-
-        public LineSegment? CalculateFrontFace(Opaque opaque) {
-            if (opaque.CrossSection(GetOrigin()) is LineSegment crossSec) {
-                return crossSec.Intersect(viewTriangle);
-            }
-            return null;
-        }
-
-        public float Angle(Vector2 point) {
-            return RightEdge().Angle(point);
-        }
-
-        public int CompareAngles(LineSegment seg1, LineSegment seg2) {
-            return Angle(seg1.Midpoint()).CompareTo(Angle(seg2.Midpoint()));
-        }
-
-        public bool Contains(Vector2 point) {
-            return viewTriangle.Contains(point);
-        }
-    }
 
     [SerializeField]
     private LightViewTriangle targetTriangle;
@@ -185,21 +181,6 @@ public class RotatableLight : LightBase {
             }
             Gizmos.DrawLine(side.p1, side.p2);
         }
-        //DrawSnapshot(lastSnapshot);
-    }
-
-    private void DrawSnapshot(DebugSnapshot snap) {
-        if (snap == null) {
-            return;
-        }
-        Gizmos.color = Color.red;
-        foreach (var seg in snap.targetViewTriangle.GetSides()) {
-            Gizmos.DrawLine(seg.p1, seg.p2);
-        }
-        Gizmos.color = Color.white;
-        //foreach (var seg in snap.actualViewTriangle.GetSides()) {
-        //    Gizmos.DrawLine(seg.p1, seg.p2);
-        //}
     }
 
     //void OnDrawGizmosSelected() {
@@ -482,15 +463,6 @@ public class RotatableLight : LightBase {
 
         return opaqueSet;
     }
-
-    //private void TakeSnapshot() {
-    //    if (lastSnapshot == null) {
-    //        lastSnapshot = new DebugSnapshot();
-    //    }
-    //
-    //    //lastSnapshot.actualViewTriangle = actualViewTriangle;
-    //    lastSnapshot.targetViewTriangle = targetTriangle.viewTriangle;
-    //}
 }
 
 
