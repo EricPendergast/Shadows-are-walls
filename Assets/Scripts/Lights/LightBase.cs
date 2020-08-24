@@ -22,7 +22,7 @@ public abstract class LightBase : AllTracker<LightBase> {
 
     protected override void Awake() {
         base.Awake();
-        gameObject.layer = LayerMask.NameToLayer("Light");
+        gameObject.layer = PhysicsHelper.lightLayer;
     }
     
     public static IEnumerable<LightBase> GetLights() {

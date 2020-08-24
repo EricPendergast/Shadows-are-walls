@@ -1,4 +1,4 @@
-﻿using System.Collections;
+﻿//using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -39,6 +39,8 @@ public class RotatableLight : LightBase {
     [SerializeField]
     private LampshadeRenderer lampshadeRenderer;
 
+    //[SerializeField]
+    //private ShadowCalculator shadowCalculator;
 
     private Dictionary<Opaque, Shadow> shadows = new Dictionary<Opaque, Shadow>();
     //public List<Opaque> DEBUG = new List<Opaque>();
@@ -468,3 +470,86 @@ public class RotatableLight : LightBase {
         lastSnapshot.targetViewTriangle = targetViewTriangle;
     }
 }
+
+
+// TODO: Partially completed refactor
+//class ShadowCalculator {
+//    private List<LineSegment> trimmedShadows = new List<LineSegment>();
+//    private Dictionary<Opaque, List<LineSegment>> frontFacing = new Dictionary<Opaque, List<LineSegment>>();
+//    private Dictionary<Opaque, LineSegment> leftFacing = new Dictionary<Opaque, LineSegment>();
+//    private Dictionary<Opaque, LineSegment> rightFacing = new Dictionary<Opaque, LineSegment>();
+//
+//    public void CalculateShadows(IEnumerable<Opaque> opaqueObjs) {
+//        var shadowFrontFaces = CalculateShadowFrontFaces(opaqueObjs);
+//        GenerateLeftRightFront(shadowFrontFaces);
+//
+//        trimmedShadows.Clear();
+//        foreach (var tuple in shadowFrontFaces) {
+//            trimmedShadows.Add(tuple.Item1);
+//        }
+//    }
+//
+//    private void GenerateLeftRightFront(List<System.Tuple<LineSegment, Opaque>> frontFaces) {
+//        frontFacing.Clear();
+//        leftFacing.Clear();
+//        rightFacing.Clear();
+//        //var frontFacing = new Dictionary<Opaque, List<LineSegment>>();
+//        //var leftFacing = new Dictionary<Opaque, LineSegment>();
+//        //var rightFacing = new Dictionary<Opaque, LineSegment>();
+//
+//        for (int i = 0; i < frontFaces.Count; i++) {
+//            LineSegment? prevSeg = i == 0 ? (LineSegment?)null : frontFaces[i-1].Item1;
+//            LineSegment? nextSeg = i == frontFaces.Count-1 ? (LineSegment?)null : frontFaces[i+1].Item1;
+//            LineSegment seg = frontFaces[i].Item1;
+//            Opaque caster = frontFaces[i].Item2;
+//
+//            if (caster != null) {
+//                if (seg.Length() > .0001) {
+//                    if (!frontFacing.ContainsKey(caster)) {
+//                        frontFacing.Add(caster, new List<LineSegment>());
+//                    }
+//                    frontFacing[caster].Add(seg);
+//                }
+//                if (prevSeg is LineSegment prev) {
+//                    LineSegment right = new LineSegment(prev.p2, seg.p1);
+//                    if (right.Length() > .0001 && !right.GoesAwayFrom(GetTargetPosition())) {
+//                        rightFacing[caster] = right;
+//                    }
+//                }
+//                if (nextSeg is LineSegment next) {
+//                    LineSegment left = new LineSegment(seg.p2, next.p1);
+//                    if (left.Length() > .0001 && left.GoesAwayFrom(GetTargetPosition())) {
+//                        leftFacing[caster] = left;
+//                    }
+//                }
+//            }
+//        }
+//    }
+//
+//    private float Angle(Vector2 p) {
+//        return TargetRightEdge().Angle(p);
+//    }
+//
+//    private List<System.Tuple<LineSegment, Opaque>> CalculateShadowFrontFaces(IEnumerable<Opaque> opaqueObjs) {
+//        var frontFaces = new List<System.Tuple<LineSegment, Opaque>>();
+//
+//        foreach (Opaque opaque in opaqueObjs) {
+//            if (opaque.CrossSection(GetTargetPosition()) is LineSegment crossSec) {
+//                if (crossSec.Intersect(targetViewTriangle) is LineSegment seg) {
+//                    frontFaces.Add(System.Tuple.Create(seg, opaque));
+//                }
+//            }
+//        }
+//        frontFaces.Add(System.Tuple.Create(TargetFarEdge(), (Shadow)null));
+//
+//        MinimalUnion<Shadow>.Calculate(ref frontFaces, GetTargetPosition(), Angle);
+//
+//        frontFaces.Sort((s1, s2) => Angle(s1.Item1.Midpoint()).CompareTo(Angle(s2.Item1.Midpoint())));
+//
+//        return frontFaces;
+//    }
+//
+//    public List<LineSegment> GetShadowSegments() {
+//        return trimmedShadows;
+//    }
+//}
