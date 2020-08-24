@@ -56,7 +56,7 @@ public class RotatableLight : LightBase {
     //private Triangle actualViewTriangle;
 
     private readonly struct LightViewTriangle {
-        public readonly Triangle viewTriangle;
+        private readonly Triangle viewTriangle;
 
         public LightViewTriangle(Triangle viewTriangle) {
             this.viewTriangle = viewTriangle;
@@ -76,6 +76,25 @@ public class RotatableLight : LightBase {
 
         public LineSegment LeftEdge() {
             return new LineSegment(viewTriangle.p1, viewTriangle.p2);
+        }
+
+        public LineSegment? CalculateFrontFace(Opaque opaque) {
+            if (opaque.CrossSection(GetOrigin()) is LineSegment crossSec) {
+                return crossSec.Intersect(viewTriangle);
+            }
+            return null;
+        }
+
+        public float Angle(Vector2 point) {
+            return RightEdge().Angle(point);
+        }
+
+        public int CompareAngles(LineSegment seg1, LineSegment seg2) {
+            return Angle(seg1.Midpoint()).CompareTo(Angle(seg2.Midpoint()));
+        }
+
+        public bool Contains(Vector2 point) {
+            return viewTriangle.Contains(point);
         }
     }
 
@@ -114,18 +133,6 @@ public class RotatableLight : LightBase {
     public override Vector2 GetTargetPosition() {
         return body.position;
     }
-
-    //private LineSegment TargetFarEdge() {
-    //    return new LineSegment(targetViewTriangle.p2, targetViewTriangle.p3);
-    //}
-    //
-    //private LineSegment TargetRightEdge() {
-    //    return new LineSegment(targetViewTriangle.p1, targetViewTriangle.p3);
-    //}
-    //
-    //private LineSegment TargetLeftEdge() {
-    //    return new LineSegment(targetViewTriangle.p1, targetViewTriangle.p2);
-    //}
 
     private void CacheViewTriangles() {
         // TODO: The order of the elements in the triangle are important, but
@@ -255,19 +262,19 @@ public class RotatableLight : LightBase {
         DoForces();
 
         CacheViewTriangles();
-        TakeSnapshot();
+        //TakeSnapshot();
 
         UpdateKnownShadows();
 
-        var shadowData = GetShadowData();
+        var shadowFrontFaces = CalculateShadowFrontFaces();
 
         trimmedShadows.Clear();
-        foreach (var tuple in shadowData) {
+        foreach (var tuple in shadowFrontFaces) {
             trimmedShadows.Add(tuple.Item1);
         }
 
-        SendDataToShadows(shadowData);
-        SendDataToLightEdges(shadowData);
+        SendDataToShadows(shadowFrontFaces);
+        SendDataToLightEdges(shadowFrontFaces);
     }
 
     private void Update() {
@@ -334,23 +341,21 @@ public class RotatableLight : LightBase {
         //}
     }
 
-    private List<System.Tuple<LineSegment, Shadow>> GetShadowData() {
-        var shadowCorrespondences = new List<System.Tuple<LineSegment, Shadow>>();
+    private List<System.Tuple<LineSegment, Shadow>> CalculateShadowFrontFaces() {
+        var shadowFrontFaces = new List<System.Tuple<LineSegment, Shadow>>();
 
         foreach (Shadow s in shadows.Values) {
-            if (s.caster.CrossSection(GetTargetPosition()) is LineSegment crossSec) {
-                if (crossSec.Intersect(targetTriangle.viewTriangle) is LineSegment seg) {
-                    shadowCorrespondences.Add(System.Tuple.Create(seg, s));
-                }
+            if (targetTriangle.CalculateFrontFace(s.caster) is LineSegment frontFace) {
+                shadowFrontFaces.Add(System.Tuple.Create(frontFace, s));
             }
         }
-        shadowCorrespondences.Add(System.Tuple.Create(targetTriangle.FarEdge(), (Shadow)null));
+        shadowFrontFaces.Add(System.Tuple.Create(targetTriangle.FarEdge(), (Shadow)null));
 
-        MinimalUnion<Shadow>.Calculate(ref shadowCorrespondences, GetTargetPosition(), Angle);
+        MinimalUnion<Shadow>.Calculate(ref shadowFrontFaces, GetTargetPosition(), targetTriangle.Angle);
 
-        shadowCorrespondences.Sort((s1, s2) => Angle(s1.Item1.Midpoint()).CompareTo(Angle(s2.Item1.Midpoint())));
+        shadowFrontFaces.Sort((s1, s2) => targetTriangle.CompareAngles(s1.Item1, s2.Item1));
 
-        return shadowCorrespondences;
+        return shadowFrontFaces;
     }
 
     private void SendDataToShadows(List<System.Tuple<LineSegment, Shadow>> shadowData) {
@@ -408,14 +413,12 @@ public class RotatableLight : LightBase {
 
     private void SendDataToLightEdges(List<System.Tuple<LineSegment, Shadow>> shadowData) {
 
+        // TODO: This is problematic because it is not obvious that shadowData
+        // has to be sorted this way
         var rightExtent = shadowData[0].Item1.p1;
         var leftExtent = shadowData[shadowData.Count-1].Item1.p2;
         rightShadowEdge.SetTarget(new LineSegment(GetTargetPosition(), rightExtent));
         leftShadowEdge.SetTarget(new LineSegment(GetTargetPosition(), leftExtent));
-    }
-
-    private float Angle(Vector2 p) {
-        return targetTriangle.RightEdge().Angle(p);
     }
 
     public override bool IsIlluminated(Vector2 point) {
@@ -423,7 +426,7 @@ public class RotatableLight : LightBase {
     }
 
     public override bool IsInDark(Vector2 point) {
-        if (!this.targetTriangle.viewTriangle.Contains(point)) {
+        if (!targetTriangle.Contains(point)) {
             return true;
         }
 
@@ -480,14 +483,14 @@ public class RotatableLight : LightBase {
         return opaqueSet;
     }
 
-    private void TakeSnapshot() {
-        if (lastSnapshot == null) {
-            lastSnapshot = new DebugSnapshot();
-        }
-
-        //lastSnapshot.actualViewTriangle = actualViewTriangle;
-        lastSnapshot.targetViewTriangle = targetTriangle.viewTriangle;
-    }
+    //private void TakeSnapshot() {
+    //    if (lastSnapshot == null) {
+    //        lastSnapshot = new DebugSnapshot();
+    //    }
+    //
+    //    //lastSnapshot.actualViewTriangle = actualViewTriangle;
+    //    lastSnapshot.targetViewTriangle = targetTriangle.viewTriangle;
+    //}
 }
 
 
