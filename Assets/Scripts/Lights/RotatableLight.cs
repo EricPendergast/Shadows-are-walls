@@ -457,11 +457,7 @@ class ShadowCalculator {
         }
         shadowFrontFaces.Add(System.Tuple.Create(lightTriangle.FarEdge(), (Opaque)null));
 
-        MinimalUnion<Opaque>.Calculate(ref shadowFrontFaces, lightTriangle.GetOrigin(), lightTriangle.Angle);
-        // TODO: Make it explicit that the individual coordinates of each line
-        // segment in shadowFrontFaces are sorted by angle
-
-        shadowFrontFaces.Sort((s1, s2) => lightTriangle.CompareAngles(s1.Item1, s2.Item1));
+        MinimalUnion<Opaque>.CalculateAndSort(ref shadowFrontFaces, lightTriangle.GetOrigin(), lightTriangle.Angle);
 
         return shadowFrontFaces;
     }

@@ -78,8 +78,10 @@ public static class MinimalUnion<T> {
     private static Queue<CupWrapper> toTrim = new Queue<CupWrapper>();
     // Assumes that every Cup passed in has the same convergence point
     // Input does not need to be sorted
-    // Output may not be sorted
-    public static void Calculate(ref List<System.Tuple<LineSegment, T>> shadowsIn, Vector2 convergencePoint, System.Func<Vector2, float> metric) {
+    // Output is sorted by increasing angle.
+    // Individual line segments are sorted by increasing angle as well. (i.e.
+    // any line segment l has metric(l.p1) < metric(l.p2))
+    public static void CalculateAndSort(ref List<System.Tuple<LineSegment, T>> shadowsIn, Vector2 convergencePoint, System.Func<Vector2, float> metric) {
         allShadows.Clear();
         minimalUnion.Clear();
         toTrim.Clear();
@@ -120,6 +122,8 @@ public static class MinimalUnion<T> {
         foreach (CupWrapper cup in minimalUnion) {
             shadowsIn.Add(System.Tuple.Create(cup.v.Base(), cup.obj));
         }
+
+        shadowsIn.Sort((s1, s2) => metric(s1.Item1.Midpoint()).CompareTo(metric(s2.Item1.Midpoint())));
     }
 
 }
