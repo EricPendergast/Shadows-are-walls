@@ -402,7 +402,8 @@ public class RotatableLight : LightBase {
 
 
 class ShadowCalculator {
-    private List<LineSegment> sortedFrontFaces = new List<LineSegment>();
+    private List<System.Tuple<LineSegment, Opaque>> sortedFrontFaces = new List<System.Tuple<LineSegment, Opaque>>();
+    //private List<LineSegment> sortedFrontFaces = new List<LineSegment>();
     private Dictionary<Opaque, List<LineSegment>> frontFacing = new Dictionary<Opaque, List<LineSegment>>();
     private Dictionary<Opaque, LineSegment> leftFacing = new Dictionary<Opaque, LineSegment>();
     private Dictionary<Opaque, LineSegment> rightFacing = new Dictionary<Opaque, LineSegment>();
@@ -411,18 +412,14 @@ class ShadowCalculator {
     private LineSegment leftmostFace;
 
     public void CalculateShadows(IEnumerable<Opaque> opaqueObjs, LightViewTriangle lightTriangle) {
-        var shadowFrontFaces = CalculateSortedShadowFrontFaces(opaqueObjs, lightTriangle);
-
-        sortedFrontFaces.Clear();
-        foreach (var tuple in shadowFrontFaces) {
-            sortedFrontFaces.Add(tuple.Item1);
-        }
-
-        CalculateShadowFaces(shadowFrontFaces, lightTriangle);
+        CalculateSortedFrontFaces(opaqueObjs, lightTriangle);
+        CalculateShadowFaces(lightTriangle);
     }
 
-    public List<LineSegment> GetShadowSegments() {
-        return sortedFrontFaces;
+    public IEnumerable<LineSegment> GetShadowSegments() {
+        foreach (var tup in sortedFrontFaces) {
+            yield return tup.Item1;
+        }
     }
 
     public Dictionary<Opaque, List<LineSegment>> GetFrontFacing() {
@@ -445,24 +442,22 @@ class ShadowCalculator {
         return leftmostFace;
     }
 
-    private List<System.Tuple<LineSegment, Opaque>> CalculateSortedShadowFrontFaces(
+    private void CalculateSortedFrontFaces(
             IEnumerable<Opaque> opaqueObjs, LightViewTriangle lightTriangle) {
 
-        var shadowFrontFaces = new List<System.Tuple<LineSegment, Opaque>>();
+        sortedFrontFaces.Clear();
 
         foreach (Opaque opaque in opaqueObjs) {
             if (lightTriangle.CalculateFrontFace(opaque) is LineSegment frontFace) {
-                shadowFrontFaces.Add(System.Tuple.Create(frontFace, opaque));
+                sortedFrontFaces.Add(System.Tuple.Create(frontFace, opaque));
             }
         }
-        shadowFrontFaces.Add(System.Tuple.Create(lightTriangle.FarEdge(), (Opaque)null));
+        sortedFrontFaces.Add(System.Tuple.Create(lightTriangle.FarEdge(), (Opaque)null));
 
-        MinimalUnion<Opaque>.CalculateAndSort(ref shadowFrontFaces, lightTriangle.GetOrigin(), lightTriangle.Angle);
-
-        return shadowFrontFaces;
+        MinimalUnion<Opaque>.CalculateAndSort(ref sortedFrontFaces, lightTriangle.GetOrigin(), lightTriangle.Angle);
     }
 
-    private void CalculateShadowFaces(List<System.Tuple<LineSegment, Opaque>> sortedFrontFaces, LightViewTriangle lightTriangle) {
+    private void CalculateShadowFaces(LightViewTriangle lightTriangle) {
         frontFacing.Clear();
         leftFacing.Clear();
         rightFacing.Clear();
