@@ -3,7 +3,7 @@ using UnityEngine;
 // This class shouldn't be used in new levels. Use LightAngler. Really this
 // should be removed soon.
 [RequireComponent(typeof(Rigidbody2D))]
-public class LightAnglerDeprecated : LevelObject, Interactable, SimpleButtonControlable {
+public class LightAnglerDeprecated : LevelObject, Interactable {
 
     [SerializeField]
     private bool useConstraints = true;
@@ -24,7 +24,6 @@ public class LightAnglerDeprecated : LevelObject, Interactable, SimpleButtonCont
     private float speed = 10;
     [SerializeField]
     public RotatableLight controled;
-    private SimpleButton.State? buttonState = null;
     //[SerializeField]
     //private float gizmoLength = 1;
 
@@ -76,24 +75,14 @@ public class LightAnglerDeprecated : LevelObject, Interactable, SimpleButtonCont
         myJoint.angularOffset = currentAngle;
     }
 
-    public void SetState(SimpleButton.State state) {
-        buttonState = state;
-    }
-
-    void FixedUpdate() {
-        if (buttonState == SimpleButton.State.unpressed) {
-            MovePosition(-1);
-        } else if (buttonState == SimpleButton.State.pressed) {
-            MovePosition(1);
-        }
-    }
-
     private void OnDrawGizmos() {
         DrawGizmos(1);
     }
+
     protected override void OnDrawGizmosSelected() {
         DrawGizmos(20);
     }
+
     void DrawGizmos(float gizmoLength) {
         Gizmos.color = Color.red;
         Gizmos.DrawRay(body.position, Quaternion.Euler(0,0,body.rotation - angleLeft - apertureAngle/2)*Vector2.right*gizmoLength);

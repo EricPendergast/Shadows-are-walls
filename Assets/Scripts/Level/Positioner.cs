@@ -1,7 +1,7 @@
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody2D))]
-public class Positioner : SnappableObject, Interactable, SimpleButtonControlable {
+public class Positioner : SnappableObject, Interactable {
 
     public Vector2 left {
         get => transform.position;
@@ -24,7 +24,6 @@ public class Positioner : SnappableObject, Interactable, SimpleButtonControlable
     private float rotation;
 
     private RelativeJoint2D myJoint;
-    private SimpleButton.State? buttonState = null;
 
     void Start() {
         Debug.Assert(controled != null);
@@ -62,20 +61,6 @@ public class Positioner : SnappableObject, Interactable, SimpleButtonControlable
         myJoint.linearOffset = transform.InverseTransformPoint(newTarget);
         //myJoint.angularOffset = GetComponent<Rigidbody2D>().rotation - controled.rotation;
         //controled.SetTargetPosition(Vector2.Lerp(left.Position(), right.Position(), position));
-    }
-
-    public void SetState(SimpleButton.State state) {
-        buttonState = state;
-    }
-
-    void FixedUpdate() {
-        if (Application.isPlaying) {
-            if (buttonState == SimpleButton.State.unpressed) {
-                MovePosition(-1);
-            } else if (buttonState == SimpleButton.State.pressed) {
-                MovePosition(1);
-            }
-        }
     }
 
     void OnDrawGizmos() {

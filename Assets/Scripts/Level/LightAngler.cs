@@ -1,7 +1,7 @@
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody2D))]
-public class LightAngler : LevelObject, SimpleButtonControlable, Interactable {
+public class LightAngler : LevelObject, Interactable {
 
     [SerializeField]
     private bool DEBUG = false;
@@ -19,9 +19,9 @@ public class LightAngler : LevelObject, SimpleButtonControlable, Interactable {
     }
     [SerializeField]
     private float speed = 10;
+    private float currentSpeed = 0;
     [SerializeField]
     public RotatableLight controled;
-    private SimpleButton.State? buttonState = null;
 
     private RelativeJoint2D myJoint;
 
@@ -67,32 +67,23 @@ public class LightAngler : LevelObject, SimpleButtonControlable, Interactable {
         currentAngle = ClampToConstraints(currentAngle);
 
         float maxDiff = 2*speed*Time.deltaTime;
+        if (direction == 0) {
+            maxDiff = 0;
+        }
       
         currentAngle = Mathf.Clamp(currentAngle, actualAngle - maxDiff, actualAngle + maxDiff);
 
         myJoint.angularOffset = currentAngle;
     }
 
-    public void SetState(SimpleButton.State state) {
-        buttonState = state;
-    }
-
-    void FixedUpdate() {
-        if (buttonState == SimpleButton.State.unpressed) {
-            Rotate(-1);
-        } else if (buttonState == SimpleButton.State.pressed) {
-            Rotate(1);
-        } else {
-            Rotate(0);
-        }
-    }
-
     private void OnDrawGizmos() {
         DrawGizmos(1);
     }
+
     protected override void OnDrawGizmosSelected() {
         DrawGizmos(20);
     }
+
     void DrawGizmos(float gizmoLength) {
         if (unconstrained) {
             return;

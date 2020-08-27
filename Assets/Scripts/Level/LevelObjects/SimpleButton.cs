@@ -1,17 +1,11 @@
 using UnityEngine;
 
-public interface SimpleButtonControlable {
-    void SetState(SimpleButton.State state);
-}
-
 public class SimpleButton : LevelObject {
-    public enum State {
-        unpressed,
-        pressed
-    }
     [SerializeField]
     private GameObject controledGameObject;
-    private SimpleButtonControlable controled;
+    private Interactable controled;
+    [SerializeField]
+    private Vector2 interactionDirection;
 
     [SerializeField]
     private int numObjectsPressing;
@@ -25,28 +19,35 @@ public class SimpleButton : LevelObject {
 
     void Start() {
         controled = null;
-        foreach (var controlable in controledGameObject.GetComponentsInChildren<SimpleButtonControlable>()) {
+        foreach (var controlable in controledGameObject.GetComponentsInChildren<Interactable>()) {
             if (controled == null) {
                 controled = controlable;
             } else {
-                Debug.Log("Warning: controledGameObject has multiple SimpleButtonControlable components");
+                Debug.Log("Warning: controledGameObject has multiple Interactable components");
             }
         }
         if (controled == null) {
-            Debug.LogError("Warning: controledGameObject has no SimpleButtonControlable component");
+            Debug.LogError("Warning: controledGameObject has no Interactable component");
         }
+        numObjectsPressing = 0;
+    }
 
-        controled.SetState(State.unpressed);
+    void Update() {
+        if (numObjectsPressing > 0) {
+            controled.Interact(interactionDirection);
+        } else {
+            controled.Interact(-interactionDirection);
+        }
     }
 
     void Press() {
-        controled.SetState(State.pressed);
         transform.localScale = new Vector3(transform.localScale.x, transform.localScale.y*.5f, 1);
     }
+
     void Unpress() {
-        controled.SetState(State.unpressed);
         transform.localScale = new Vector3(transform.localScale.x, transform.localScale.y*2, 1);
     }
+
     void OnTriggerEnter2D(Collider2D collider) {
         if (!ShouldIgnore(collider)) {
             numObjectsPressing++;
