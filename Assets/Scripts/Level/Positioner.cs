@@ -36,14 +36,18 @@ public class Positioner : SnappableObject, Interactable {
         myJoint.autoConfigureOffset = false;
         myJoint.angularOffset = rotation;
 
-        MovePosition(0);
+        MoveRaw(0);
     }
 
     public void Interact(Vector2 direction) {
-        if (direction.x < 0) {
-            MovePosition(-1);
-        } else if (direction.x > 0) {
-            MovePosition(1);
+        if (direction == Vector2.zero) {
+            return;
+        } 
+
+        if (Vector2.Dot(direction, right - left) > 0) {
+            MoveRaw(1);
+        } else {
+            MoveRaw(-1);
         }
     }
 
@@ -54,7 +58,7 @@ public class Positioner : SnappableObject, Interactable {
         return Vector2.positiveInfinity;
     }
 
-    public void MovePosition(int direction) {
+    private void MoveRaw(int direction) {
         var deltaPosition = direction * speed / ((left - right).magnitude) * Time.deltaTime;
         position = Mathf.Clamp(position + deltaPosition, 0, 1);
         var newTarget = Vector2.Lerp(left, right, position);

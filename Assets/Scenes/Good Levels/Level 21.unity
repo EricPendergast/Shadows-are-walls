@@ -1935,6 +1935,16 @@ PrefabInstance:
       propertyPath: controledGameObject
       value: 
       objectReference: {fileID: 153289943}
+    - target: {fileID: 3387885169775428411, guid: 5e8af84ea18e19962bfe3bf27e7b389a,
+        type: 3}
+      propertyPath: interactionDirection.x
+      value: -1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3387885169775428411, guid: 5e8af84ea18e19962bfe3bf27e7b389a,
+        type: 3}
+      propertyPath: interactionDirection.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6925944510488535872, guid: 5e8af84ea18e19962bfe3bf27e7b389a,
         type: 3}
       propertyPath: m_Name
