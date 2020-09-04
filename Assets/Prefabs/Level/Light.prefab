@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 172423370}
   - component: {fileID: 2248304478567775631}
   m_Layer: 11
-  m_Name: Lever Light
+  m_Name: Light
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -70,11 +70,16 @@ MonoBehaviour:
   snapToGrid: 1
   gridSize: 1
   snapPoint: {x: -0.001, y: 0}
+  DEBUG: 0
   unconstrained: 0
   angleConstraint: 90
   currentAngle: 0
   apertureAngle: 35
-  speed: 40
+  speed: 50
+  currentVelocity: 0
+  acceleration: 100
+  decceleration: 400
+  rotatedThisFrame: 0
   controled: {fileID: 1973197721580949894}
 --- !u!58 &2248304478567775631
 CircleCollider2D:

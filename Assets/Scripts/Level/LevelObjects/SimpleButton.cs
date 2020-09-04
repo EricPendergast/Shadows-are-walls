@@ -32,7 +32,9 @@ public class SimpleButton : LevelObject {
         numObjectsPressing = 0;
     }
 
-    void Update() {
+    // NOTE: It is important that this happens in FixedUpdate, because it needs
+    // to be in sync with LightAngler.
+    void FixedUpdate() {
         if (numObjectsPressing > 0) {
             controled.Interact(interactionDirection);
         } else {
