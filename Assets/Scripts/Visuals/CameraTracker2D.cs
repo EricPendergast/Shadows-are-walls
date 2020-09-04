@@ -18,6 +18,7 @@ public class CameraTracker2D : MonoBehaviour
         instance = this;
     }
 
+    // For some reason, having this be FixedUpdate makes it smoother.
     void FixedUpdate() {
         if (trackedObject == null) {
             return;
