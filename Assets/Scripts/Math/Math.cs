@@ -31,4 +31,12 @@ public class Math {
         // Vector2, since Quaternions are for 3D rotations
         return Quaternion.Euler(0,0,angle)*toRotate;
     }
+
+    public static float Mod(float x, float m) {
+        return ((x % m) + m) % m;
+    }
+
+    public static int Mod(int x, int m) {
+        return ((x % m) + m) % m;
+    }
 }

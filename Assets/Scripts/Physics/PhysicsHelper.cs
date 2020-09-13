@@ -100,6 +100,13 @@ class PhysicsHelper {
         return diff < -180 ? diff + 360 : diff;
     }
 
+    // Returns the counterclockwise difference from angle1 to angle2. This
+    // quantity is always in the range [0, 360]
+    public static float CounterClockwiseAngleDifference(float angle1, float angle2) {
+        float diffSigned = AngleDifference(angle1, angle2);
+        return diffSigned > 0 ? diffSigned : 360 + diffSigned;
+    }
+
     public static void GetForceAndTorque(Rigidbody2D body, LineSegment target, out Vector2 force, out float torque) {
         Vector2 targetCenterOfMass = target.p1 + (target.p2 - target.p1).normalized*body.centerOfMass.magnitude;
         force = PhysicsHelper.GetMoveToForce(body, body.worldCenterOfMass, targetCenterOfMass);
@@ -159,4 +166,8 @@ class PhysicsHelper {
     //    copyTo.sharedMaterial = copyFrom.sharedMaterial;
     //    copyTo.isTrigger = copyFrom.isTrigger;
     //}
+
+    public static bool IsStatic(Rigidbody2D body) {
+        return (body.bodyType == RigidbodyType2D.Static) || (body.constraints == RigidbodyConstraints2D.FreezeAll);
+    }
 }

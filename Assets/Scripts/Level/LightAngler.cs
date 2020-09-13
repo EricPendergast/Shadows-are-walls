@@ -1,4 +1,6 @@
 using System.Collections;
+using System.Collections.Generic;
+using System;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody2D))]
@@ -147,6 +149,9 @@ public class LightAngler : LevelObject, Interactable {
     }
 
     public void ApplySettings() {
+        DoSnapping();
+        DetectConstraints();
+
         angleConstraint = Mathf.Max(angleConstraint, apertureAngle/2);
         currentAngle = ClampToConstraints(currentAngle);
         if (controled != null) {
@@ -174,5 +179,51 @@ public class LightAngler : LevelObject, Interactable {
         // When this is called in the editor, the transform doesn't update
         // automatically, so we need to change it manually.
         controled.transform.localRotation = Quaternion.Euler(0,0,angle);
+    }
+
+
+    private bool IsAngleUnoccupied(float angle) {
+        foreach (RaycastHit2D hit in Physics2D.LinecastAll(body.position + Math.Rotate(Vector2.right, angle)*.1f, body.position + Math.Rotate(Vector2.right, angle)*.5f)) {
+            if (PhysicsHelper.IsStatic(hit.rigidbody) && hit.rigidbody != body) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+
+    // Uses raycasting to detect angular constraints on this light. For
+    // example, if it is on a wall, this function will set body.rotation and
+    // angleConstraint so that the light won't intersect the wall.
+    private void DetectConstraints() {
+        float inc = 45;
+
+        var unoccupiedAngles = new List<bool>();
+
+        for (int i = 0; i < 360/inc; i++) {
+            unoccupiedAngles.Add(IsAngleUnoccupied((i+.5f)*inc));
+        }
+        Algorithm.Bounds bounds = Algorithm.FindContiguousWrapAround(unoccupiedAngles);
+
+        if (bounds.IsEmpty() || bounds.IsFull()) {
+            unconstrained = true;
+            return;
+        } else {
+            unconstrained = false;
+        }
+
+        float lowerBound = (bounds.Lower()) * inc;
+        float upperBound = (bounds.Upper()+1) * inc;
+        if (upperBound < lowerBound) {
+            lowerBound -= 360;
+        }
+
+        body.rotation = (upperBound + lowerBound)/2;
+        // Running in the editor, transform.rotation doesn't get updated
+        // automatically, so we must do it manually here.
+        transform.rotation = Quaternion.Euler(0,0,body.rotation);
+
+        angleConstraint = PhysicsHelper.CounterClockwiseAngleDifference(lowerBound, upperBound)/2;
     }
 }
