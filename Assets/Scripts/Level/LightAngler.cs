@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using System;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody2D))]
@@ -142,10 +141,19 @@ public class LightAngler : LevelObject, Interactable {
 
     private float ClampToConstraints(float lightAngle) {
         if (!unconstrained) {
+            lightAngle = Math.AngleDifference(0, lightAngle);
             return Mathf.Clamp(lightAngle, -(angleConstraint - apertureAngle/2) - .1f, angleConstraint - apertureAngle/2 + .1f);
         } else {
             return lightAngle;
         }
+    }
+
+    public void SetCurrentAngle(float angle) {
+        currentAngle = angle;
+    }
+
+    public float GetCurrentAngle() {
+        return currentAngle;
     }
 
     public void ApplySettings() {
@@ -219,11 +227,10 @@ public class LightAngler : LevelObject, Interactable {
             lowerBound -= 360;
         }
 
+        float prevRotation = body.rotation;
         body.rotation = (upperBound + lowerBound)/2;
-        // Running in the editor, transform.rotation doesn't get updated
-        // automatically, so we must do it manually here.
         transform.rotation = Quaternion.Euler(0,0,body.rotation);
-
-        angleConstraint = PhysicsHelper.CounterClockwiseAngleDifference(lowerBound, upperBound)/2;
+        currentAngle += prevRotation - body.rotation;
+        angleConstraint = Math.CounterClockwiseAngleDifference(lowerBound, upperBound)/2;
     }
 }

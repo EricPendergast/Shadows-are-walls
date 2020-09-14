@@ -39,4 +39,19 @@ public class Math {
     public static int Mod(int x, int m) {
         return ((x % m) + m) % m;
     }
+
+    // Calculates the change in angle from angle1 to angle2, in the
+    // range [-180, 180]
+    public static float AngleDifference(float angle1, float angle2 )
+    {
+        float diff = ( angle2 - angle1 + 180 ) % 360 - 180;
+        return diff < -180 ? diff + 360 : diff;
+    }
+
+    // Returns the counterclockwise difference from angle1 to angle2. This
+    // quantity is always in the range [0, 360]
+    public static float CounterClockwiseAngleDifference(float angle1, float angle2) {
+        float diffSigned = AngleDifference(angle1, angle2);
+        return diffSigned > 0 ? diffSigned : 360 + diffSigned;
+    }
 }

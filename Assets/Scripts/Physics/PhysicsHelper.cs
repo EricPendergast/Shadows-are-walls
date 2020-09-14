@@ -64,7 +64,7 @@ class PhysicsHelper {
         // Making endAngle be as close to startAngle as possible (in
         // numerical distance, not angular distance; angular distance
         // stays the same)
-        endAngle = startAngle + AngleDifference(startAngle, endAngle);
+        endAngle = startAngle + Math.AngleDifference(startAngle, endAngle);
         float startAngVelocity = body.angularVelocity;
         float time = Time.deltaTime == 0 ? Time.fixedDeltaTime : Time.deltaTime;
 
@@ -90,21 +90,6 @@ class PhysicsHelper {
 
         // For some strange reason, we need to divide by 2; I can't figure out why.
         return accel*body.mass/2;
-    }
-
-    // Calculates the change in angle from angle1 to angle2, in the
-    // range [-180, 180]
-    public static float AngleDifference(float angle1, float angle2 )
-    {
-        float diff = ( angle2 - angle1 + 180 ) % 360 - 180;
-        return diff < -180 ? diff + 360 : diff;
-    }
-
-    // Returns the counterclockwise difference from angle1 to angle2. This
-    // quantity is always in the range [0, 360]
-    public static float CounterClockwiseAngleDifference(float angle1, float angle2) {
-        float diffSigned = AngleDifference(angle1, angle2);
-        return diffSigned > 0 ? diffSigned : 360 + diffSigned;
     }
 
     public static void GetForceAndTorque(Rigidbody2D body, LineSegment target, out Vector2 force, out float torque) {
