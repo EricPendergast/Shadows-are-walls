@@ -1,0 +1,82 @@
+<?xml version="1.0"?>
+<minder>
+  <theme name="Solarized Light" index="0"/>
+  <styles>
+    <style level="0" isset="true" linktype="straight" linkwidth="4" linkarrow="false" linkdash="solid" nodeborder="squared" nodewidth="200" nodeborderwidth="4" nodefill="false" nodemargin="8" nodepadding="6" nodefont="Sans 11" nodemarkup="true" connectiondash="dotted" connectionwidth="1" connectionarrow="fromto" connectionpadding="3" connectionfont="Sans 10"/>
+    <style level="1" isset="true" linktype="straight" linkwidth="4" linkarrow="false" linkdash="solid" nodeborder="squared" nodewidth="200" nodeborderwidth="4" nodefill="false" nodemargin="8" nodepadding="6" nodefont="Sans 11" nodemarkup="true" connectiondash="dotted" connectionwidth="1" connectionarrow="fromto" connectionpadding="3" connectionfont="Sans 10"/>
+    <style level="2" isset="true" linktype="straight" linkwidth="4" linkarrow="false" linkdash="solid" nodeborder="squared" nodewidth="200" nodeborderwidth="4" nodefill="false" nodemargin="8" nodepadding="6" nodefont="Sans 11" nodemarkup="true" connectiondash="dotted" connectionwidth="1" connectionarrow="fromto" connectionpadding="3" connectionfont="Sans 10"/>
+    <style level="3" isset="true" linktype="straight" linkwidth="4" linkarrow="false" linkdash="solid" nodeborder="squared" nodewidth="200" nodeborderwidth="4" nodefill="false" nodemargin="8" nodepadding="6" nodefont="Sans 11" nodemarkup="true" connectiondash="dotted" connectionwidth="1" connectionarrow="fromto" connectionpadding="3" connectionfont="Sans 10"/>
+    <style level="4" isset="true" linktype="straight" linkwidth="4" linkarrow="false" linkdash="solid" nodeborder="squared" nodewidth="200" nodeborderwidth="4" nodefill="false" nodemargin="8" nodepadding="6" nodefont="Sans 11" nodemarkup="true" connectiondash="dotted" connectionwidth="1" connectionarrow="fromto" connectionpadding="3" connectionfont="Sans 10"/>
+    <style level="5" isset="true" linktype="straight" linkwidth="4" linkarrow="false" linkdash="solid" nodeborder="squared" nodewidth="200" nodeborderwidth="4" nodefill="false" nodemargin="8" nodepadding="6" nodefont="Sans 11" nodemarkup="true" connectiondash="dotted" connectionwidth="1" connectionarrow="fromto" connectionpadding="3" connectionfont="Sans 10"/>
+    <style level="6" isset="true" linktype="straight" linkwidth="4" linkarrow="false" linkdash="solid" nodeborder="squared" nodewidth="200" nodeborderwidth="4" nodefill="false" nodemargin="8" nodepadding="6" nodefont="Sans 11" nodemarkup="true" connectiondash="dotted" connectionwidth="1" connectionarrow="fromto" connectionpadding="3" connectionfont="Sans 10"/>
+    <style level="7" isset="true" linktype="straight" linkwidth="4" linkarrow="false" linkdash="solid" nodeborder="squared" nodewidth="200" nodeborderwidth="4" nodefill="false" nodemargin="8" nodepadding="6" nodefont="Sans 11" nodemarkup="true" connectiondash="dotted" connectionwidth="1" connectionarrow="fromto" connectionpadding="3" connectionfont="Sans 10"/>
+    <style level="8" isset="true" linktype="straight" linkwidth="4" linkarrow="false" linkdash="solid" nodeborder="squared" nodewidth="200" nodeborderwidth="4" nodefill="false" nodemargin="8" nodepadding="6" nodefont="Sans 11" nodemarkup="true" connectiondash="dotted" connectionwidth="1" connectionarrow="fromto" connectionpadding="3" connectionfont="Sans 10"/>
+    <style level="9" isset="true" linktype="straight" linkwidth="4" linkarrow="false" linkdash="solid" nodeborder="squared" nodewidth="200" nodeborderwidth="4" nodefill="false" nodemargin="8" nodepadding="6" nodefont="Sans 11" nodemarkup="true" connectiondash="dotted" connectionwidth="1" connectionarrow="fromto" connectionpadding="3" connectionfont="Sans 10"/>
+    <style level="10" isset="true" linktype="straight" linkwidth="4" linkarrow="false" linkdash="solid" nodeborder="squared" nodewidth="200" nodeborderwidth="4" nodefill="false" nodemargin="8" nodepadding="6" nodefont="Sans 11" nodemarkup="true" connectiondash="dotted" connectionwidth="1" connectionarrow="fromto" connectionpadding="3" connectionfont="Sans 10"/>
+  </styles>
+  <drawarea x="-781.74128723144531" y="-383.93122863769531" scale="1"/>
+  <images/>
+  <nodes>
+    <node id="1" posx="530.82295227050781" posy="266.47352600097656" maxwidth="200" width="135" height="46" side="right" fold="false" treesize="46" layout="Horizontal">
+      <style linktype="straight" linkwidth="4" linkarrow="false" linkdash="solid" nodeborder="squared" nodewidth="200" nodeborderwidth="4" nodefill="false" nodemargin="8" nodepadding="6" nodefont="Sans 11" nodemarkup="true"/>
+      <nodename>RotatableLight</nodename>
+      <nodenote></nodenote>
+    </node>
+    <node id="3" posx="1016.4531402587891" posy="271.47477722167969" maxwidth="200" width="159" height="46" side="right" fold="false" treesize="46" layout="Horizontal">
+      <style linktype="straight" linkwidth="4" linkarrow="false" linkdash="solid" nodeborder="squared" nodewidth="200" nodeborderwidth="4" nodefill="false" nodemargin="8" nodepadding="6" nodefont="Sans 11" nodemarkup="true"/>
+      <nodename>ShadowCalculator</nodename>
+      <nodenote></nodenote>
+    </node>
+    <node id="5" posx="308.57331848144531" posy="529.42713928222656" maxwidth="200" width="85" height="46" side="right" fold="false" treesize="46" layout="Horizontal">
+      <style linktype="straight" linkwidth="4" linkarrow="false" linkdash="solid" nodeborder="squared" nodewidth="200" nodeborderwidth="4" nodefill="false" nodemargin="8" nodepadding="6" nodefont="Sans 11" nodemarkup="true"/>
+      <nodename>Opaque</nodename>
+      <nodenote></nodenote>
+    </node>
+    <node id="7" posx="550.87947082519531" posy="566.87074279785156" maxwidth="200" width="85" height="46" side="right" fold="false" treesize="46" layout="Horizontal">
+      <style linktype="straight" linkwidth="4" linkarrow="false" linkdash="solid" nodeborder="squared" nodewidth="200" nodeborderwidth="4" nodefill="false" nodemargin="8" nodepadding="6" nodefont="Sans 11" nodemarkup="true"/>
+      <nodename>Shadow</nodename>
+      <nodenote></nodenote>
+    </node>
+    <node id="9" posx="1047.0044097900391" posy="533.14021301269531" maxwidth="200" width="123" height="46" side="right" fold="false" treesize="46" layout="Horizontal">
+      <style linktype="straight" linkwidth="4" linkarrow="false" linkdash="solid" nodeborder="squared" nodewidth="200" nodeborderwidth="4" nodefill="false" nodemargin="8" nodepadding="6" nodefont="Sans 11" nodemarkup="true"/>
+      <nodename>LineSegment</nodename>
+      <nodenote></nodenote>
+    </node>
+  </nodes>
+  <connections>
+    <connection from_id="1" to_id="5" drag_x="474.69813537597656" drag_y="420.95033264160156" color="rgb(96,96,96)">
+      <style connectiondash="dotted" connectionwidth="2" connectionarrow="fromto" connectionpadding="3" connectionfont="Sans 10"/>
+      <title>1. Finds all in view</title>
+      <note></note>
+    </connection>
+    <connection from_id="1" to_id="3" drag_x="859.254638671875" drag_y="158.62001037597656" color="rgb(96,96,96)">
+      <style connectiondash="dotted" connectionwidth="2" connectionarrow="fromto" connectionpadding="3" connectionfont="Sans 10"/>
+      <title>3. Sends all known opaque objects</title>
+      <note></note>
+    </connection>
+    <connection from_id="1" to_id="7" drag_x="589.72824096679688" drag_y="421.79067993164062" color="rgb(96,96,96)">
+      <style connectiondash="dotted" connectionwidth="2" connectionarrow="fromto" connectionpadding="3" connectionfont="Sans 10"/>
+      <title>2. Creates one Shadow for each known Opaque object</title>
+      <note></note>
+    </connection>
+    <connection from_id="1" to_id="3" drag_x="857.4482421875" drag_y="283.38314819335938" color="rgb(96,96,96)">
+      <style connectiondash="dotted" connectionwidth="2" connectionarrow="fromto" connectionpadding="5" connectionfont="Sans 10"/>
+      <title>5. Gets 3 maps from opaque objects to their shadow line segments</title>
+      <note>Specifically:
+
+Opaque -&gt; its front faces
+Opaque -&gt; its left face
+Opaque -&gt; its right face</note>
+    </connection>
+    <connection from_id="3" to_id="9" drag_x="1102.2287750244141" drag_y="425.3074951171875" color="rgb(96,96,96)">
+      <style connectiondash="dotted" connectionwidth="1" connectionarrow="fromto" connectionpadding="3" connectionfont="Sans 10"/>
+      <title>4. Creates correspondence with Opaque objects and the shadows they generate (represented as LineSegments)</title>
+      <note></note>
+    </connection>
+    <connection from_id="1" to_id="7" drag_x="699.179931640625" drag_y="438.84832763671875" color="rgb(96,96,96)">
+      <style connectiondash="dotted" connectionwidth="1" connectionarrow="fromto" connectionpadding="3" connectionfont="Sans 10"/>
+      <title>6. Sends front, right, and left segments to each Shadow</title>
+      <note></note>
+    </connection>
+  </connections>
+</minder>
