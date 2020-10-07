@@ -1,11 +1,13 @@
 ﻿//using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Experimental.Rendering.Universal;
+using System.Reflection;
+using System.Linq;
 
 // General idea: Light finds all opaque objects in the scene, calculates all
 // their shadows, tells all its shadow edges where they should be based on
 // those calculations (setting their "targets"). It also handles rendering
-
 
 public readonly struct LightViewTriangle {
     private readonly Triangle viewTriangle;
@@ -55,6 +57,7 @@ public readonly struct LightViewTriangle {
 //      "right" and "left" are refered to as if you are facing in the
 //      direction of the light
 [RequireComponent(typeof(Rigidbody2D))]
+[RequireComponent(typeof(Light2D))]
 public class RotatableLight : LightBase {
     [SerializeField]
     private bool DEBUG = false;
@@ -97,6 +100,13 @@ public class RotatableLight : LightBase {
     private GameObject shadowParent;
 
     private PolygonCollider2D visibleCollider;
+
+    public static void SetFieldValue<T>(object obj, string name, T val) {
+        var field = obj.GetType().GetField(name, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+        field?.SetValue(obj, val);
+    }
+
+    private Light2D light2D;
 
     private Rigidbody2D _body;
     private Rigidbody2D body {
@@ -205,20 +215,30 @@ public class RotatableLight : LightBase {
         visibleCollider = gameObject.AddComponent<PolygonCollider2D>();
         visibleCollider.isTrigger = true;
 
+        light2D = GetComponent<Light2D>();
+        light2D.lightType = Light2D.LightType.Freeform;
+        SetFieldValue<Vector3[]>(light2D, "m_ShapePath", new Vector3[]{Vector3.zero, Vector3.right, Vector3.up});
+
         body.inertia = 1;
     }
 
     private void DrawCastedLight() {
-
         var vertices = new List<Vector3>();
         var triangles = new List<int>();
         vertices.Add(GetTargetPosition());
 
         foreach (LineSegment shadow in shadowCalculator.GetShadowSegments()) {
-            triangles.Add(vertices.Count);
-            vertices.Add(shadow.p1);
-            triangles.Add(vertices.Count);
-            vertices.Add(shadow.p2);
+
+            if ((Vector2)vertices.Last() != shadow.p1) {
+                vertices.Add(shadow.p1);
+            }
+            triangles.Add(vertices.Count - 1);
+
+            if ((Vector2)vertices.Last() != shadow.p2) {
+                vertices.Add(shadow.p2);
+            }
+            triangles.Add(vertices.Count - 1);
+
             triangles.Add(0);
         }
 
@@ -226,13 +246,15 @@ public class RotatableLight : LightBase {
             vertices[i] = transform.InverseTransformPoint(vertices[i]);
         }
 
-        if (castLightMesh.vertexCount < vertices.Count) {
-            castLightMesh.vertices = vertices.ToArray();
-            castLightMesh.triangles = triangles.ToArray();
-        } else {
-            castLightMesh.triangles = triangles.ToArray();
-            castLightMesh.vertices = vertices.ToArray();
-        }
+        //if (castLightMesh.vertexCount < vertices.Count) {
+        //    castLightMesh.vertices = vertices.ToArray();
+        //    castLightMesh.triangles = triangles.ToArray();
+        //} else {
+        //    castLightMesh.triangles = triangles.ToArray();
+        //    castLightMesh.vertices = vertices.ToArray();
+        //}
+
+        SetFieldValue<Vector3[]>(light2D, "m_ShapePath", vertices.ToArray());
     }
 
     public override void DoFixedUpdate() {
