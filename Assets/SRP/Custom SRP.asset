@@ -1,0 +1,15 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 48be637d862e20ab8a0677bda785a8d4, type: 3}
+  m_Name: Custom SRP
+  m_EditorClassIdentifier: 
+  postFXSettings: {fileID: 11400000, guid: cb99f5a4d2d1c1459a39827b487bee87, type: 2}
