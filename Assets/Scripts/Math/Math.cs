@@ -54,4 +54,9 @@ public class Math {
         float diffSigned = AngleDifference(angle1, angle2);
         return diffSigned > 0 ? diffSigned : 360 + diffSigned;
     }
+
+    public static bool AnglesApproximatelyEqual(float a1, float a2) {
+        return Mathf.Approximately(Math.Mod(a1, 360), Math.Mod(a2, 360)) ||
+               Mathf.Approximately(Math.Mod(a1 + 180, 360), Math.Mod(a2 + 180, 360));
+    }
 }

@@ -124,10 +124,24 @@ public partial class LightAngler : LevelObject {
             lowerBound -= 360;
         }
 
-        float prevRotation = body.rotation;
-        body.rotation = (upperBound + lowerBound)/2;
+        SetConstraints(lowerBound, upperBound);
+    }
+
+    void SetConstraints(float lowerBound, float upperBound) {
+        if (Math.AnglesApproximatelyEqual(lowerBound, body.rotation - angleConstraint) &&
+            Math.AnglesApproximatelyEqual(upperBound, body.rotation + angleConstraint)) {
+            return;
+        }
+
+        float deltaRotation;
+        {
+            float newRotation = (upperBound + lowerBound)/2;
+            deltaRotation = body.rotation - newRotation;
+            body.rotation = newRotation;
+        }
+
         transform.rotation = Quaternion.Euler(0,0,body.rotation);
-        currentAngle += prevRotation - body.rotation;
+        currentAngle += deltaRotation;
         angleConstraint = Math.CounterClockwiseAngleDifference(lowerBound, upperBound)/2;
     }
 }
