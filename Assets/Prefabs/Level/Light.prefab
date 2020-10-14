@@ -71,10 +71,10 @@ MonoBehaviour:
   gridSize: 1
   snapPoint: {x: -0.001, y: 0}
   DEBUG: 0
-  unconstrained: 0
+  unconstrained: 1
   angleConstraint: 90
   currentAngle: -72.6
-  apertureAngle: 35
+  apertureAngle: 37.07
   speed: 50
   currentVelocity: 0
   acceleration: 100
@@ -123,6 +123,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Intensity
       value: 0.63
+      objectReference: {fileID: 0}
+    - target: {fileID: 7607047789442624828, guid: 525e182bd728c0103a02b525d651d69d,
+        type: 3}
+      propertyPath: apertureAngle
+      value: 37.07
       objectReference: {fileID: 0}
     - target: {fileID: 7909692603331570561, guid: 525e182bd728c0103a02b525d651d69d,
         type: 3}
@@ -197,12 +202,12 @@ PrefabInstance:
     - target: {fileID: 7909692603331570564, guid: 525e182bd728c0103a02b525d651d69d,
         type: 3}
       propertyPath: apertureAngle
-      value: 35
+      value: 37.07
       objectReference: {fileID: 0}
     - target: {fileID: 7909692603331570565, guid: 525e182bd728c0103a02b525d651d69d,
         type: 3}
       propertyPath: m_Name
-      value: Light 2
+      value: Light
       objectReference: {fileID: 0}
     - target: {fileID: 7909692603331570575, guid: 525e182bd728c0103a02b525d651d69d,
         type: 3}

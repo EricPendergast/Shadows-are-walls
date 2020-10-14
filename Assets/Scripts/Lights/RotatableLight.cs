@@ -56,7 +56,6 @@ public readonly struct LightViewTriangle {
 //      "right" and "left" are refered to as if you are facing in the
 //      direction of the light
 [RequireComponent(typeof(Rigidbody2D))]
-[RequireComponent(typeof(Light2D))]
 public class RotatableLight : LightBase {
     [SerializeField]
     private bool DEBUG = false;

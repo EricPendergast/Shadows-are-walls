@@ -69,6 +69,7 @@ MonoBehaviour:
   snapToGrid: 1
   gridSize: 1
   snapPoint: {x: -0.03, y: 0}
+  useConstraints: 1
   angleLeft: 45
   angleRight: 45
   currentAngle: 0
@@ -82,6 +83,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 2653933352807445335}
     m_Modifications:
+    - target: {fileID: 934799719176233428, guid: 525e182bd728c0103a02b525d651d69d,
+        type: 3}
+      propertyPath: m_Mesh
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 7909692603331570561, guid: 525e182bd728c0103a02b525d651d69d,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -160,7 +166,7 @@ PrefabInstance:
     - target: {fileID: 7909692603331570565, guid: 525e182bd728c0103a02b525d651d69d,
         type: 3}
       propertyPath: m_Name
-      value: Light 2
+      value: Light
       objectReference: {fileID: 0}
     - target: {fileID: 7909692603331570575, guid: 525e182bd728c0103a02b525d651d69d,
         type: 3}
