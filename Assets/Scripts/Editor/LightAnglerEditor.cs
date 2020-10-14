@@ -13,7 +13,7 @@ public class LightAnglerEditor : LevelObjectEditor {
             var lightAngler = target as LightAngler;
 
             EditorGUI.BeginChangeCheck();
-            var newRot = Handles.RotationHandle(Quaternion.Euler(0,0,lightAngler.EditorGetCurrentAngle()), lightAngler.transform.position);
+            var newRot = Handles.RotationHandle(Quaternion.Euler(0,0,lightAngler.EditorGetCurrentAngle()), (Vector2)lightAngler.transform.position);
             if (EditorGUI.EndChangeCheck()) {
                  lightAngler.EditorSetCurrentAngle(newRot.eulerAngles.z);
             } 
