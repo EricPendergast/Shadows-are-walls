@@ -38,4 +38,25 @@ float4 CopyPassFragment(Varyings input) : SV_TARGET {
     return GetSource(input.fxUV);
 }
 
+
+float ApplyCCCurve(float channel) {
+    return pow((1-1/(6*channel+1)), 2);
+}
+
+float4 ColorCorrectFragment(Varyings input) : SV_TARGET {
+    // TODO: This probably isn't very good color correction
+    float4 color = GetSource(input.fxUV);
+    return float4(
+        ApplyCCCurve(color.r),
+        ApplyCCCurve(color.g),
+        ApplyCCCurve(color.b),
+        color.a);
+}
+
+float4 GrayscaleFragment(Varyings input) : SV_TARGET {
+    float4 color = GetSource(input.fxUV);
+    float intensity = (color.r + color.g + color.b)/3;
+    return float4(intensity, intensity, intensity, color.a);
+}
+
 #endif

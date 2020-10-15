@@ -14,6 +14,7 @@
 
         Pass
         {
+            Tags { "LightMode" = "SRPDefaultUnlit" }
             CGPROGRAM
             #pragma vertex vert
             #pragma fragment frag

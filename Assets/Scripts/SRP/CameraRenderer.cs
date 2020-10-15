@@ -5,7 +5,7 @@ public partial class CameraRenderer {
 	ScriptableRenderContext context;
 	Camera camera;
     const string bufferName = "Render Camera";
-    static ShaderTagId unlitShaderTagId = new ShaderTagId("SRPDefaultUnlit");
+    static ShaderTagId defaultShaderTagId = new ShaderTagId("SRPDefaultUnlit");
     static int frameBufferId = Shader.PropertyToID("_CameraFrameBuffer");
 
     CommandBuffer buffer = new CommandBuffer { name = bufferName };
@@ -77,7 +77,7 @@ public partial class CameraRenderer {
         
         // Drawing opaque objects
         var sortingSettings = new SortingSettings(camera);
-        var drawingSettings = new DrawingSettings(unlitShaderTagId, sortingSettings);
+        var drawingSettings = new DrawingSettings(defaultShaderTagId, sortingSettings);
         var filteringSettings = new FilteringSettings(RenderQueueRange.opaque);
         
         context.DrawRenderers(

@@ -12,4 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 48be637d862e20ab8a0677bda785a8d4, type: 3}
   m_Name: Custom SRP
   m_EditorClassIdentifier: 
-  postFXSettings: {fileID: 0}
+  postFXSettings: {fileID: 11400000, guid: cb99f5a4d2d1c1459a39827b487bee87, type: 2}

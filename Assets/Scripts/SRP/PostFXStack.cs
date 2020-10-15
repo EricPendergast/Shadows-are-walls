@@ -18,13 +18,17 @@ public partial class PostFXStack {
     int fxSourceId = Shader.PropertyToID("_PostFXSource");
 
     enum Pass {
-        Copy
+        Copy,
+        ColorCorrect,
+        Grayscale
     }
 
     List<int> bloomPyramidIds = new List<int>();
 
+    int tmpDestId = Shader.PropertyToID("_tmpDestId");
+
     public PostFXStack() {
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < 16; i++) {
             bloomPyramidIds.Add(Shader.PropertyToID("_BloomPyramid" + i));
         }
     }
@@ -40,10 +44,35 @@ public partial class PostFXStack {
     public bool IsActive => settings != null;
 
     public void Render(RenderTargetIdentifier source) {
-        //Draw(source, BuiltinRenderTextureType.CameraTarget, Pass.Copy);
-        DoBloom(source);
+
+        buffer.GetTemporaryRT(tmpDestId, camera.pixelWidth, camera.pixelHeight);
+        RenderTargetIdentifier dest = tmpDestId;
+
+        if (settings.Bloom.enabled) {
+            DoBloom(source, dest);
+            Swap(ref source, ref dest);
+        }
+
+        if (settings.ColorCorrect.enabled) {
+            DoColorCorrect(source, dest);
+            Swap(ref source, ref dest);
+        }
+
+        if (settings.grayscale) {
+            DoGrayscale(source, dest);
+            Swap(ref source, ref dest);
+        }
+
+        Draw(source, BuiltinRenderTextureType.CameraTarget, Pass.Copy);
+
         context.ExecuteCommandBuffer(buffer);
         buffer.Clear();
+    }
+
+    void Swap(ref RenderTargetIdentifier rti1, ref RenderTargetIdentifier rti2) {
+        var tmp = rti1;
+        rti1 = rti2;
+        rti2 = tmp;
     }
 
     void Draw(RenderTargetIdentifier source, RenderTargetIdentifier dest, Pass pass) {
@@ -58,7 +87,17 @@ public partial class PostFXStack {
         );
     }
 
-    void DoBloom(RenderTargetIdentifier source) {
+    void DoGrayscale(RenderTargetIdentifier source, RenderTargetIdentifier dest) {
+        Draw(source, dest, Pass.Grayscale);
+    }
+
+    void DoColorCorrect(RenderTargetIdentifier source, RenderTargetIdentifier dest) {
+        Draw(source, dest, Pass.ColorCorrect);
+    }
+
+    void DoBloom(RenderTargetIdentifier source, RenderTargetIdentifier dest) {
+        var bloom = settings.Bloom;
+
         buffer.BeginSample("Bloom");
         int width = camera.pixelWidth/2, height = camera.pixelHeight/2;
         var format = RenderTextureFormat.Default;
@@ -66,9 +105,9 @@ public partial class PostFXStack {
         List<int> allocated = new List<int>();
 
         int i;
-        for (i = 0; i < bloomPyramidIds.Count; i++) {
+        for (i = 0; i < bloom.maxIterations; i++) {
 
-            if (height < 1 || width < 1) {
+            if (height < bloom.downscaleLimit || width < bloom.downscaleLimit) {
                 break;
             }
             int destId = bloomPyramidIds[i];
@@ -88,9 +127,7 @@ public partial class PostFXStack {
             buffer.ReleaseTemporaryRT(renderTextureId);
         }
 
-        Draw(source, BuiltinRenderTextureType.CameraTarget, Pass.Copy);
-
-
+        Draw(source, dest, Pass.Copy);
         buffer.EndSample("Bloom");
     }
 }
