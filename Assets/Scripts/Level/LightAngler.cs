@@ -92,7 +92,6 @@ public partial class LightAngler : LevelObject, Interactable {
         }
 
         currentAngle += currentVelocity*Time.deltaTime;
-        currentAngle = ClampToConstraints(currentAngle);
 
         float maxDiff = 2*speed*Time.deltaTime;
         if (direction == 0) {
@@ -100,10 +99,15 @@ public partial class LightAngler : LevelObject, Interactable {
         }
       
         var actualAngle = myJoint.connectedBody.rotation - body.rotation;
+        var difference = Math.AngleDifference(actualAngle, currentAngle);
 
-        currentAngle = Mathf.Clamp(currentAngle, actualAngle - maxDiff, actualAngle + maxDiff);
+        if (Mathf.Abs(difference) > maxDiff) {
+            difference = Mathf.Clamp(difference, -maxDiff, maxDiff);
+            currentAngle = actualAngle + difference;
+        }
+        currentAngle = ClampToConstraints(currentAngle);
 
-        myJoint.angularOffset = currentAngle;
+        myJoint.angularOffset = actualAngle + difference;
     }
 
     private void FixedUpdate() {
