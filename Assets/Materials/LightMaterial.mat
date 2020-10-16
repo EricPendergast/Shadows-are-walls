@@ -8,7 +8,7 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: LightMaterial
-  m_Shader: {fileID: 4800000, guid: c70e212e531b5b086a73c4145540a8a8, type: 3}
+  m_Shader: {fileID: 4800000, guid: c783c49da8916d2dfbb2e7942ea76d33, type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
@@ -78,6 +78,6 @@ Material:
     m_Colors:
     - Color_719A8BDB: {r: 1, g: 0.9885714, b: 0.8584906, a: 0}
     - Vector4_1D7241F: {r: 1, g: 1, b: 0, a: 0}
-    - _Color: {r: 1, g: 0.865686, b: 0.7735849, a: 0.44313726}
+    - _Color: {r: 1, g: 0.865686, b: 0.7735849, a: 0.6392157}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
   m_BuildTextureStacks: []
