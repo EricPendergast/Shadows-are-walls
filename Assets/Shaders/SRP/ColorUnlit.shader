@@ -6,6 +6,9 @@ Shader "Custom RP/Color Unlit" {
         Cull Off
         ZTest LEqual
         ZWrite On
+        // This needs to be here because without it, in the build there are
+        // strange artifacts around the borders of triangles.
+        Blend SrcAlpha OneMinusSrcAlpha
 
         HLSLINCLUDE
         #include "../../ShaderLibrary/Common.hlsl"
@@ -25,7 +28,7 @@ Shader "Custom RP/Color Unlit" {
                 }
 
                 float4 Fragment(float4 position : POSITION) : SV_TARGET {
-                    return _Color;
+                    return float4(_Color.rgb, 1);
                 }
             ENDHLSL
         }

@@ -7,7 +7,6 @@ struct Varyings {
 
 struct FragOut {
     float4 color : SV_TARGET;
-    float depth : SV_DEPTH;
 };
 
 float4 _Color;
@@ -21,7 +20,6 @@ Varyings Vertex(float3 vertex : POSITION) {
 FragOut Fragment(Varyings input) {
     FragOut output;
     output.color = _Color;
-    output.depth = 0;
     return output;
 }
 

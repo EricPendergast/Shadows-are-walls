@@ -176,7 +176,9 @@ public class RotatableLight : LightBase {
             if (DEBUG) {
                 Debug.Log(side.Angle());
             }
-            Gizmos.DrawLine(side.p1, side.p2);
+            var side1 = new Vector3(side.p1.x, side.p1.y, transform.position.z);
+            var side2 = new Vector3(side.p2.x, side.p2.y, transform.position.z);
+            Gizmos.DrawLine(side1, side2);
         }
     }
 
@@ -232,7 +234,9 @@ public class RotatableLight : LightBase {
         }
 
         for (int i = 0; i < vertices.Count; i++) {
-            vertices[i] = transform.InverseTransformPoint(vertices[i]);
+            var vert = transform.InverseTransformPoint(vertices[i]);
+            vert.z = transform.position.z;
+            vertices[i] = vert;
         }
 
         if (castLightMesh.vertexCount < vertices.Count) {

@@ -144,6 +144,18 @@ public partial class LightAngler : LevelObject {
         currentAngle += deltaRotation;
         angleConstraint = Math.CounterClockwiseAngleDifference(lowerBound, upperBound)/2;
     }
+
+
+    // Reverts transform.position.z back to the prefab. This code was used once
+    // to revert the z coordinate of all the light anglers, because for some
+    // reason they were all modified (and also the wrong value). I will keep it
+    // around in case I need it again.
+    void RevertLocalPositionZ() {
+        var oldPosition = transform.localPosition;
+        PrefabUtility.RevertPropertyOverride(new SerializedObject(transform).FindProperty("m_LocalPosition"), InteractionMode.UserAction);
+        oldPosition.z = transform.localPosition.z;
+        transform.localPosition = oldPosition;
+    }
 }
 
 #endif
