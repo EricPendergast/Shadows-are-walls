@@ -2,18 +2,16 @@ using UnityEngine;
 
 [RequireComponent(typeof(MeshFilter))]
 [ExecuteAlways]
-public class LampshadeRenderer : MonoBehaviour {
+public partial class LampshadeRenderer : MonoBehaviour {
     [SerializeField]
     private float apertureAngle;
 
     public void Awake() {
         GetComponent<MeshFilter>().sharedMesh = new Mesh();
-        OnApertureAngleChange(apertureAngle);
+        BuildMesh();
     }
-    
-    public void OnApertureAngleChange(float apertureAngle) {
-        this.apertureAngle = apertureAngle;
 
+    void BuildMesh() {
         Mesh mesh = GetComponent<MeshFilter>().sharedMesh;
         if (mesh == null) {
             Debug.Log("Allocating new mesh. This should not happen very often.");

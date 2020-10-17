@@ -1,7 +1,6 @@
 ﻿//using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Experimental.Rendering.Universal;
 using System.Linq;
 
 // General idea: Light finds all opaque objects in the scene, calculates all
@@ -56,7 +55,7 @@ public readonly struct LightViewTriangle {
 //      "right" and "left" are refered to as if you are facing in the
 //      direction of the light
 [RequireComponent(typeof(Rigidbody2D))]
-public class RotatableLight : LightBase {
+public partial class RotatableLight : LightBase {
     [SerializeField]
     private bool DEBUG = false;
 
@@ -116,12 +115,6 @@ public class RotatableLight : LightBase {
         return _edgeMountPoint;
     }
 
-    public void SetTargetApertureAngle(float v) {
-        apertureAngle = v;
-        if (lampshadeRenderer) {
-            lampshadeRenderer.OnApertureAngleChange(apertureAngle);
-        }
-    }
 
     public override Vector2 GetTargetPosition() {
         return body.position;
@@ -170,29 +163,6 @@ public class RotatableLight : LightBase {
                 transform.InverseTransformPoint(loc.p2),
                 transform.InverseTransformPoint(loc.p3));
     }
-
-    private void OnDrawGizmos() {
-        foreach (var side in CalculateTargetViewTriangle().GetSides()) {
-            if (DEBUG) {
-                Debug.Log(side.Angle());
-            }
-            var side1 = new Vector3(side.p1.x, side.p1.y, transform.position.z);
-            var side2 = new Vector3(side.p2.x, side.p2.y, transform.position.z);
-            Gizmos.DrawLine(side1, side2);
-        }
-    }
-
-    //void OnDrawGizmosSelected() {
-    //    Gizmos.color = Color.red;
-    //    foreach (var seg in CalculateActualViewTriangle().GetSides()) {
-    //        Gizmos.DrawLine(seg.p1, seg.p2);
-    //    }
-    //    Gizmos.color = Color.blue;
-    //    foreach (var seg in CalculateTargetViewTriangle().GetSides()) {
-    //        Gizmos.DrawLine(seg.p1, seg.p2);
-    //    }
-    //    Gizmos.color = Color.white;
-    //}
 
     protected override void Awake() {
         base.Awake();

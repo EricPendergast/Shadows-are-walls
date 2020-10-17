@@ -6,15 +6,6 @@ using UnityEditor;
 [ExecuteAlways]
 public partial class LightAngler : LevelObject {
 
-    void UndoRecordAll() {
-        foreach (Component c in gameObject.GetComponents<Component>()) {
-            Undo.RecordObject(c, "Automatically set light aperture angle");
-        }
-        foreach (Component c in Util.AllChildrenComponentsIter(gameObject)) {
-            Undo.RecordObject(c, "Automatically set light aperture angle");
-        }
-    }
-
     public float EditorGetCurrentAngle() {
         return currentAngle;
     }
@@ -53,34 +44,21 @@ public partial class LightAngler : LevelObject {
     }
 
     public void ApplySettings() {
-        foreach (Component c in gameObject.GetComponents<Component>()) {
-            Undo.RecordObject(c, "Automatically set light aperture angle");
-        }
+        Undo.RecordObject(this, "Undo Light angler");
         DoSnapping();
         DetectConstraints();
 
         angleConstraint = Mathf.Max(angleConstraint, apertureAngle/2);
         currentAngle = ClampToConstraints(currentAngle);
         if (controled != null) {
-            SetControledAngle(currentAngle);
+            controled.SetAngle(currentAngle);
             controled.SetTargetApertureAngle(apertureAngle);
-            controled.transform.localPosition = Vector3.zero;
         }
     } 
 
-    private float GetControledAngle() {
-        return controled.GetComponent<Rigidbody2D>().rotation;
-    }
-
-    private void SetControledAngle(float angle) {
-        controled.GetComponent<Rigidbody2D>().rotation = body.rotation + angle;
-        // When this is called in the editor, the transform doesn't update
-        // automatically, so we need to change it manually.
-        controled.transform.localRotation = Quaternion.Euler(0,0,angle);
-    }
-
     public override void DoSnapping() {
         if (!Application.isPlaying) {
+            Undo.RecordObject(this, "Snap LightAngler");
             if (base.snapToGrid) {
                 SnapPosition();
                 body.position = transform.position;
