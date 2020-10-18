@@ -16,6 +16,16 @@ public partial class LightAngler : LevelObject {
         ApplySettings();
     }
 
+    public float EditorGetApertureAngle() {
+        return apertureAngle;
+    }
+
+    public void EditorSetApertureAngle(float angle) {
+        Undo.RecordObject(this, "Change aperture angle");
+        apertureAngle = angle;
+        ApplySettings();
+    }
+
     void Update() {
         if (!Application.isPlaying) {
             ApplySettings();
@@ -23,13 +33,13 @@ public partial class LightAngler : LevelObject {
     }
 
     private void OnDrawGizmos() {
-        DrawGizmos(1);
+        //DrawGizmos(1);
     }
-
+    
     protected override void OnDrawGizmosSelected() {
-        DrawGizmos(20);
+        //DrawGizmos(20);
     }
-
+    
     void DrawGizmos(float gizmoLength) {
         if (unconstrained) {
             return;
@@ -37,7 +47,7 @@ public partial class LightAngler : LevelObject {
         Gizmos.color = Color.red;
         Gizmos.DrawRay(body.position, Quaternion.Euler(0,0,body.rotation - angleConstraint)*Vector2.right*gizmoLength);
         Gizmos.DrawRay(body.position, Quaternion.Euler(0,0,body.rotation - (angleConstraint - apertureAngle))*Vector2.right*gizmoLength);
-
+    
         Gizmos.color = Color.green;
         Gizmos.DrawRay(body.position, Quaternion.Euler(0,0,body.rotation + angleConstraint)*Vector2.right*gizmoLength);
         Gizmos.DrawRay(body.position, Quaternion.Euler(0,0,body.rotation + (angleConstraint - apertureAngle))*Vector2.right*gizmoLength);
@@ -48,7 +58,9 @@ public partial class LightAngler : LevelObject {
         DoSnapping();
         DetectConstraints();
 
-        angleConstraint = Mathf.Max(angleConstraint, apertureAngle/2);
+        apertureAngle = Mathf.Round(apertureAngle/5)*5;
+        apertureAngle = Mathf.Clamp(apertureAngle, 1, angleConstraint*2);
+
         currentAngle = ClampToConstraints(currentAngle);
         if (controled != null) {
             controled.SetAngle(currentAngle);
