@@ -30,24 +30,9 @@ public class LightAnglerDeprecated : LevelObject, Interactable {
     private RelativeJoint2D myJoint;
 
     public void Start() {
-        ApplySettings();
-        myJoint = gameObject.AddComponent<RelativeJoint2D>();
-        myJoint.connectedBody = controled.GetComponent<Rigidbody2D>();
-        myJoint.maxForce = 80;
-        myJoint.maxTorque = 10;
-        myJoint.autoConfigureOffset = false;
-        currentAngle = 0;
-        myJoint.angularOffset = currentAngle;
-
-        MovePosition(0);
     }
 
     public void Interact(Vector2 direction) {
-        if (direction.x < 0) {
-            MovePosition(-1);
-        } else if (direction.x > 0) {
-            MovePosition(1);
-        }
     }
 
     // This can't be interacted with directly
@@ -56,49 +41,8 @@ public class LightAnglerDeprecated : LevelObject, Interactable {
     }
 
     public void MovePosition(int direction) {
-        var minAngle = Mathf.Min(-angleLeft, angleRight);
-        var maxAngle = Mathf.Max(-angleLeft, angleRight);
-        if (-angleLeft > angleRight) {
-            direction = -direction;
-        }
-
-        var delta = direction*speed*Time.deltaTime;
-        var actualAngle = myJoint.connectedBody.rotation - body.rotation;
-        var newCurrentAngle = currentAngle + delta;
-        if (useConstraints) {
-            newCurrentAngle = Mathf.Clamp(newCurrentAngle, minAngle, maxAngle);
-        }
-      
-        newCurrentAngle = Mathf.Clamp(newCurrentAngle, actualAngle - Mathf.Abs(2*delta), actualAngle + Mathf.Abs(2*delta));
-
-        currentAngle = newCurrentAngle;
-        myJoint.angularOffset = currentAngle;
-    }
-
-    private void OnDrawGizmos() {
-        DrawGizmos(1);
-    }
-
-    protected void OnDrawGizmosSelected() {
-        DrawGizmos(20);
-    }
-
-    void DrawGizmos(float gizmoLength) {
-        Gizmos.color = Color.red;
-        Gizmos.DrawRay(body.position, Quaternion.Euler(0,0,body.rotation - angleLeft - apertureAngle/2)*Vector2.right*gizmoLength);
-        Gizmos.DrawRay(body.position, Quaternion.Euler(0,0,body.rotation - angleLeft + apertureAngle/2)*Vector2.right*gizmoLength);
-
-        Gizmos.color = Color.yellow;
-        Gizmos.DrawRay(body.position, Quaternion.Euler(0,0,body.rotation + angleRight - apertureAngle/2)*Vector2.right*gizmoLength);
-        Gizmos.DrawRay(body.position, Quaternion.Euler(0,0,body.rotation + angleRight + apertureAngle/2)*Vector2.right*gizmoLength);
     }
 
     public void ApplySettings() {
-        var minAngle = Mathf.Min(-angleLeft, angleRight);
-        var maxAngle = Mathf.Max(-angleLeft, angleRight);
-        currentAngle = Mathf.Clamp(currentAngle, minAngle, maxAngle);
-        controled.transform.rotation = Quaternion.Euler(0,0,currentAngle)*transform.rotation;
-        controled.SetTargetApertureAngle(apertureAngle);
-        controled.transform.localPosition = Vector3.zero;
     }
 }
