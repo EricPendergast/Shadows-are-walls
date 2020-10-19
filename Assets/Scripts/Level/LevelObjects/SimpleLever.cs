@@ -34,8 +34,7 @@ public class SimpleLever : LevelObject, Interactable {
         controled.Interact(direction);
     }
 
-    protected override void OnDrawGizmosSelected() {
-        base.OnDrawGizmosSelected();
+    protected void OnDrawGizmosSelected() {
         Gizmos.color = Color.magenta;
         if (controledGameObject != null) {
             Gizmos.DrawLine(transform.position, controledGameObject.transform.position);

@@ -24,11 +24,10 @@ public abstract class SolidTriangle : LevelObject {
         if (firstApplySettings) {
             GetComponent<MeshFilter>().sharedMesh = new Mesh();
         }
-        if (snapToGrid) {
-            this.SnapPosition();
-            p1 = Snap(p1);
-            p2 = Snap(p2);
-            p3 = Snap(p3);
+        if (TryGetComponent<Snapper>(out var snapper)) {
+            p1 = snapper.SnapPoint(p1);
+            p2 = snapper.SnapPoint(p2);
+            p3 = snapper.SnapPoint(p3);
         }
         var mesh = GetComponent<MeshFilter>().sharedMesh;
         //var mesh = GetComponent<MeshFilter>().sharedMesh;

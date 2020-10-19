@@ -3,12 +3,12 @@ using UnityEditor;
 
 [CustomEditor(typeof(Positioner), true)]
 [CanEditMultipleObjects]
-public class PositionerEditor : SnappableObjectEditor {
+public class PositionerEditor : Editor {
     public override void OnInspectorGUI() {
         base.OnInspectorGUI();
     }
 
-    public override void OnSceneGUI() {
+    public void OnSceneGUI() {
         if (!Application.isPlaying) {
             var positioner = target as Positioner;
 
@@ -20,7 +20,5 @@ public class PositionerEditor : SnappableObjectEditor {
             } 
             positioner.EditorUpdate();
         }
-
-        base.OnSceneGUI();
     }
 }

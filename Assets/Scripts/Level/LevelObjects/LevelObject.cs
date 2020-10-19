@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class LevelObject : SnappableObject {
+public class LevelObject : MonoBehaviour {
     protected Rigidbody2D body;
     new protected Collider2D collider;
 
@@ -17,9 +17,5 @@ public class LevelObject : SnappableObject {
                 collider = gameObject.AddComponent<BoxCollider2D>();
             }
         }
-    }
-
-    protected virtual void OnDrawGizmosSelected() {
-        GizmosUtil.DrawConstantWidthSphere(transform.TransformPoint(snapPoint), .025f);
     }
 }

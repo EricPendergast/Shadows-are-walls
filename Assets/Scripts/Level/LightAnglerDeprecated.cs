@@ -79,7 +79,7 @@ public class LightAnglerDeprecated : LevelObject, Interactable {
         DrawGizmos(1);
     }
 
-    protected override void OnDrawGizmosSelected() {
+    protected void OnDrawGizmosSelected() {
         DrawGizmos(20);
     }
 
@@ -100,14 +100,5 @@ public class LightAnglerDeprecated : LevelObject, Interactable {
         controled.transform.rotation = Quaternion.Euler(0,0,currentAngle)*transform.rotation;
         controled.SetTargetApertureAngle(apertureAngle);
         controled.transform.localPosition = Vector3.zero;
-    }
-
-    public override void DoSnapping() {
-        if (!Application.isPlaying) {
-            if (base.snapToGrid) {
-                SnapPosition();
-                body.position = transform.position;
-            }
-        }
     }
 }

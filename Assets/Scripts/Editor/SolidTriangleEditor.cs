@@ -18,7 +18,6 @@ public class SolidTriangleEditor : Editor {
                 DoPositionHandle(ref tri.p3);
             }
 
-            tri.DoSnapping();
             tri.ApplySettings();
         }
     }

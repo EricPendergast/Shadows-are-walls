@@ -41,7 +41,7 @@ public partial class LightAngler : LevelObject {
         //DrawGizmos(1);
     }
     
-    protected override void OnDrawGizmosSelected() {
+    protected void OnDrawGizmosSelected() {
         //DrawGizmos(20);
     }
     
@@ -60,7 +60,9 @@ public partial class LightAngler : LevelObject {
 
     public void ApplySettings() {
         OnAboutToChange(this, "Undo Light angler");
-        DoSnapping();
+        if (TryGetComponent<Snapper>(out var snapper)) {
+            snapper.DoSnapping();
+        }
         DetectConstraints();
 
         apertureAngle = Mathf.Round(apertureAngle/5)*5;
@@ -72,16 +74,6 @@ public partial class LightAngler : LevelObject {
             controled.SetTargetApertureAngle(apertureAngle);
         }
     } 
-
-    public override void DoSnapping() {
-        if (!Application.isPlaying) {
-            OnAboutToChange(this, "Snap LightAngler");
-            if (base.snapToGrid) {
-                SnapPosition();
-                body.position = transform.position;
-            }
-        }
-    }
 
     private bool IsAngleUnoccupied(float angle) {
         foreach (RaycastHit2D hit in Physics2D.LinecastAll(body.position + Math.Rotate(Vector2.right, angle)*.1f, body.position + Math.Rotate(Vector2.right, angle)*.5f)) {

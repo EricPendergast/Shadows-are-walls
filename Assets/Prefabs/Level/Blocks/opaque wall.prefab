@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3925993344884474903}
   - component: {fileID: 3925993344884474904}
+  - component: {fileID: 2827476111186083580}
   - component: {fileID: 3925993344884474900}
   - component: {fileID: 3925993344884474901}
   - component: {fileID: 3925993344884474906}
@@ -47,7 +48,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c1a2b8ddbc4230907a6c8449646983a1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  snapToGrid: 1
+--- !u!114 &2827476111186083580
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3925993344884474905}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ab67d60f53bf6e14c98b695a62a41ab1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  enable: 1
   gridSize: 1
   snapPoint: {x: -0.5, y: -0.5}
 --- !u!50 &3925993344884474900

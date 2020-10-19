@@ -3,12 +3,12 @@ using UnityEditor;
 
 [CustomEditor(typeof(LightAngler))]
 [CanEditMultipleObjects]
-public class LightAnglerEditor : LevelObjectEditor {
+public class LightAnglerEditor : Editor {
     public override void OnInspectorGUI() {
         base.OnInspectorGUI();
     }
 
-    public override void OnSceneGUI() {
+    public void OnSceneGUI() {
         if (!Application.isPlaying) {
             var lightAngler = target as LightAngler;
 
@@ -26,7 +26,6 @@ public class LightAnglerEditor : LevelObjectEditor {
                 lightAngler.EditorSetApertureAngle(newApertureAngle);
             }
         }
-        base.OnSceneGUI();
     }
 
     private float DiscHandle(float currentAngle, float scale) {

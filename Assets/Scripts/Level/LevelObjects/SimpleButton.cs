@@ -72,8 +72,7 @@ public class SimpleButton : LevelObject {
         return collider.isTrigger || collider.attachedRigidbody.constraints == RigidbodyConstraints2D.FreezeAll || collider.attachedRigidbody.bodyType == RigidbodyType2D.Static;
     }
 
-    protected override void OnDrawGizmosSelected() {
-        base.OnDrawGizmosSelected();
+    protected void OnDrawGizmosSelected() {
         Gizmos.color = Color.magenta;
         if (controledGameObject != null) {
             Gizmos.DrawLine(transform.position, controledGameObject.transform.position);

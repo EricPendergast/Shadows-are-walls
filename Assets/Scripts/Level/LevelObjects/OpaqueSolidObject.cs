@@ -59,11 +59,4 @@ public class OpaqueSolidObject : LevelObject {
             return LineSegment.zero;
         }
     }
-
-    public override void DoSnapping() {
-        if (snapToGrid) {
-            SnapScale();
-            SnapPosition();
-        }
-    }
 }
