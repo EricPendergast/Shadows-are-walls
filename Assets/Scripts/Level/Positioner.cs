@@ -3,18 +3,8 @@ using UnityEngine;
 [ExecuteAlways]
 [RequireComponent(typeof(Rigidbody2D))]
 public partial class Positioner : MonoBehaviour, Interactable {
-
-    public Vector2 left {
-        get => transform.position;
-        set => transform.position = value;
-    }
-
     [SerializeField]
-    public Vector2 right;
-    //public Vector2 right {
-    //    get => transform.TransformPoint(rightLocal);
-    //    set => rightLocal = transform.InverseTransformPoint(value);
-    //}
+    private Vector2 destination;
     [SerializeField]
     private float position = 0;
     [SerializeField]
@@ -47,7 +37,9 @@ public partial class Positioner : MonoBehaviour, Interactable {
             return;
         } 
 
-        if (Vector2.Dot(direction, right - left) > 0) {
+        Vector2 origin = (Vector2)transform.position;
+
+        if (Vector2.Dot(direction, destination - origin) > 0) {
             MoveRaw(1);
         } else {
             MoveRaw(-1);
@@ -62,11 +54,13 @@ public partial class Positioner : MonoBehaviour, Interactable {
     }
 
     private void MoveRaw(int direction) {
-        var deltaPosition = direction * speed / ((left - right).magnitude) * Time.deltaTime;
+        Vector2 origin = (Vector2)transform.position;
+
+        var deltaPosition = direction * speed / ((origin - destination).magnitude) * Time.deltaTime;
         position = Mathf.Clamp(position + deltaPosition, 0, 1);
-        var newTarget = Vector2.Lerp(left, right, position);
+        var newTarget = Vector2.Lerp(origin, destination, position);
         myJoint.linearOffset = transform.InverseTransformPoint(newTarget);
         //myJoint.angularOffset = GetComponent<Rigidbody2D>().rotation - controled.rotation;
-        //controled.SetTargetPosition(Vector2.Lerp(left.Position(), right.Position(), position));
+        //controled.SetTargetPosition(Vector2.Lerp(left.Position(), destination.Position(), position));
     }
 }

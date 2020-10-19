@@ -6,17 +6,12 @@ using UnityEditor;
 [ExecuteAlways]
 public partial class LightAngler : LevelObject {
 
-    private void OnAboutToChange(Object obj, string msg) {
-        Undo.RecordObject(obj, msg);
-        PrefabUtility.RecordPrefabInstancePropertyModifications(obj);
-    }
-
     public float EditorGetCurrentAngle() {
         return currentAngle;
     }
 
     public void EditorSetCurrentAngle(float angle) {
-        OnAboutToChange(this, "Change current angle");
+        EditorHelper.RecordObjectUndo(this, "Change current angle");
         currentAngle = angle;
         ApplySettings();
     }
@@ -26,7 +21,7 @@ public partial class LightAngler : LevelObject {
     }
 
     public void EditorSetApertureAngle(float angle) {
-        OnAboutToChange(this, "Change aperture angle");
+        EditorHelper.RecordObjectUndo(this, "Change aperture angle");
         apertureAngle = angle;
         ApplySettings();
     }
@@ -59,7 +54,7 @@ public partial class LightAngler : LevelObject {
     }
 
     public void ApplySettings() {
-        OnAboutToChange(this, "Undo Light angler");
+        EditorHelper.RecordObjectUndo(this, "Undo Light angler");
         if (TryGetComponent<Snapper>(out var snapper)) {
             snapper.DoSnapping();
         }

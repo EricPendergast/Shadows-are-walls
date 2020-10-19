@@ -4,16 +4,60 @@ using UnityEngine;
 using UnityEditor;
 
 public partial class Positioner : MonoBehaviour {
+
+    public void EditorSetPosition(Vector2 position) {
+        EditorHelper.RecordObjectUndo(this, "Set position");
+
+        Vector2 toPosition = position - (Vector2)transform.position;
+        Vector2 toDestination = destination - (Vector2)transform.position;
+
+        this.position = toPosition.magnitude / toDestination.magnitude*Mathf.Sign(Vector2.Dot(toPosition, toDestination));
+        ApplySettings();
+    }
+
+    public Vector2 EditorGetPosition() {
+        return Vector2.Lerp(transform.position, destination, position);
+    }
+
+    public Vector2 EditorGetOrigin() {
+        return transform.position;
+    }
+    public Vector2 EditorGetDestination() {
+        return destination;
+    }
+
+    public void EditorSetDestination(Vector2 destination) {
+        EditorHelper.RecordObjectUndo(this, "Set destination");
+        this.destination = destination;
+        ApplySettings();
+    }
+
     void Update() {
+        if (Application.isPlaying) {
+            ApplySettings();
+        }
+    }
+
+    void ApplySettings() {
+        EditorHelper.RecordObjectUndo(this, "Apply Settings");
+
         if (TryGetComponent<Snapper>(out var snapper)) {
-            left = snapper.SnapPoint(left);
-            right = snapper.SnapPoint(right);
+            snapper.DoSnapping();
+            this.destination = snapper.SnapPoint(this.destination);
+        }
+        position = Mathf.Clamp01(position);
+
+        if (controled != null) {
+            EditorHelper.RecordObjectUndo(controled.transform, "Apply Settings");
+
+            controled.transform.position = Vector2.Lerp(transform.position, destination, position);
+            controled.transform.localRotation = Quaternion.Euler(0,0,rotation);
         }
     }
 
     void OnDrawGizmos() {
         Gizmos.color = Color.cyan;
-        Gizmos.DrawLine(left, right);
+        Gizmos.DrawLine(transform.position, destination);
     }
 
     //void OnDrawGizmosSelected() {
@@ -30,14 +74,6 @@ public partial class Positioner : MonoBehaviour {
     //        Gizmos.DrawLine(left, right);
     //    }
     //}
-
-    public void EditorUpdate() {
-        position = Mathf.Clamp01(position);
-        if (controled != null) {
-            controled.transform.position = Vector2.Lerp(left, right, position);
-            controled.transform.localRotation = Quaternion.Euler(0,0,rotation);
-        }
-    }
 }
 
 #endif

@@ -17,6 +17,9 @@ public partial class Snapper : MonoBehaviour {
 
     public void DoSnapping() {
         if (enable) {
+            if (Application.isPlaying) {
+                EditorHelper.RecordObjectUndo(transform, "Snap");
+            }
             SnapScale();
             SnapPosition();
         }

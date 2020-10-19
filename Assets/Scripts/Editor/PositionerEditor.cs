@@ -13,12 +13,21 @@ public class PositionerEditor : Editor {
             var positioner = target as Positioner;
 
             EditorGUI.BeginChangeCheck();
-            var newPos = Handles.PositionHandle(positioner.right, Quaternion.identity);
+            var newDest = Handles.PositionHandle(positioner.EditorGetDestination(), Quaternion.identity);
             if (EditorGUI.EndChangeCheck()) {
-                 Undo.RecordObject(positioner, "Change movement path");
-                 positioner.right = newPos;
+                 positioner.EditorSetDestination(newDest);
             } 
-            positioner.EditorUpdate();
+
+            EditorGUI.BeginChangeCheck();
+            var origin = positioner.EditorGetOrigin();
+            var dest = positioner.EditorGetDestination();
+            Vector2 position = positioner.EditorGetPosition();
+
+            Vector2 newPosition = Handles.Slider(position, origin-dest, HandleUtility.GetHandleSize(position)*.25f, Handles.ConeHandleCap, .1f);
+
+            if (EditorGUI.EndChangeCheck()) {
+                positioner.EditorSetPosition(newPosition);
+            }
         }
     }
 }
