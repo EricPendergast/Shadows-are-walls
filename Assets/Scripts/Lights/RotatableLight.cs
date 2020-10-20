@@ -105,7 +105,8 @@ public partial class RotatableLight : LightBase {
 
     private Rigidbody2D _edgeMountPoint;
 
-    public override Rigidbody2D GetEdgeMountPoint() { if (_edgeMountPoint == null) {
+    public override Rigidbody2D GetEdgeMountPoint() {
+        if (_edgeMountPoint == null) {
             _edgeMountPoint = Util.CreateChild<Rigidbody2D>(transform);
             //_edgeMountPoint.constraints = RigidbodyConstraints2D.FreezeRotation;
             _edgeMountPoint.constraints = RigidbodyConstraints2D.FreezeAll;
@@ -114,7 +115,6 @@ public partial class RotatableLight : LightBase {
         }
         return _edgeMountPoint;
     }
-
 
     public override Vector2 GetTargetPosition() {
         return body.position;
@@ -253,45 +253,12 @@ public partial class RotatableLight : LightBase {
         edge.GetComponent<Rigidbody2D>().mass = currentSettings.mass;
         plasticMode -= Time.deltaTime;
     
-        //if (difference.magnitude != 0) {
-            //Debug.Log("difference magnitude " + difference.magnitude);
-            //difference = difference.normalized * (difference.magnitude - .13f);
-            // The angle change from actual to target
+        var simpleAngleDelta = new LineSegment(body.position, point + difference).Angle(point);
+        var angleDelta = simpleAngleDelta + body.angularVelocity*Time.deltaTime*currentSettings.velocityCorrectionConstant;
 
-            var simpleAngleDelta = new LineSegment(body.position, point + difference).Angle(point);
-            var angleDelta = simpleAngleDelta + body.angularVelocity*Time.deltaTime*currentSettings.velocityCorrectionConstant;
-            //if (DEBUG) {
-            //    Debug.Log(difference.magnitude);
-            //}
-            //Debug.Log("Simpleangledelta" + simpleAngleDelta);
-            //Debug.Log(angleDelta);
-            //angleDelta = Mathf.Clamp(angleDelta, -.5f, .5f);
-            //Debug.Log("angle delta " + angleDelta);
-            //var torque = PhysicsHelper.GetRotateToTorque(body, 0, angleDelta);
-            //var torque = PhysicsHelper.GetRotateToTorque(body, 0, 0);
-            //Debug.Log("test1 " + torque);
-            //Debug.Log("test2 " + point);
-            //Debug.Log("test3 " + difference);
-            //Debug.Log("test5 " + angleDelta);
-            //body.AddTorque(torque);
-            //body.angularVelocity *= .9f;
-            var torque = PhysicsHelper.GetSpringTorque(angleDelta, 0, 0, 0, currentSettings.correctionSpringConstant, currentSettings.correctionDampingConstant);
-            body.AddTorque(torque);
-            body.angularVelocity *= currentSettings.velocityMultiplier;
-            //body.AddTorque(Mathf.Clamp(torque, -maxCorrectionTorque, maxCorrectionTorque));
-            //body.angularVelocity *= Mathf.Lerp(1, .3f, difference.magnitude*5);
-            //body.angularVelocity += edge.AngularVelocity();
-            //body.angularVelocity /= 2;
-            //if (difference.magnitude > .01) {
-            //    body.angularVelocity *= .5f;
-            //}
-            //if (simpleAngleDelta * body.angularVelocity > 0) {
-            //    StartCoroutine(SlowVelocityCoroutine());
-            //    Debug.Log("Uh oh" + simpleAngleDelta);
-            //}
-            //var torque2 = PhysicsHelper.GetSpringTorque(body.rotation, targetAngle, body.angularVelocity, [>edge.AngularVelocity()<]0, toTargetSpringConstant, toTargetDampingConstant);
-            //body.AddTorque(Mathf.Clamp(torque2, -maxToTargetTorque, maxToTargetTorque));
-        //}
+        var torque = PhysicsHelper.GetSpringTorque(angleDelta, 0, 0, 0, currentSettings.correctionSpringConstant, currentSettings.correctionDampingConstant);
+        body.AddTorque(torque);
+        body.angularVelocity *= currentSettings.velocityMultiplier;
     }
 
     private void SetUpLightEdges() {

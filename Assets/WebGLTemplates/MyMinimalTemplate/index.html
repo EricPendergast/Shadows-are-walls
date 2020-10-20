@@ -1,18 +1,45 @@
 <!DOCTYPE html>
 <html lang="en-us">
-
   <head>
     <meta charset="utf-8">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>Unity WebGL Player | {{{PRODUCT_NAME}}}</title>
-    <script src="%UNITY_WEBGL_LOADER_URL%"></script>
-    <script>
-        var unityInstance = UnityLoader.instantiate("unityContainer", "{{{LOADER_FILENAME}}}");
-    </script>
+    <title>Unity WebGL Player | {{{ PRODUCT_NAME }}}</title>
   </head>
   
   <body>
-      <div id="unityContainer" style="width: {{{WIDTH}}}px; height: {{{HEIGHT}}}px; margin: auto"></div>
+      <canvas id="unityContainer" style="width: {{{ WIDTH }}}px; height: {{{ HEIGHT }}}px; margin: auto"></canvas>
+      <script src="Build/{{{ LOADER_FILENAME }}}"></script>
+      <script>
+        var buildUrl = "Build";
+        var config = {
+            dataUrl: buildUrl + "/{{{ DATA_FILENAME }}}",
+            frameworkUrl: buildUrl + "/{{{ FRAMEWORK_FILENAME }}}",
+            codeUrl: buildUrl + "/{{{ CODE_FILENAME }}}",
+        #if MEMORY_FILENAME
+            memoryUrl: buildUrl + "/{{{ MEMORY_FILENAME }}}",
+        #endif
+        #if SYMBOLS_FILENAME
+            symbolsUrl: buildUrl + "/{{{ SYMBOLS_FILENAME }}}",
+        #endif
+            streamingAssetsUrl: "StreamingAssets",
+            companyName: "{{{ COMPANY_NAME }}}",
+            productName: "{{{ PRODUCT_NAME }}}",
+            productVersion: "{{{ PRODUCT_VERSION }}}",
+        };
+
+        function onProgress(progress) {
+
+        }
+        function onSuccess(unityInstance) {
+
+        }
+        function onError(message) {
+
+        }
+
+        canvas = document.getElementById('unityContainer')
+
+        createUnityInstance(canvas, config, onProgress).then(onSuccess).catch(onError);
+      </script>
   </body>
-  
 </html>
