@@ -3,12 +3,16 @@ using System.Collections.Generic;
 
 public abstract class ShadowEdgeBase : AllTracker<ShadowEdgeBase> {
     [SerializeField]
-    protected bool DEBUG = false;
+    protected bool DO_DEBUG = false;
 
     private static List<LineSegment> pieces = new List<LineSegment>();
 
-    private readonly float maxTorque = 1000000000;
-    private readonly float maxAngularSpeed = 120;
+    [SerializeField]
+    private float springConstant = 10;
+    [SerializeField]
+    private float dampingConstant = 1;
+    [SerializeField]
+    private float maxAccel = 1000;
 
     public enum Side {
         right,
@@ -24,7 +28,6 @@ public abstract class ShadowEdgeBase : AllTracker<ShadowEdgeBase> {
     [SerializeField]
     private Side illuminatedSide;
     private Side initialIlluminatedSide;
-    private HingeJoint2D joint;
 
     // The line segment used to calculate intersections
     public abstract LineSegment GetDivider();
@@ -66,8 +69,9 @@ public abstract class ShadowEdgeBase : AllTracker<ShadowEdgeBase> {
         gameObject.layer = PhysicsHelper.shadowEdgeLayer;
         rb = gameObject.AddComponent<Rigidbody2D>();
         rb.gravityScale = 0;
-        rb.mass = 10;
+        rb.mass = 100;
         rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
+        rb.constraints = RigidbodyConstraints2D.FreezePosition;
 
         // For now, we will not use platform effectors since the edge case they
         // were trying to fix no longer seems to happen. And also they make it
@@ -94,13 +98,6 @@ public abstract class ShadowEdgeBase : AllTracker<ShadowEdgeBase> {
         this.lightSource = lightSource;
         this.initialIlluminatedSide = illuminatedSide;
         this.illuminatedSide = illuminatedSide;
-
-        joint = lightSource.GetEdgeMountPoint().gameObject.AddComponent<HingeJoint2D>();
-        joint.autoConfigureConnectedAnchor = false;
-        joint.connectedBody = rb;
-        joint.connectedAnchor = Vector2.zero;
-        joint.useMotor = true;
-        joint.motor = new JointMotor2D{maxMotorTorque = 0, motorSpeed = 0};
     }
 
     private bool initialized = false;
@@ -109,7 +106,7 @@ public abstract class ShadowEdgeBase : AllTracker<ShadowEdgeBase> {
     }
 
     protected void AddSimpleForces() {
-        if (DEBUG) {
+        if (DO_DEBUG) {
             Debug.Log("Break point");
         }
         if (target == LineSegment.zero) {
@@ -118,18 +115,15 @@ public abstract class ShadowEdgeBase : AllTracker<ShadowEdgeBase> {
         var targetAngle = target.Angle();
         var deltaAngle = Mathf.DeltaAngle(rb.rotation, targetAngle);
 
-        var motorSpeed = deltaAngle/Time.deltaTime;
-        if (DEBUG) {
-            Debug.Log("Motor speed: " + motorSpeed);
-            Debug.Log("Target angle: " + targetAngle);
-            Debug.Log("Delta angle: " + targetAngle);
-        }
-        joint.motor = new JointMotor2D{maxMotorTorque = maxTorque, motorSpeed = Mathf.Clamp(motorSpeed, -maxAngularSpeed, maxAngularSpeed)};
-        //joint.connectedAnchor = new Vector2(-(lightSource.GetComponent<Rigidbody2D>().position - target.p1).magnitude, 0);
+        // Notice that here we are treating torque like acceleration. This is
+        // because we want the spring to effect all objects' accereration
+        // identically, where it does not depend on their mass. This makes
+        // shadow edges reach their targets consistently.
 
-        //PhysicsHelper.GetForceAndTorque(rb, target, out Vector2 force, out float torque);
-        //rb.AddForce(force);
-        //rb.AddTorque(torque);
+        var accel = PhysicsHelper.GetSpringTorque(0, deltaAngle, rb.angularVelocity, lightSource.GetAngularVelocity(), springConstant, dampingConstant);
+        accel = Mathf.Clamp(accel, -maxAccel, maxAccel);
+
+        rb.AddTorque(accel * rb.inertia);
     }
 
     protected void UpdateColliders() {
@@ -232,7 +226,6 @@ public abstract class ShadowEdgeBase : AllTracker<ShadowEdgeBase> {
 
     protected override void OnDestroy() {
         base.OnDestroy();
-        Destroy(joint);
     }
 
 

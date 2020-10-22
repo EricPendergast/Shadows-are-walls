@@ -22,9 +22,6 @@ public partial class RotatableLight {
 
     private void OnDrawGizmos() {
         foreach (var side in CalculateTargetViewTriangle().GetSides()) {
-            if (DEBUG) {
-                Debug.Log(side.Angle());
-            }
             var side1 = new Vector3(side.p1.x, side.p1.y, transform.position.z);
             var side2 = new Vector3(side.p2.x, side.p2.y, transform.position.z);
             Gizmos.DrawLine(side1, side2);

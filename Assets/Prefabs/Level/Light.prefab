@@ -68,6 +68,9 @@ MonoBehaviour:
   plasticModeDuration: 0.1
   lampshadeRenderer: {fileID: 2249340161031165758}
   shadowParent: {fileID: 0}
+  mult: 1
+  maxAccel: 100
+  velocityMultiplier: 0.9
 --- !u!50 &1973197721580949901
 Rigidbody2D:
   serializedVersion: 4
@@ -82,7 +85,7 @@ Rigidbody2D:
   m_UseAutoMass: 0
   m_Mass: 1
   m_LinearDrag: 0
-  m_AngularDrag: 1
+  m_AngularDrag: 10
   m_GravityScale: 0
   m_Material: {fileID: 0}
   m_Interpolate: 0
@@ -143,10 +146,13 @@ MonoBehaviour:
   apertureAngle: 35
   speed: 50
   currentVelocity: 0
-  acceleration: 100
+  acceleration: 5
   decceleration: 400
   rotatedThisFrame: 0
   controled: {fileID: 1973197721580949894}
+  springConstant: 3
+  dampingConstant: 0
+  maxAccel: 0
 --- !u!114 &1792074600334544284
 MonoBehaviour:
   m_ObjectHideFlags: 0

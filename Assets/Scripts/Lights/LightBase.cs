@@ -30,4 +30,6 @@ public abstract class LightBase : AllTracker<LightBase> {
     }
 
     public abstract Vector2 GetTargetPosition();
+
+    public abstract float GetAngularVelocity();
 }

@@ -104,10 +104,14 @@ class PhysicsHelper {
         GetForceAndTorque(body, target, out force, out torque);
     }
 
+    /// Returns the force on an object with angle rbAngle, and angular velocity
+    /// rbAngVel, when attached to a spring with the various passed in
+    /// properties.
+    /// Using the equation F = -k*x - b*v
     public static float GetSpringTorque(float rbAngle, float springAngle, float rbAngVel, float springAngVel, float springConstant, float damping) {
-        // Using the equation F = -k*x - b*v
         var angleDifference = rbAngle - springAngle;
-        return -angleDifference * springConstant - (rbAngVel - springAngVel)*damping;
+        var velDifference = rbAngVel - springAngVel;
+        return -angleDifference*springConstant - velDifference*damping;
     }
 
     public static float GetInertia(Rigidbody2D body, List<BoxCollider2D> boxes, Vector2 pivot) {

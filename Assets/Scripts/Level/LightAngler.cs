@@ -33,6 +33,15 @@ public partial class LightAngler : LevelObject, Interactable {
     [SerializeField]
     public RotatableLight controled;
 
+    [SerializeField]
+    private float springConstant;
+    [SerializeField]
+    private float dampingConstant;
+
+    [SerializeField]
+    private float maxAccel;
+
+
     private RelativeJoint2D myJoint;
 
     public void Start() {
@@ -43,12 +52,12 @@ public partial class LightAngler : LevelObject, Interactable {
             myJoint = gameObject.AddComponent<RelativeJoint2D>();
         }
         myJoint.connectedBody = controled.GetComponent<Rigidbody2D>();
-        myJoint.maxForce = 80;
-        myJoint.maxTorque = 10;
+        //myJoint.maxForce = 80;
+        //myJoint.maxTorque = 10;
+        myJoint.maxForce = 0;
+        myJoint.maxTorque = 0;
         myJoint.autoConfigureOffset = false;
         myJoint.angularOffset = currentAngle;
-
-        Rotate(0);
     }
 
     public void Interact(Vector2 direction) {
@@ -70,6 +79,11 @@ public partial class LightAngler : LevelObject, Interactable {
     }
 
     private void Rotate(int direction) {
+        rotatedThisFrame = true;
+        controled.ApplyAngularAcceleration(direction * acceleration);
+    }
+
+    private void RotateOld(int direction) {
         rotatedThisFrame = true;
 
         float currentAcceleration;
@@ -98,7 +112,7 @@ public partial class LightAngler : LevelObject, Interactable {
             maxDiff /= 2;
         }
       
-        var actualAngle = myJoint.connectedBody.rotation - body.rotation;
+        var actualAngle = controled.GetRotation() - body.rotation;
         var difference = Math.AngleDifference(actualAngle, currentAngle);
 
         if (Mathf.Abs(difference) > maxDiff) {
@@ -107,7 +121,11 @@ public partial class LightAngler : LevelObject, Interactable {
         }
         currentAngle = ClampToConstraints(currentAngle);
 
-        myJoint.angularOffset = actualAngle + difference;
+        var rotAccel = -PhysicsHelper.GetSpringTorque(actualAngle, currentAngle, 0, 0, springConstant, dampingConstant);
+        rotAccel = Mathf.Clamp(rotAccel, -maxAccel, maxAccel);
+        //controled.ApplyAngularAcceleration(rotAccel);
+        //Debug.Log("Applied " + rotAccel);
+        //myJoint.angularOffset = actualAngle + difference;
     }
 
     private void FixedUpdate() {

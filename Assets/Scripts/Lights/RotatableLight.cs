@@ -116,6 +116,18 @@ public partial class RotatableLight : LightBase {
         return _edgeMountPoint;
     }
 
+    public void ApplyAngularAcceleration(float accel) {
+        body.AddTorque(accel*body.inertia);
+    }
+
+    public float GetRotation() {
+        return body.rotation;
+    }
+
+    public override float GetAngularVelocity() {
+        return body.angularVelocity;
+    }
+
     public override Vector2 GetTargetPosition() {
         return body.position;
     }
@@ -235,30 +247,28 @@ public partial class RotatableLight : LightBase {
     }
 
     private void DoForces() {
-        //return;
         DoForces(rightShadowEdge);
         DoForces(leftShadowEdge);
     }
 
+    public float mult = 1;
+    public float maxAccel = 1;
+
     private void DoForces(LightEdge edge) {
-        edge.MaxDifferenceFromTarget(out var point, out var difference);
-
-        var currentSettings = plasticMode > 0 ? plasticModeSettings : settings;
-
-        if (difference.magnitude > currentSettings.plasticModeDifferenceThreshold) {
-            plasticMode = plasticModeDuration;
+        var edgeAccel = edge.GetAppliedAngularAcceleration();
+        if (edgeAccel != 0) {
+            Debug.Log("Edge accel: " + edgeAccel);
         }
 
-        currentSettings = plasticMode > 0 ? plasticModeSettings : settings;
-        edge.GetComponent<Rigidbody2D>().mass = currentSettings.mass;
-        plasticMode -= Time.deltaTime;
-    
-        var simpleAngleDelta = new LineSegment(body.position, point + difference).Angle(point);
-        var angleDelta = simpleAngleDelta + body.angularVelocity*Time.deltaTime*currentSettings.velocityCorrectionConstant;
+        var accel = -edge.GetAppliedAngularAcceleration()*mult;
+        accel = Mathf.Clamp(accel, -maxAccel, maxAccel);
+        //accel = Mathf.Sign(accel) * Mathf.Sqrt(Mathf.Abs(accel));
 
-        var torque = PhysicsHelper.GetSpringTorque(angleDelta, 0, 0, 0, currentSettings.correctionSpringConstant, currentSettings.correctionDampingConstant);
-        body.AddTorque(torque);
-        body.angularVelocity *= currentSettings.velocityMultiplier;
+        if (Mathf.Abs(accel) < 0) {
+            accel = 0;
+        }
+
+        body.AddTorque(accel*body.inertia);
     }
 
     private void SetUpLightEdges() {

@@ -3,8 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class LightEdge : ShadowEdgeBase {
+    private ForceMeasurer forceMeasurer;
+
     protected override void Awake() {
         base.Awake();
+
+        forceMeasurer = gameObject.AddComponent<ForceMeasurer>();
 
         //StartCoroutine(PostFixedUpdateLoop());
     }
@@ -32,6 +36,18 @@ public class LightEdge : ShadowEdgeBase {
 
     public float AngularVelocity() {
         return rb.angularVelocity;
+    }
+
+    public float GetAppliedAngularAcceleration() {
+        return forceMeasurer.GetTorqueLastFrame() / rb.inertia;
+    }
+
+    public float GetAppliedTorque() {
+        return forceMeasurer.GetTorqueLastFrame();
+    }
+
+    public Vector2 GetAppliedForce() {
+        return forceMeasurer.GetForceLastFrame();
     }
 
     // 'point' lies on the target

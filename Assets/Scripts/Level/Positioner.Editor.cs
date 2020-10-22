@@ -33,7 +33,7 @@ public partial class Positioner : MonoBehaviour {
     }
 
     void Update() {
-        if (Application.isPlaying) {
+        if (!Application.isPlaying) {
             ApplySettings();
         }
     }
