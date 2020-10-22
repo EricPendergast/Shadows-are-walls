@@ -105,6 +105,24 @@ public partial class RotatableLight : LightBase {
 
     private Rigidbody2D _edgeMountPoint;
 
+    public struct RotationConstraints {
+        public bool unconstrained;
+        public float lower;
+        public float upper;
+
+        public void Apply(Rigidbody2D body, float apertureAngle) {
+            if (!unconstrained) {
+                body.rotation = Mathf.Clamp(body.rotation, lower + apertureAngle/2, upper - apertureAngle/2);
+            }
+        }
+    }
+
+    private RotationConstraints rotationConstraints  = new RotationConstraints {
+        unconstrained = true,
+        lower = 0,
+        upper = 0
+    };
+
     public override Rigidbody2D GetEdgeMountPoint() {
         if (_edgeMountPoint == null) {
             _edgeMountPoint = Util.CreateChild<Rigidbody2D>(transform);
@@ -118,6 +136,10 @@ public partial class RotatableLight : LightBase {
 
     public void ApplyAngularAcceleration(float accel) {
         body.AddTorque(accel*body.inertia);
+    }
+
+    public void SetRotationConstraints(RotationConstraints constraints) {
+        rotationConstraints = constraints;
     }
 
     public float GetRotation() {
@@ -264,9 +286,11 @@ public partial class RotatableLight : LightBase {
         accel = Mathf.Clamp(accel, -maxAccel, maxAccel);
         //accel = Mathf.Sign(accel) * Mathf.Sqrt(Mathf.Abs(accel));
 
-        if (Mathf.Abs(accel) < 0) {
+        if (Mathf.Abs(accel) < .1) {
             accel = 0;
         }
+
+        rotationConstraints.Apply(body, apertureAngle);
 
         body.AddTorque(accel*body.inertia);
     }

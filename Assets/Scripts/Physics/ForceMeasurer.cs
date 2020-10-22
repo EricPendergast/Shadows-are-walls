@@ -22,16 +22,24 @@ public class ForceMeasurer : MonoBehaviour {
     [SerializeField]
     private FrameData thisFrame = new FrameData();
     [SerializeField]
-    private FrameData lastFrame = new FrameData();
+    private List<FrameData> lastFrames = new List<FrameData>{new FrameData(), new FrameData()};
 
     public float GetTorqueLastFrame() {
         UpdateFrameData();
-        return lastFrame.sumTorque;
+        float totalTorque = 0;
+        foreach (var frame in lastFrames) {
+            totalTorque += frame.sumTorque;
+        }
+        return totalTorque/lastFrames.Count;
     }
 
     public Vector2 GetForceLastFrame() {
         UpdateFrameData();
-        return lastFrame.sumForce;
+        Vector2 totalForce = Vector2.zero;
+        foreach (var frame in lastFrames) {
+            totalForce += frame.sumForce;
+        }
+        return totalForce/lastFrames.Count;
     }
 
     //void OnCollisionEnter2D(Collision2D collision) {
@@ -53,7 +61,7 @@ public class ForceMeasurer : MonoBehaviour {
         foreach (var contact in collision.contacts) {
             thisFrame.contacts.Add(contact.rigidbody);
 
-            if (lastFrame.contacts.Contains(contact.rigidbody)) {
+            if (lastFrames[lastFrames.Count - 1].contacts.Contains(contact.rigidbody)) {
 
                 var impulse = (IsValid(contact.normalImpulse) ? contact.normal*contact.normalImpulse : Vector2.zero) +
                               (IsValid(contact.tangentImpulse) ? Math.Rotate(contact.normal, -90)*contact.tangentImpulse : Vector2.zero);
@@ -71,9 +79,9 @@ public class ForceMeasurer : MonoBehaviour {
         if (Time.fixedTime > lastUpdate) {
             lastUpdate = Time.fixedTime;
 
-            var tmp = lastFrame;
-            lastFrame = thisFrame;
-            thisFrame = tmp;
+            lastFrames.Insert(0, thisFrame);
+            thisFrame = lastFrames[lastFrames.Count - 1];
+            lastFrames.RemoveAt(lastFrames.Count - 1);
 
             thisFrame.Reset();
         }

@@ -81,6 +81,14 @@ public partial class LightAngler : LevelObject, Interactable {
     private void Rotate(int direction) {
         rotatedThisFrame = true;
         controled.ApplyAngularAcceleration(direction * acceleration);
+        
+        controled.SetRotationConstraints(
+            new RotatableLight.RotationConstraints{
+                lower = body.rotation - angleConstraint,
+                upper = body.rotation + angleConstraint,
+                unconstrained = unconstrained
+            }
+        );
     }
 
     private void RotateOld(int direction) {
