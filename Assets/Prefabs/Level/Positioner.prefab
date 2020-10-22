@@ -45,11 +45,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 81837a9c9b63118b89cee7bef484716e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  right: {x: 0, y: 0}
+  destination: {x: 0, y: 0}
   position: 0
   speed: 1
   controled: {fileID: 0}
   rotation: 0
+  maxAccel: 1000
+  springConstant: 200
+  dampingConstant: 20
+  movedThisFrame: 0
 --- !u!114 &2291644667158105967
 MonoBehaviour:
   m_ObjectHideFlags: 0

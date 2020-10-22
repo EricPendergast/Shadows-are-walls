@@ -13,6 +13,8 @@ public abstract class ShadowEdgeBase : AllTracker<ShadowEdgeBase> {
     private float dampingConstant = 1;
     [SerializeField]
     private float maxAccel = 1000;
+    [SerializeField]
+    private float inertia = 10000;
 
     public enum Side {
         right,
@@ -133,13 +135,8 @@ public abstract class ShadowEdgeBase : AllTracker<ShadowEdgeBase> {
 
         ConfigureColliders(colliders, pieces);
 
-        // Moving the center of mass to rb.position, which is where the light
-        // source is. This makes things act nicer, for unclear reasons. But the
-        // code in AddSimpleForces totally breaks if this doesn't happen.
-        // Also, the inertia needs to be set manually because sometimes the
-        // physics system doesn't update the inertia.
         rb.centerOfMass = Vector2.zero;
-        rb.inertia = PhysicsHelper.GetInertia(rb, colliders, Vector2.zero);
+        rb.inertia = inertia;
     }
 
     private void ConfigureColliders(List<BoxCollider2D> colliders, List<LineSegment> pieces) {

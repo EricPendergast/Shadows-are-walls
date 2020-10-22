@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 [ExecuteAlways]
@@ -13,23 +14,32 @@ public partial class Positioner : MonoBehaviour, Interactable {
     private Rigidbody2D controled;
     [SerializeField]
     private float rotation;
-
-    private RelativeJoint2D myJoint;
+    [SerializeField]
+    private float maxAccel;
+    [SerializeField]
+    private float springConstant;
+    [SerializeField]
+    private float dampingConstant;
+    [SerializeField]
+    private bool movedThisFrame = false;
 
     void Start() {
         if (Application.isPlaying) {
             Debug.Assert(controled != null);
-
-            myJoint = gameObject.AddComponent<RelativeJoint2D>();
-
-            myJoint.connectedBody = controled.GetComponent<Rigidbody2D>();
-            myJoint.maxForce = 5000;
-            myJoint.maxTorque = 5000;
-            myJoint.autoConfigureOffset = false;
-            myJoint.angularOffset = rotation;
-
             MoveRaw(0);
         }
+    }
+
+    void FixedUpdate() {
+        IEnumerator Do() {
+            // This waits until all other calls to FixedUpdate to finish
+            yield return new WaitForFixedUpdate();
+            if (!movedThisFrame) {
+                MoveRaw(0);
+            }
+            movedThisFrame = false;
+        };
+        StartCoroutine(Do());
     }
 
     public void Interact(Vector2 direction) {
@@ -54,13 +64,17 @@ public partial class Positioner : MonoBehaviour, Interactable {
     }
 
     private void MoveRaw(int direction) {
+        movedThisFrame = true;
         Vector2 origin = (Vector2)transform.position;
 
         var deltaPosition = direction * speed / ((origin - destination).magnitude) * Time.deltaTime;
         position = Mathf.Clamp(position + deltaPosition, 0, 1);
         var newTarget = Vector2.Lerp(origin, destination, position);
-        myJoint.linearOffset = transform.InverseTransformPoint(newTarget);
-        //myJoint.angularOffset = GetComponent<Rigidbody2D>().rotation - controled.rotation;
-        //controled.SetTargetPosition(Vector2.Lerp(left.Position(), destination.Position(), position));
+
+        // TODO: Can pass in the spring velocity
+        var accel = PhysicsHelper.GetSpringForce(controled.position, newTarget, controled.velocity, Vector2.zero, springConstant, dampingConstant);
+        accel = Vector2.ClampMagnitude(accel, maxAccel);
+
+        controled.AddForce(accel*controled.mass);
     }
 }

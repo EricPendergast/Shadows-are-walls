@@ -114,6 +114,12 @@ class PhysicsHelper {
         return -angleDifference*springConstant - velDifference*damping;
     }
 
+    public static Vector2 GetSpringForce(Vector2 rbPosition, Vector2 springPosition, Vector2 rbVel, Vector2 springVel, float springConstant, float damping) {
+        var positionDifference = rbPosition - springPosition;
+        var velDifference = rbVel - springVel;
+        return -positionDifference*springConstant - velDifference*damping;
+    }
+
     public static float GetInertia(Rigidbody2D body, List<BoxCollider2D> boxes, Vector2 pivot) {
         float totalArea = 0;
         foreach (var box in boxes) {
