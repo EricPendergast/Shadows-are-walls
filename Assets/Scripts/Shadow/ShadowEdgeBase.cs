@@ -12,9 +12,9 @@ public abstract class ShadowEdgeBase : AllTracker<ShadowEdgeBase> {
     [SerializeField]
     private float dampingConstant = 1;
     [SerializeField]
-    private float maxAccel = 1000;
+    private float maxAccel = 10000;
     [SerializeField]
-    private float inertia = 10000;
+    protected float inertia = 1000;
 
     public enum Side {
         right,
@@ -71,7 +71,7 @@ public abstract class ShadowEdgeBase : AllTracker<ShadowEdgeBase> {
         gameObject.layer = PhysicsHelper.shadowEdgeLayer;
         rb = gameObject.AddComponent<Rigidbody2D>();
         rb.gravityScale = 0;
-        rb.mass = 100;
+        rb.mass = 100000;
         rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
         rb.constraints = RigidbodyConstraints2D.FreezePosition;
 

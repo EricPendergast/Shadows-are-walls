@@ -112,7 +112,16 @@ public partial class RotatableLight : LightBase {
 
         public void Apply(Rigidbody2D body, float apertureAngle) {
             if (!unconstrained) {
-                body.rotation = Mathf.Clamp(body.rotation, lower + apertureAngle/2, upper - apertureAngle/2);
+                var trueLower = lower + apertureAngle/2;
+                if (body.rotation < trueLower) {
+                    body.rotation = trueLower;
+                    body.angularVelocity = Mathf.Max(body.angularVelocity, 0);
+                }
+                var trueUpper = upper - apertureAngle/2;
+                if (body.rotation > trueUpper) {
+                    body.rotation = trueUpper;
+                    body.angularVelocity = Mathf.Min(body.angularVelocity, 0);
+                }
             }
         }
     }
@@ -273,22 +282,30 @@ public partial class RotatableLight : LightBase {
         DoForces(leftShadowEdge);
     }
 
-    public float mult = 1;
-    public float maxAccel = 1;
-
     private void DoForces(LightEdge edge) {
         var edgeAccel = edge.GetAppliedAngularAcceleration();
+        var accelTowardsCenter = edge.GetAppliedAccelTowardsCenter();
         if (edgeAccel != 0) {
             Debug.Log("Edge accel: " + edgeAccel);
+            Debug.Log("Central Force" + accelTowardsCenter);
         }
 
-        var accel = -edge.GetAppliedAngularAcceleration()*mult;
-        accel = Mathf.Clamp(accel, -maxAccel, maxAccel);
+        LightSettings s = settings;
+
+        edge.SetInertia(s.inertia);
+
+        var accel = -edge.GetAppliedAngularAcceleration()*s.mult;
         //accel = Mathf.Sign(accel) * Mathf.Sqrt(Mathf.Abs(accel));
 
-        if (Mathf.Abs(accel) < .1) {
+        accelTowardsCenter*=s.centralAccelerationConstant;
+        accel = Mathf.Sign(accel)*(Mathf.Abs(accel) + Mathf.Abs(accelTowardsCenter));
+
+        accel = Mathf.Clamp(accel, -s.maxAccel, s.maxAccel);
+
+        if (Mathf.Abs(accel) < s.minAccel) {
             accel = 0;
         }
+        body.rotation -= Mathf.Clamp(edge.AngularDifferenceFromTarget()*s.resolveConstant, -s.maxResolve, s.maxResolve);
 
         rotationConstraints.Apply(body, apertureAngle);
 

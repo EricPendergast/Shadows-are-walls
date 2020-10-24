@@ -49,28 +49,23 @@ MonoBehaviour:
   apertureAngle: 35
   distance: 50.1
   settings:
-    velocityCorrectionConstant: 0
-    maxCorrectionTorque: 100000000
-    correctionSpringConstant: 10
-    correctionDampingConstant: 0.2
-    velocityMultiplier: 1
-    mass: 10
-    plasticModeDifferenceThreshold: 0.05
+    mult: 0.5
+    maxAccel: 10
+    minAccel: 0.1
+    resolveConstant: 0.4
+    maxResolve: 1
+    inertia: 10000
   plasticModeSettings:
-    velocityCorrectionConstant: 1
-    maxCorrectionTorque: 10000000
-    correctionSpringConstant: 100
-    correctionDampingConstant: 0.2
-    velocityMultiplier: 1
-    mass: 10
-    plasticModeDifferenceThreshold: 0.01
+    mult: 1
+    maxAccel: 1
+    minAccel: 0.1
+    resolveConstant: 0.1
+    maxResolve: 1
+    inertia: 1000
   plasticMode: -1
   plasticModeDuration: 0.1
   lampshadeRenderer: {fileID: 2249340161031165758}
   shadowParent: {fileID: 0}
-  mult: 1
-  maxAccel: 100
-  velocityMultiplier: 0.9
 --- !u!50 &1973197721580949901
 Rigidbody2D:
   serializedVersion: 4

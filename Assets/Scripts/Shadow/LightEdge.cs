@@ -13,6 +13,10 @@ public class LightEdge : ShadowEdgeBase {
         //StartCoroutine(PostFixedUpdateLoop());
     }
 
+    public void SetInertia(float inertia) {
+        this.inertia = inertia;
+    }
+
     public void SetTargetLength(float newLength) {
         target = target.WithLength(newLength);
     }
@@ -46,9 +50,20 @@ public class LightEdge : ShadowEdgeBase {
         return forceMeasurer.GetTorqueLastFrame();
     }
 
+    public float GetAppliedAccelTowardsCenter() {
+        Vector2 targetVector = target.p2 - target.p1;
+        Vector2 projected = Vector3.Project(forceMeasurer.GetForceLastFrame(), targetVector);
+        if (Vector2.Dot(projected, targetVector) < 0) {
+            return projected.magnitude/rb.inertia;
+        } else {
+            return 0;
+        }
+    }
+
     public Vector2 GetAppliedForce() {
         return forceMeasurer.GetForceLastFrame();
     }
+
 
     // 'point' lies on the target
     // point+difference is the point on the actual light edge
@@ -73,19 +88,12 @@ public class LightEdge : ShadowEdgeBase {
     }
 
     public float AngularDifferenceFromTarget() {
-        float maxDifference = 0;
-        var contacts = new List<ContactPoint2D>();
-        rb.GetContacts(contacts);
-
-        foreach (var contact in contacts) {
-            var angle = target.Angle(contact.point);
-            if (Mathf.Abs(angle) > Mathf.Abs(maxDifference)) {
-                maxDifference = angle;
-            }
+        if (target.isValid()) {
+            return Math.AngleDifference(this.rb.rotation, target.Angle());
+        } else {
+            return 0;
         }
-        return maxDifference;
     }
-
     //void OnCollisionEnter2D(Collision2D collision) {
     //    DoCollision(collision);
     //    Debug.Log("Collision enter");

@@ -1,11 +1,11 @@
 #if UNITY_EDITOR
 
 using UnityEngine;
-using UnityEditor;
 
 public partial class RotatableLight {
     public void SetAngle(float angle) {
-        Undo.RecordObjects(new Object[]{body, transform}, "Set angle");
+        EditorHelper.RecordObjectUndo(body, "Set angle");
+        EditorHelper.RecordObjectUndo(transform, "Set angle");
         body.rotation = body.rotation + angle;
         // When this is called in the editor, the transform doesn't update
         // automatically, so we need to change it manually.
@@ -13,7 +13,7 @@ public partial class RotatableLight {
     }
 
     public void SetTargetApertureAngle(float angle) {
-        Undo.RecordObject(this, "Change aperture angle");
+        EditorHelper.RecordObjectUndo(this, "Change aperture angle");
         apertureAngle = angle;
         if (lampshadeRenderer != null) {
             lampshadeRenderer.OnApertureAngleChange(apertureAngle);
