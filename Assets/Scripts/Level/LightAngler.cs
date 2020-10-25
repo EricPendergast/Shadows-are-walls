@@ -3,62 +3,27 @@ using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody2D))]
 public partial class LightAngler : LevelObject, Interactable {
-
     [SerializeField]
     private bool DEBUG = false;
+
     [SerializeField]
-    private bool unconstrained = false;
-    [SerializeField]
-    [Range(0,180)]
-    private float angleConstraint = 90;
-    [SerializeField]
-    private float currentAngle = 0;
-    [SerializeField]
-    private float apertureAngle = 35;
+    private RotatableLight.RotationConstraints constraints =
+        new RotatableLight.RotationConstraints {
+            unconstrained = true,
+            lower= 0,
+            upper = 0
+        };
     new private Rigidbody2D body {
         get => base.body == null ? GetComponent<Rigidbody2D>() : base.body;
     }
     [SerializeField]
-    private float speed = 10;
-    [SerializeField]
-    private float currentVelocity = 0;
-    [SerializeField]
     private float acceleration = 20;
-    [SerializeField]
-    private float decceleration = 20;
 
     [SerializeField]
     private bool rotatedThisFrame = false;
 
     [SerializeField]
     public RotatableLight controled;
-
-    [SerializeField]
-    private float springConstant;
-    [SerializeField]
-    private float dampingConstant;
-
-    [SerializeField]
-    private float maxAccel;
-
-
-    private RelativeJoint2D myJoint;
-
-    public void Start() {
-        if (!Application.isPlaying) {
-            return;
-        }
-        if (!gameObject.TryGetComponent(out myJoint)) {
-            myJoint = gameObject.AddComponent<RelativeJoint2D>();
-        }
-        myJoint.connectedBody = controled.GetComponent<Rigidbody2D>();
-        //myJoint.maxForce = 80;
-        //myJoint.maxTorque = 10;
-        myJoint.maxForce = 0;
-        myJoint.maxTorque = 0;
-        myJoint.autoConfigureOffset = false;
-        myJoint.angularOffset = currentAngle;
-    }
 
     public void Interact(Vector2 direction) {
         var lightDirection = controled.transform.right;
@@ -82,58 +47,7 @@ public partial class LightAngler : LevelObject, Interactable {
         rotatedThisFrame = true;
         controled.ApplyAngularAcceleration(direction * acceleration);
         
-        controled.SetRotationConstraints(
-            new RotatableLight.RotationConstraints{
-                lower = body.rotation - angleConstraint,
-                upper = body.rotation + angleConstraint,
-                unconstrained = unconstrained
-            }
-        );
-    }
-
-    private void RotateOld(int direction) {
-        rotatedThisFrame = true;
-
-        float currentAcceleration;
-        if (direction == 0 && currentVelocity == 0) {
-            currentAcceleration = 0;
-        } else if (direction == 0) {
-            currentAcceleration = -decceleration * Mathf.Sign(currentVelocity);
-        } else if (currentVelocity == 0) {
-            currentAcceleration = acceleration * Mathf.Sign(direction);
-        } else {
-            currentAcceleration = (direction * currentVelocity >= 0 ? acceleration : decceleration) * Mathf.Sign(direction);
-        }
-
-        var newVelocity = currentVelocity + currentAcceleration*Time.deltaTime;
-
-        if (newVelocity * currentVelocity < 0) {
-            currentVelocity = 0;
-        } else {
-            currentVelocity = Mathf.Clamp(newVelocity, -speed, speed);
-        }
-
-        currentAngle += currentVelocity*Time.deltaTime;
-
-        float maxDiff = 2*speed*Time.deltaTime;
-        if (direction == 0) {
-            maxDiff /= 2;
-        }
-      
-        var actualAngle = controled.GetRotation() - body.rotation;
-        var difference = Math.AngleDifference(actualAngle, currentAngle);
-
-        if (Mathf.Abs(difference) > maxDiff) {
-            difference = Mathf.Clamp(difference, -maxDiff, maxDiff);
-            currentAngle = actualAngle + difference;
-        }
-        currentAngle = ClampToConstraints(currentAngle);
-
-        var rotAccel = -PhysicsHelper.GetSpringTorque(actualAngle, currentAngle, 0, 0, springConstant, dampingConstant);
-        rotAccel = Mathf.Clamp(rotAccel, -maxAccel, maxAccel);
-        //controled.ApplyAngularAcceleration(rotAccel);
-        //Debug.Log("Applied " + rotAccel);
-        //myJoint.angularOffset = actualAngle + difference;
+        controled.SetRotationConstraints(constraints);
     }
 
     private void FixedUpdate() {
@@ -150,15 +64,4 @@ public partial class LightAngler : LevelObject, Interactable {
         };
         StartCoroutine(Do());
     }
-
-
-    private float ClampToConstraints(float lightAngle) {
-        if (!unconstrained) {
-            lightAngle = Math.AngleDifference(0, lightAngle);
-            return Mathf.Clamp(lightAngle, -(angleConstraint - apertureAngle/2) - .1f, angleConstraint - apertureAngle/2 + .1f);
-        } else {
-            return lightAngle;
-        }
-    }
-
 }

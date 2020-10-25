@@ -53,6 +53,10 @@ MonoBehaviour:
   maxAccel: 1000
   springConstant: 200
   dampingConstant: 20
+  correctionConstant: 0.1
+  correctionMinDistance: 0.2
+  stationaryMass: 20
+  movingMass: 100
   movedThisFrame: 0
 --- !u!114 &2291644667158105967
 MonoBehaviour:

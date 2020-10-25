@@ -30,14 +30,15 @@ public class LightAnglerEditor : Editor {
 
     private float DiscHandle(float currentAngle, float scale) {
         var lightAngler = target as LightAngler;
-        var newApertureAngle = Handles.Disc(
+        float newAngle = Handles.Disc(
             Quaternion.Euler(0,0,currentAngle),
             (Vector2)lightAngler.transform.position,
             Vector3.back,
             HandleUtility.GetHandleSize(lightAngler.transform.position)*scale,
             false,
             1
-        );
-        return newApertureAngle.eulerAngles.z;
+        ).eulerAngles.z;
+
+        return currentAngle + Math.AngleDifference(currentAngle, newAngle);
     }
 }

@@ -1,7 +1,6 @@
 #if UNITY_EDITOR
 
 using UnityEngine;
-using UnityEditor;
 
 public partial class Positioner : MonoBehaviour {
 

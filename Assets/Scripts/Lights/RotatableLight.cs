@@ -105,27 +105,33 @@ public partial class RotatableLight : LightBase {
 
     private Rigidbody2D _edgeMountPoint;
 
+    [System.Serializable]
     public struct RotationConstraints {
+        [SerializeField]
         public bool unconstrained;
+        [SerializeField]
         public float lower;
+        [SerializeField]
         public float upper;
 
         public void Apply(Rigidbody2D body, float apertureAngle) {
             if (!unconstrained) {
                 var trueLower = lower + apertureAngle/2;
-                if (body.rotation < trueLower) {
-                    body.rotation = trueLower;
+                var trueUpper = upper - apertureAngle/2;
+
+                body.rotation = Math.ClampAngle(body.rotation, trueLower, trueUpper);
+
+                if (body.rotation == trueLower) {
                     body.angularVelocity = Mathf.Max(body.angularVelocity, 0);
                 }
-                var trueUpper = upper - apertureAngle/2;
-                if (body.rotation > trueUpper) {
-                    body.rotation = trueUpper;
+                if (body.rotation == trueUpper) {
                     body.angularVelocity = Mathf.Min(body.angularVelocity, 0);
                 }
             }
         }
     }
 
+    [SerializeField]
     private RotationConstraints rotationConstraints  = new RotationConstraints {
         unconstrained = true,
         lower = 0,

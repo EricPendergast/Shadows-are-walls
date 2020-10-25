@@ -59,4 +59,26 @@ public class Math {
         return Mathf.Approximately(Math.Mod(a1, 360), Math.Mod(a2, 360)) ||
                Mathf.Approximately(Math.Mod(a1 + 180, 360), Math.Mod(a2 + 180, 360));
     }
+
+    /// Returns whether 'angle' is in the region of the unit circle starting at
+    /// 'lower', and going counterclockwise (increasing angle) to 'upper'.
+    /// This will not wind around the circle multiple times. This means, for
+    /// example, that LiesBetween(20, 0, 360+10) == false.
+    public static bool LiesBetween(float angle, float lower, float upper) {
+        return CounterClockwiseAngleDifference(lower, angle) <= CounterClockwiseAngleDifference(lower, upper);
+    }
+
+    /// Clamps 'angle' to the region of the unit circle starting at 'lower',
+    /// and going counterclockwise (increasing angle) to 'upper'
+    /// This will not wind around the circle multiple times. This means, for
+    /// example, that LiesBetween(20, 0, 360+10) == false.
+    public static float ClampAngle(float angle, float lower, float upper) {
+        if (LiesBetween(angle, lower, upper)) {
+            return angle;
+        } else if (Mathf.Abs(Math.AngleDifference(angle, lower)) < Mathf.Abs(Math.AngleDifference(angle, upper))) {
+            return lower;
+        } else {
+            return upper;
+        }
+    }
 }

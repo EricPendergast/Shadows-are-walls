@@ -7,23 +7,19 @@ using UnityEditor;
 public partial class LightAngler : LevelObject {
 
     public float EditorGetCurrentAngle() {
-        return currentAngle;
+        return controled.EditorGetRotation();
     }
 
     public void EditorSetCurrentAngle(float angle) {
-        EditorHelper.RecordObjectUndo(this, "Change current angle");
-        currentAngle = angle;
-        ApplySettings();
+        controled.EditorSetRotation(angle);
     }
 
     public float EditorGetApertureAngle() {
-        return apertureAngle;
+        return controled.EditorGetTargetApertureAngle();
     }
 
     public void EditorSetApertureAngle(float angle) {
-        EditorHelper.RecordObjectUndo(this, "Change aperture angle");
-        apertureAngle = angle;
-        ApplySettings();
+        controled.EditorSetTargetApertureAngle(angle);
     }
 
     void Update() {
@@ -41,33 +37,25 @@ public partial class LightAngler : LevelObject {
     }
     
     void DrawGizmos(float gizmoLength) {
-        if (unconstrained) {
+        if (constraints.unconstrained) {
             return;
         }
-        Gizmos.color = Color.red;
-        Gizmos.DrawRay(body.position, Quaternion.Euler(0,0,body.rotation - angleConstraint)*Vector2.right*gizmoLength);
-        Gizmos.DrawRay(body.position, Quaternion.Euler(0,0,body.rotation - (angleConstraint - apertureAngle))*Vector2.right*gizmoLength);
-    
-        Gizmos.color = Color.green;
-        Gizmos.DrawRay(body.position, Quaternion.Euler(0,0,body.rotation + angleConstraint)*Vector2.right*gizmoLength);
-        Gizmos.DrawRay(body.position, Quaternion.Euler(0,0,body.rotation + (angleConstraint - apertureAngle))*Vector2.right*gizmoLength);
+        //Gizmos.color = Color.red;
+        //Gizmos.DrawRay(body.position, Quaternion.Euler(0,0,body.rotation - angleConstraint)*Vector2.right*gizmoLength);
+        //Gizmos.DrawRay(body.position, Quaternion.Euler(0,0,body.rotation - (angleConstraint - apertureAngle))*Vector2.right*gizmoLength);
+    //
+        //Gizmos.color = Color.green;
+        //Gizmos.DrawRay(body.position, Quaternion.Euler(0,0,body.rotation + angleConstraint)*Vector2.right*gizmoLength);
+        //Gizmos.DrawRay(body.position, Quaternion.Euler(0,0,body.rotation + (angleConstraint - apertureAngle))*Vector2.right*gizmoLength);
     }
 
-    public void ApplySettings() {
+    private void ApplySettings() {
         EditorHelper.RecordObjectUndo(this, "Undo Light angler");
         if (TryGetComponent<Snapper>(out var snapper)) {
             snapper.DoSnapping();
         }
         DetectConstraints();
-
-        apertureAngle = Mathf.Round(apertureAngle/5)*5;
-        apertureAngle = Mathf.Clamp(apertureAngle, 1, angleConstraint*2);
-
-        currentAngle = ClampToConstraints(currentAngle);
-        if (controled != null) {
-            controled.SetAngle(currentAngle);
-            controled.SetTargetApertureAngle(apertureAngle);
-        }
+        controled.EditorSetConstraints(constraints);
     } 
 
     private bool IsAngleUnoccupied(float angle) {
@@ -94,10 +82,10 @@ public partial class LightAngler : LevelObject {
         Algorithm.Bounds bounds = Algorithm.FindContiguousWrapAround(unoccupiedAngles);
 
         if (bounds.IsEmpty() || bounds.IsFull()) {
-            unconstrained = true;
+            constraints.unconstrained = true;
             return;
         } else {
-            unconstrained = false;
+            constraints.unconstrained = false;
         }
 
         float lowerBound = (bounds.Lower()) * inc;
@@ -106,27 +94,9 @@ public partial class LightAngler : LevelObject {
             lowerBound -= 360;
         }
 
-        SetConstraints(lowerBound, upperBound);
+        constraints.lower = lowerBound;
+        constraints.upper = upperBound;
     }
-
-    void SetConstraints(float lowerBound, float upperBound) {
-        if (Math.AnglesApproximatelyEqual(lowerBound, body.rotation - angleConstraint) &&
-            Math.AnglesApproximatelyEqual(upperBound, body.rotation + angleConstraint)) {
-            return;
-        }
-
-        float deltaRotation;
-        {
-            float newRotation = (upperBound + lowerBound)/2;
-            deltaRotation = body.rotation - newRotation;
-            body.rotation = newRotation;
-        }
-
-        transform.rotation = Quaternion.Euler(0,0,body.rotation);
-        currentAngle += deltaRotation;
-        angleConstraint = Math.CounterClockwiseAngleDifference(lowerBound, upperBound)/2;
-    }
-
 
     // Reverts transform.position.z back to the prefab. This code was used once
     // to revert the z coordinate of all the light anglers, because for some

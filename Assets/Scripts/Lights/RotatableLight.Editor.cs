@@ -3,21 +3,48 @@
 using UnityEngine;
 
 public partial class RotatableLight {
-    public void SetAngle(float angle) {
+    public void EditorSetRotation(float angle) {
         EditorHelper.RecordObjectUndo(body, "Set angle");
         EditorHelper.RecordObjectUndo(transform, "Set angle");
-        body.rotation = body.rotation + angle;
         // When this is called in the editor, the transform doesn't update
         // automatically, so we need to change it manually.
-        transform.localRotation = Quaternion.Euler(0,0,angle);
+        transform.rotation = Quaternion.Euler(0,0,angle);
+        body.rotation = angle;
+        EditorSetConstraints(rotationConstraints);
     }
 
-    public void SetTargetApertureAngle(float angle) {
+    public float EditorGetRotation() {
+        return body.rotation;
+    }
+
+    public float EditorGetTargetApertureAngle() {
+        return apertureAngle;
+    }
+
+    public void EditorSetTargetApertureAngle(float angle) {
         EditorHelper.RecordObjectUndo(this, "Change aperture angle");
         apertureAngle = angle;
+        apertureAngle = Mathf.Round(apertureAngle/5)*5;
+        apertureAngle = Mathf.Clamp(apertureAngle, 1,
+            Math.CounterClockwiseAngleDifference(
+                rotationConstraints.lower,
+                rotationConstraints.upper
+            )
+        );
         if (lampshadeRenderer != null) {
             lampshadeRenderer.OnApertureAngleChange(apertureAngle);
         }
+        EditorSetConstraints(rotationConstraints);
+    }
+
+    public void EditorSetConstraints(RotationConstraints constraints) {
+        EditorHelper.RecordObjectUndo(this, "Set constraints");
+        EditorHelper.RecordObjectUndo(body, "Set constraints");
+        EditorHelper.RecordObjectUndo(transform, "Set constraints");
+
+        rotationConstraints = constraints;
+        rotationConstraints.Apply(body, apertureAngle);
+        transform.rotation = Quaternion.Euler(0, 0, body.rotation);
     }
 
     private void OnDrawGizmos() {
