@@ -28,7 +28,12 @@ public partial class Snapper : MonoBehaviour {
     void SnapPosition() {
         Vector2 point = transform.TransformPoint(snapPoint);
         var newPoint = SnapPoint(point);
-        transform.position += (Vector3)(newPoint - point);
+
+        // This prevents the scene from being dirtied occasionally due to float
+        // precision issues
+        if (!Mathf.Approximately(newPoint.x, point.x) || !Mathf.Approximately(newPoint.y, point.y)) {
+            transform.position += (Vector3)(newPoint - point);
+        }
         if (gameObject.TryGetComponent<Rigidbody2D>(out var body)) {
             body.position = transform.position;
         }

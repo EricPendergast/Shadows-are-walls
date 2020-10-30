@@ -375,21 +375,11 @@ partial class ForceApplier {
     [SerializeField]
     private LightSettings plasticModeSettings;
     [SerializeField]
-    private float rotationLastFrame = 0;
-    [SerializeField]
     private float plasticMode = -1;
     [SerializeField]
     private float plasticModeDuration = .1f;
 
     public void ApplyForces(Rigidbody2D body, LightEdge rightShadowEdge, LightEdge leftShadowEdge, RotatableLight.RotationConstraints constraints) {
-        LightSettings s = settings;
-        if (Mathf.Abs(rotationLastFrame - body.rotation) < s.minVelocity) {
-            body.rotation = rotationLastFrame;
-        } else {
-            Debug.Log("Delta rotation: " + Mathf.Abs(rotationLastFrame - body.rotation));
-        }
-        rotationLastFrame = body.rotation;
-
         DoForces(body, rightShadowEdge, constraints);
         DoForces(body, leftShadowEdge, constraints);
     }

@@ -47,7 +47,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   DEBUG: 0
   distance: 50.1
-  apertureAngle: 35
   forceApplier:
     settings:
       mult: 0.5
@@ -55,7 +54,7 @@ MonoBehaviour:
       minAccel: 0.5
       resolveConstant: 0.4
       maxResolve: 1
-      inertia: 500
+      inertia: 10000
       centralAccelerationConstant: 0
       minVelocity: 0.1
     plasticModeSettings:
@@ -67,7 +66,6 @@ MonoBehaviour:
       inertia: 500
       centralAccelerationConstant: 0
       minVelocity: 0.1
-    rotationLastFrame: 0
     plasticMode: -1
     plasticModeDuration: 0.1
   lampshadeRenderer: {fileID: 2249340161031165758}
