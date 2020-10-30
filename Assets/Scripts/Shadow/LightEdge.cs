@@ -64,6 +64,13 @@ public class LightEdge : ShadowEdgeBase {
         return forceMeasurer.GetForceLastFrame();
     }
 
+    public Vector2 GetAppliedPerpendicularForce() {
+        var force = forceMeasurer.GetForceLastFrame();
+        Vector2 parallelForce = Vector3.Project(force, target.p2 - target.p1);
+
+        return force - parallelForce;
+    }
+
 
     // 'point' lies on the target
     // point+difference is the point on the actual light edge

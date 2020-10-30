@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 5363106461772989931}
   - component: {fileID: 1325032037878620005}
   - component: {fileID: -6366066015650867786}
+  - component: {fileID: 1017514030759368131}
   m_Layer: 0
   m_Name: Lever
   m_TagString: Untagged
@@ -45,9 +46,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3b554705806e0858b95de4cd304c5942, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  snapToGrid: 1
-  gridSize: 0.25
-  snapPoint: {x: 0, y: -0.5}
   controledGameObject: {fileID: 0}
 --- !u!33 &1325032037878620005
 MeshFilter:
@@ -72,6 +70,7 @@ MeshRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -96,3 +95,19 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &1017514030759368131
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 826386651801936350}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ab67d60f53bf6e14c98b695a62a41ab1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  enable: 1
+  gridSize: 0.125
+  snapPoint: {x: -0.5, y: -0.5}

@@ -105,6 +105,8 @@ public partial class RotatableLight : LightBase {
 
     private Rigidbody2D _edgeMountPoint;
 
+    private float rotationLastFrame = 0;
+
     [System.Serializable]
     public struct RotationConstraints {
         [SerializeField]
@@ -284,6 +286,14 @@ public partial class RotatableLight : LightBase {
     }
 
     private void DoForces() {
+        LightSettings s = settings;
+        if (Mathf.Abs(rotationLastFrame - body.rotation) < s.minVelocity) {
+            body.rotation = rotationLastFrame;
+        } else {
+            Debug.Log("Delta rotation: " + Mathf.Abs(rotationLastFrame - body.rotation));
+        }
+        rotationLastFrame = body.rotation;
+
         DoForces(rightShadowEdge);
         DoForces(leftShadowEdge);
     }
@@ -291,10 +301,10 @@ public partial class RotatableLight : LightBase {
     private void DoForces(LightEdge edge) {
         var edgeAccel = edge.GetAppliedAngularAcceleration();
         var accelTowardsCenter = edge.GetAppliedAccelTowardsCenter();
-        if (edgeAccel != 0) {
-            Debug.Log("Edge accel: " + edgeAccel);
-            Debug.Log("Central Force" + accelTowardsCenter);
-        }
+        //if (edgeAccel != 0) {
+        //    Debug.Log("Edge accel: " + edgeAccel);
+        //    Debug.Log("Central Force" + accelTowardsCenter);
+        //}
 
         LightSettings s = settings;
 
