@@ -19,12 +19,19 @@ public partial class LightAngler : LevelObject {
     }
 
     public void EditorSetApertureAngle(float angle) {
+        EditorHelper.RecordObjectUndo(this, "Set aperture angle");
+        constraints.apertureAngle = angle;
         controled.EditorSetTargetApertureAngle(angle);
     }
 
     void Update() {
         if (!Application.isPlaying) {
-            ApplySettings();
+            EditorHelper.RecordObjectUndo(this, "Undo Light angler");
+            if (TryGetComponent<Snapper>(out var snapper)) {
+                snapper.DoSnapping();
+            }
+            DetectConstraints();
+            controled.EditorSetConstraints(constraints);
         }
     }
 
@@ -49,15 +56,6 @@ public partial class LightAngler : LevelObject {
         //Gizmos.DrawRay(body.position, Quaternion.Euler(0,0,body.rotation + (angleConstraint - apertureAngle))*Vector2.right*gizmoLength);
     }
 
-    private void ApplySettings() {
-        EditorHelper.RecordObjectUndo(this, "Undo Light angler");
-        if (TryGetComponent<Snapper>(out var snapper)) {
-            snapper.DoSnapping();
-        }
-        DetectConstraints();
-        controled.EditorSetConstraints(constraints);
-    } 
-
     private bool IsAngleUnoccupied(float angle) {
         foreach (RaycastHit2D hit in Physics2D.LinecastAll(body.position + Math.Rotate(Vector2.right, angle)*.1f, body.position + Math.Rotate(Vector2.right, angle)*.5f)) {
             if (PhysicsHelper.IsStatic(hit.rigidbody) && hit.rigidbody != body) {
@@ -72,6 +70,8 @@ public partial class LightAngler : LevelObject {
     // example, if it is on a wall, this function will set body.rotation and
     // angleConstraint so that the light won't intersect the wall.
     private void DetectConstraints() {
+        constraints.apertureAngle = controled.EditorGetTargetApertureAngle();
+
         float inc = 45;
 
         var unoccupiedAngles = new List<bool>();

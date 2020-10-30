@@ -46,34 +46,37 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   DEBUG: 0
-  apertureAngle: 35
   distance: 50.1
-  settings:
-    mult: 0.5
-    maxAccel: 100
-    minAccel: 0.5
-    resolveConstant: 0.4
-    maxResolve: 1
-    inertia: 500
-    centralAccelerationConstant: 0
-    minVelocity: 0.1
-  plasticModeSettings:
-    mult: 0.5
-    maxAccel: 100
-    minAccel: 0.5
-    resolveConstant: 0.4
-    maxResolve: 1
-    inertia: 500
-    centralAccelerationConstant: 0
-    minVelocity: 0.1
-  plasticMode: -1
-  plasticModeDuration: 0.1
+  apertureAngle: 35
+  forceApplier:
+    settings:
+      mult: 0.5
+      maxAccel: 100
+      minAccel: 0.5
+      resolveConstant: 0.4
+      maxResolve: 1
+      inertia: 500
+      centralAccelerationConstant: 0
+      minVelocity: 0.1
+    plasticModeSettings:
+      mult: 0.5
+      maxAccel: 100
+      minAccel: 0.5
+      resolveConstant: 0.4
+      maxResolve: 1
+      inertia: 500
+      centralAccelerationConstant: 0
+      minVelocity: 0.1
+    rotationLastFrame: 0
+    plasticMode: -1
+    plasticModeDuration: 0.1
   lampshadeRenderer: {fileID: 2249340161031165758}
   shadowParent: {fileID: 0}
-  rotationConstraints:
+  constraints:
     unconstrained: 1
     lower: 0
     upper: 0
+    apertureAngle: 0
 --- !u!50 &1973197721580949901
 Rigidbody2D:
   serializedVersion: 4
@@ -147,6 +150,7 @@ MonoBehaviour:
     unconstrained: 1
     lower: 0
     upper: 0
+    apertureAngle: 0
   acceleration: 5
   rotatedThisFrame: 0
   controled: {fileID: 1973197721580949894}

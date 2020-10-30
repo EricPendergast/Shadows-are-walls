@@ -60,19 +60,10 @@ public partial class RotatableLight : LightBase {
     private bool DEBUG = false;
 
     [SerializeField]
-    private float apertureAngle;
-    [SerializeField]
     private float distance;
 
     [SerializeField]
-    private LightSettings settings;
-    [SerializeField]
-    private LightSettings plasticModeSettings;
-
-    [SerializeField]
-    private float plasticMode = -1;
-    [SerializeField]
-    private float plasticModeDuration = 1;
+    private ForceApplier forceApplier;
 
     private Mesh castLightMesh;
     [SerializeField]
@@ -105,8 +96,6 @@ public partial class RotatableLight : LightBase {
 
     private Rigidbody2D _edgeMountPoint;
 
-    private float rotationLastFrame = 0;
-
     [System.Serializable]
     public struct RotationConstraints {
         [SerializeField]
@@ -115,8 +104,10 @@ public partial class RotatableLight : LightBase {
         public float lower;
         [SerializeField]
         public float upper;
+        [SerializeField]
+        public float apertureAngle;
 
-        public void Apply(Rigidbody2D body, float apertureAngle) {
+        public void Apply(Rigidbody2D body) {
             if (!unconstrained) {
                 var trueLower = lower + apertureAngle/2;
                 var trueUpper = upper - apertureAngle/2;
@@ -134,11 +125,16 @@ public partial class RotatableLight : LightBase {
     }
 
     [SerializeField]
-    private RotationConstraints rotationConstraints  = new RotationConstraints {
+    private RotatableLight.RotationConstraints constraints  = new RotatableLight.RotationConstraints {
         unconstrained = true,
         lower = 0,
-        upper = 0
+        upper = 0,
+        apertureAngle = 0
     };
+
+    public void SetRotationConstraints(RotatableLight.RotationConstraints constraints) {
+        this.constraints = constraints;
+    }
 
     public override Rigidbody2D GetEdgeMountPoint() {
         if (_edgeMountPoint == null) {
@@ -153,10 +149,6 @@ public partial class RotatableLight : LightBase {
 
     public void ApplyAngularAcceleration(float accel) {
         body.AddTorque(accel*body.inertia);
-    }
-
-    public void SetRotationConstraints(RotationConstraints constraints) {
-        rotationConstraints = constraints;
     }
 
     public float GetRotation() {
@@ -180,8 +172,8 @@ public partial class RotatableLight : LightBase {
 
     private Triangle CalculateTargetLocalViewTriangle() {
         Vector3 origin = Vector3.zero;
-        Vector3 leftCorner = Quaternion.Euler(0f,0f, apertureAngle/2) * Vector2.right;
-        Vector3 rightCorner = Quaternion.Euler(0f,0f, -apertureAngle/2) * Vector2.right;
+        Vector3 leftCorner = Quaternion.Euler(0f,0f, constraints.apertureAngle/2) * Vector2.right;
+        Vector3 rightCorner = Quaternion.Euler(0f,0f, -constraints.apertureAngle/2) * Vector2.right;
         leftCorner *= distance;
         rightCorner *= distance;
         
@@ -270,7 +262,7 @@ public partial class RotatableLight : LightBase {
     }
 
     public override void DoFixedUpdate() {
-        DoForces();
+        forceApplier.ApplyForces(body, rightShadowEdge, leftShadowEdge, constraints);
         CacheViewTriangles();
 
         UpdateKnownShadows();
@@ -283,49 +275,6 @@ public partial class RotatableLight : LightBase {
 
     private void Update() {
         DrawCastedLight();
-    }
-
-    private void DoForces() {
-        LightSettings s = settings;
-        if (Mathf.Abs(rotationLastFrame - body.rotation) < s.minVelocity) {
-            body.rotation = rotationLastFrame;
-        } else {
-            Debug.Log("Delta rotation: " + Mathf.Abs(rotationLastFrame - body.rotation));
-        }
-        rotationLastFrame = body.rotation;
-
-        DoForces(rightShadowEdge);
-        DoForces(leftShadowEdge);
-    }
-
-    private void DoForces(LightEdge edge) {
-        var edgeAccel = edge.GetAppliedAngularAcceleration();
-        var accelTowardsCenter = edge.GetAppliedAccelTowardsCenter();
-        //if (edgeAccel != 0) {
-        //    Debug.Log("Edge accel: " + edgeAccel);
-        //    Debug.Log("Central Force" + accelTowardsCenter);
-        //}
-
-        LightSettings s = settings;
-
-        edge.SetInertia(s.inertia);
-
-        var accel = -edge.GetAppliedAngularAcceleration()*s.mult;
-        //accel = Mathf.Sign(accel) * Mathf.Sqrt(Mathf.Abs(accel));
-
-        accelTowardsCenter*=s.centralAccelerationConstant;
-        accel = Mathf.Sign(accel)*(Mathf.Abs(accel) + Mathf.Abs(accelTowardsCenter));
-
-        accel = Mathf.Clamp(accel, -s.maxAccel, s.maxAccel);
-
-        if (Mathf.Abs(accel) < s.minAccel) {
-            accel = 0;
-        }
-        body.rotation -= Mathf.Clamp(edge.AngularDifferenceFromTarget()*s.resolveConstant, -s.maxResolve, s.maxResolve);
-
-        rotationConstraints.Apply(body, apertureAngle);
-
-        body.AddTorque(accel*body.inertia);
     }
 
     private void SetUpLightEdges() {
@@ -416,6 +365,66 @@ public partial class RotatableLight : LightBase {
         return opaqueSet;
     }
 }
+
+
+
+[System.Serializable]
+partial class ForceApplier {
+    [SerializeField]
+    private LightSettings settings;
+    [SerializeField]
+    private LightSettings plasticModeSettings;
+    [SerializeField]
+    private float rotationLastFrame = 0;
+    [SerializeField]
+    private float plasticMode = -1;
+    [SerializeField]
+    private float plasticModeDuration = .1f;
+
+    public void ApplyForces(Rigidbody2D body, LightEdge rightShadowEdge, LightEdge leftShadowEdge, RotatableLight.RotationConstraints constraints) {
+        LightSettings s = settings;
+        if (Mathf.Abs(rotationLastFrame - body.rotation) < s.minVelocity) {
+            body.rotation = rotationLastFrame;
+        } else {
+            Debug.Log("Delta rotation: " + Mathf.Abs(rotationLastFrame - body.rotation));
+        }
+        rotationLastFrame = body.rotation;
+
+        DoForces(body, rightShadowEdge, constraints);
+        DoForces(body, leftShadowEdge, constraints);
+    }
+
+    private void DoForces(Rigidbody2D body, LightEdge edge, RotatableLight.RotationConstraints constraints) {
+        var edgeAccel = edge.GetAppliedAngularAcceleration();
+        var accelTowardsCenter = edge.GetAppliedAccelTowardsCenter();
+        //if (edgeAccel != 0) {
+        //    Debug.Log("Edge accel: " + edgeAccel);
+        //    Debug.Log("Central Force" + accelTowardsCenter);
+        //}
+
+        LightSettings s = settings;
+
+        edge.SetInertia(s.inertia);
+
+        var accel = -edge.GetAppliedAngularAcceleration()*s.mult;
+        //accel = Mathf.Sign(accel) * Mathf.Sqrt(Mathf.Abs(accel));
+
+        accelTowardsCenter*=s.centralAccelerationConstant;
+        accel = Mathf.Sign(accel)*(Mathf.Abs(accel) + Mathf.Abs(accelTowardsCenter));
+
+        accel = Mathf.Clamp(accel, -s.maxAccel, s.maxAccel);
+
+        if (Mathf.Abs(accel) < s.minAccel) {
+            accel = 0;
+        }
+        body.rotation -= Mathf.Clamp(edge.AngularDifferenceFromTarget()*s.resolveConstant, -s.maxResolve, s.maxResolve);
+
+        constraints.Apply(body);
+
+        body.AddTorque(accel*body.inertia);
+    }
+}
+
 
 
 class ShadowCalculator {

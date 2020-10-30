@@ -10,7 +10,7 @@ public partial class RotatableLight {
         // automatically, so we need to change it manually.
         transform.rotation = Quaternion.Euler(0,0,angle);
         body.rotation = angle;
-        EditorSetConstraints(rotationConstraints);
+        EditorSetConstraints(constraints);
     }
 
     public float EditorGetRotation() {
@@ -18,23 +18,23 @@ public partial class RotatableLight {
     }
 
     public float EditorGetTargetApertureAngle() {
-        return apertureAngle;
+        return constraints.apertureAngle;
     }
 
     public void EditorSetTargetApertureAngle(float angle) {
         EditorHelper.RecordObjectUndo(this, "Change aperture angle");
-        apertureAngle = angle;
-        apertureAngle = Mathf.Round(apertureAngle/5)*5;
-        apertureAngle = Mathf.Clamp(apertureAngle, 1,
+        constraints.apertureAngle = angle;
+        constraints.apertureAngle = Mathf.Round(constraints.apertureAngle/5)*5;
+        constraints.apertureAngle = Mathf.Clamp(constraints.apertureAngle, 1,
             Math.CounterClockwiseAngleDifference(
-                rotationConstraints.lower,
-                rotationConstraints.upper
+                constraints.lower,
+                constraints.upper
             )
         );
         if (lampshadeRenderer != null) {
-            lampshadeRenderer.OnApertureAngleChange(apertureAngle);
+            lampshadeRenderer.OnApertureAngleChange(constraints.apertureAngle);
         }
-        EditorSetConstraints(rotationConstraints);
+        EditorSetConstraints(constraints);
     }
 
     public void EditorSetConstraints(RotationConstraints constraints) {
@@ -42,8 +42,8 @@ public partial class RotatableLight {
         EditorHelper.RecordObjectUndo(body, "Set constraints");
         EditorHelper.RecordObjectUndo(transform, "Set constraints");
 
-        rotationConstraints = constraints;
-        rotationConstraints.Apply(body, apertureAngle);
+        this.constraints = constraints;
+        this.constraints.Apply(body);
         transform.rotation = Quaternion.Euler(0, 0, body.rotation);
     }
 
