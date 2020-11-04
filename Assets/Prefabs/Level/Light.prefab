@@ -70,6 +70,7 @@ MonoBehaviour:
     plasticModeDuration: 0.1
   lampshadeRenderer: {fileID: 2249340161031165758}
   shadowParent: {fileID: 0}
+  lightMaterial: {fileID: 2100000, guid: 06fd57209b4d8f8509b31cff4d08ef57, type: 2}
   constraints:
     unconstrained: 1
     lower: 0

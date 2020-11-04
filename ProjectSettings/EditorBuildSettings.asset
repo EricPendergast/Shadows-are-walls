@@ -14,4 +14,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Good Levels/Level 39.unity
     guid: 634019a983d127864a8f68be7d7b258a
+  - enabled: 1
+    path: Assets/Scenes/Non-level/GameLogic.unity
+    guid: 3f42eb626f8516f228c7813ef6fa3acf
   m_configObjects: {}

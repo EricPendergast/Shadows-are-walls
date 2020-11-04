@@ -87,6 +87,9 @@ public partial class RotatableLight : LightBase {
     [SerializeField]
     private GameObject shadowParent;
 
+    [SerializeField]
+    private Material lightMaterial;
+
     private PolygonCollider2D visibleCollider;
 
     private Rigidbody2D _body;
@@ -216,7 +219,7 @@ public partial class RotatableLight : LightBase {
 
         CacheViewTriangles();
 
-        castLightMesh = Util.CreateMeshWithSharedMaterial(gameObject, Refs.instance.lightMaterial);
+        castLightMesh = Util.CreateMeshWithSharedMaterial(gameObject, lightMaterial);
 
         visibleCollider = gameObject.AddComponent<PolygonCollider2D>();
         visibleCollider.isTrigger = true;

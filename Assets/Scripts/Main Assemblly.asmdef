@@ -1,6 +1,8 @@
 {
     "name": "MainAssembly",
-    "references": [],
+    "references": [
+        "GUID:607e5fc428cee124e9280c8cd460767b"
+    ],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
