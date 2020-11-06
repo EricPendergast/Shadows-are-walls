@@ -1,10 +1,12 @@
 #if UNITY_EDITOR
 using UnityEditor;
+using UnityEngine;
 
 public partial class LampshadeRenderer {
     public void OnApertureAngleChange(float apertureAngle) {
-        Undo.RecordObject(this, "Change aperture angle");
+        EditorHelper.RecordObjectUndo(this, "Change aperture angle");
         this.apertureAngle = apertureAngle;
+        EditorHelper.RecordObjectUndo(GetComponent<MeshFilter>(), "Change aperture angle");
         BuildMesh();
     }
 }

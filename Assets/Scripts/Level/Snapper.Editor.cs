@@ -1,14 +1,12 @@
 #if UNITY_EDITOR
 
 using UnityEngine;
-using UnityEditor;
 
 [ExecuteAlways]
 public partial class Snapper : MonoBehaviour {
     private void Update() {
         if (!Application.isPlaying) {
-            Undo.RecordObject(transform, "Snap");
-            PrefabUtility.RecordPrefabInstancePropertyModifications(transform);
+            EditorHelper.RecordObjectUndo(transform, "Snap");
             DoSnapping();
         }
     }

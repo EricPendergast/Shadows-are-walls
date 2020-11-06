@@ -42,7 +42,7 @@ public partial class Positioner : MonoBehaviour {
 
         if (TryGetComponent<Snapper>(out var snapper)) {
             snapper.DoSnapping();
-            this.destination = snapper.SnapPoint(this.destination);
+            localDestination = snapper.SnapLocalPoint(localDestination);
         }
         position = Mathf.Clamp01(position);
 

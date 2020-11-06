@@ -4,8 +4,15 @@ using UnityEngine;
 [ExecuteAlways]
 [RequireComponent(typeof(Rigidbody2D))]
 public partial class Positioner : MonoBehaviour, Interactable {
+    // This is local to the parent of this gameobject
     [SerializeField]
-    private Vector2 destination;
+    private Vector2 localDestination;
+
+    // This is in global coordinates
+    private Vector2 destination {
+        get => localDestination + ParentPosition();
+        set => localDestination = value - ParentPosition();
+    }
     // Represents where the object will be positioned. This is an interpolation
     // between transform.position and this.destination
     [SerializeField]
@@ -106,5 +113,9 @@ public partial class Positioner : MonoBehaviour, Interactable {
         accel = Vector2.ClampMagnitude(accel, maxAccel);
 
         controled.AddForce(accel*controled.mass);
+    }
+
+    private Vector2 ParentPosition() {
+        return transform.parent == null ? Vector2.zero : (Vector2)transform.parent.position;
     }
 }

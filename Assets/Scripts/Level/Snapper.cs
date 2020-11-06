@@ -8,7 +8,18 @@ public partial class Snapper : MonoBehaviour {
     [SerializeField]
     protected Vector2 snapPoint = new Vector2(-.5f, -.5f);
 
-    public Vector2 SnapPoint(Vector2 point) {
+    private Vector2 ParentPosition() {
+        return 
+            transform.parent != null ?
+            transform.parent.position :
+            Vector3.zero;
+    }
+
+    public Vector2 SnapGlobalPoint(Vector2 point) {
+        return SnapLocalPoint(point - ParentPosition()) + ParentPosition();
+    }
+
+    public Vector2 SnapLocalPoint(Vector2 point) {
         if (gridSize == 0) {
             return point;
         }
@@ -26,13 +37,16 @@ public partial class Snapper : MonoBehaviour {
     }
 
     void SnapPosition() {
-        Vector2 point = transform.TransformPoint(snapPoint);
-        var newPoint = SnapPoint(point);
+        Vector2 currentPoint =
+            (Vector2)transform.TransformPoint(snapPoint) -
+            ParentPosition();
+
+        var newPoint = SnapLocalPoint(currentPoint);
 
         // This prevents the scene from being dirtied occasionally due to float
         // precision issues
-        if (!Mathf.Approximately(newPoint.x, point.x) || !Mathf.Approximately(newPoint.y, point.y)) {
-            transform.position += (Vector3)(newPoint - point);
+        if (!Mathf.Approximately(newPoint.x, currentPoint.x) || !Mathf.Approximately(newPoint.y, currentPoint.y)) {
+            transform.localPosition += (Vector3)(newPoint - currentPoint);
         }
         if (gameObject.TryGetComponent<Rigidbody2D>(out var body)) {
             body.position = transform.position;

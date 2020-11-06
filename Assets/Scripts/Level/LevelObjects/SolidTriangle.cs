@@ -25,9 +25,9 @@ public abstract class SolidTriangle : LevelObject {
             GetComponent<MeshFilter>().sharedMesh = new Mesh();
         }
         if (TryGetComponent<Snapper>(out var snapper)) {
-            p1 = snapper.SnapPoint(p1);
-            p2 = snapper.SnapPoint(p2);
-            p3 = snapper.SnapPoint(p3);
+            p1 = snapper.SnapLocalPoint(p1);
+            p2 = snapper.SnapLocalPoint(p2);
+            p3 = snapper.SnapLocalPoint(p3);
         }
         var mesh = GetComponent<MeshFilter>().sharedMesh;
         //var mesh = GetComponent<MeshFilter>().sharedMesh;
