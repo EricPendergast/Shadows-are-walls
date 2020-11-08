@@ -58,7 +58,7 @@ public partial class LightAngler : LevelObject {
 
     private bool IsAngleUnoccupied(float angle) {
         foreach (RaycastHit2D hit in Physics2D.LinecastAll(body.position + Math.Rotate(Vector2.right, angle)*.1f, body.position + Math.Rotate(Vector2.right, angle)*.5f)) {
-            if (PhysicsHelper.IsStatic(hit.rigidbody) && hit.rigidbody != body) {
+            if (hit.rigidbody != null && PhysicsHelper.IsStatic(hit.rigidbody) && hit.rigidbody != body) {
                 return false;
             }
         }

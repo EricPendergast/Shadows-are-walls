@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections;
 
+[ExecuteAlways]
 public partial class SceneTriggerLoader : MonoBehaviour {
     [SerializeField]
     SceneReference sceneToLoad;
@@ -8,18 +9,32 @@ public partial class SceneTriggerLoader : MonoBehaviour {
     SceneSemaphore sceneSemaphore;
 
     void Awake() {
-        sceneSemaphore = SceneSemaphore.Create(sceneToLoad);
+        if (Application.isPlaying) {
+            sceneSemaphore = SceneSemaphore.Create(sceneToLoad);
+        }
+    }
+
+    partial void EditorUpdate();
+
+    void Update() {
+        if (!Application.isPlaying) {
+            EditorUpdate();
+        }
     }
 
     IEnumerator OnTriggerEnter2D(Collider2D collider) {
-        if (collider.tag == "Player") {
-            yield return sceneSemaphore.RequestLoad();
+        if (Application.isPlaying) {
+            if (collider.TryGetComponent(out Player.Player _)) {
+                yield return sceneSemaphore.RequestLoad();
+            }
         }
     }
 
     IEnumerator OnTriggerExit2D(Collider2D collider) {
-        if (collider.tag == "Player") {
-            yield return sceneSemaphore.RequestUnload();
+        if (Application.isPlaying) {
+            if (collider.TryGetComponent(out Player.Player _)) {
+                yield return sceneSemaphore.RequestUnload();
+            }
         }
     }
 }

@@ -11,6 +11,7 @@ public partial class RotatableLight {
         transform.rotation = Quaternion.Euler(0,0,angle);
         body.rotation = angle;
         EditorSetConstraints(constraints);
+        EditorApplyConstraints();
     }
 
     public float EditorGetRotation() {
@@ -35,6 +36,7 @@ public partial class RotatableLight {
             lampshadeRenderer.OnApertureAngleChange(constraints.apertureAngle);
         }
         EditorSetConstraints(constraints);
+        EditorApplyConstraints();
     }
 
     public void EditorSetConstraints(RotationConstraints constraints) {
@@ -43,7 +45,13 @@ public partial class RotatableLight {
         EditorHelper.RecordObjectUndo(transform, "Set constraints");
 
         this.constraints = constraints;
-        this.constraints.Apply(body);
+    }
+
+    public void EditorApplyConstraints() {
+        EditorHelper.RecordObjectUndo(body, "Set constraints");
+        EditorHelper.RecordObjectUndo(transform, "Set constraints");
+
+        constraints.Apply(body);
         transform.rotation = Quaternion.Euler(0, 0, body.rotation);
     }
 
