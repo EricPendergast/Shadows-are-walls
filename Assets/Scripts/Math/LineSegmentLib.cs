@@ -39,7 +39,7 @@ public static class LineSegmentLib
     }
 
     // This appears to be working
-    public static bool LineSegmentsIntersection(Vector2 p1, Vector2 p2, Vector2 p3, Vector2 p4, out Vector2 intersection, float epsilon) {
+    public static bool LineSegmentsIntersectionOld(Vector2 p1, Vector2 p2, Vector2 p3, Vector2 p4, out Vector2 intersection, float epsilon) {
         if (LineSegmentsIntersection(p1, p2, p3, p4, out intersection)) {
             return true;
         }
@@ -96,6 +96,64 @@ public static class LineSegmentLib
         if (u < 0.0f || u > 1.0f || v < 0.0f || v > 1.0f)
         {
             return false;
+        }
+
+        intersection.x = p1.x + u * (p2.x - p1.x);
+        intersection.y = p1.y + u * (p2.y - p1.y);
+
+        return true;
+    }
+
+    static bool IsObtuse(Vector2 end1, Vector2 center, Vector2 end2) {
+        Vector2 v1 = end1-center;
+        Vector2 v2 = end2-center;
+        return v1.sqrMagnitude > .0001 && v2.sqrMagnitude > .0001 && Vector2.Dot(end1-center, end2-center) < 0;
+    }
+
+    static Vector2 Project(Vector2 point, Vector2 line1, Vector2 line2) {
+        Vector2 pVec = point - line1;
+        Vector2 lVec = line2 - line1;
+        Vector2 proj = (Vector2.Dot(pVec, lVec)/lVec.sqrMagnitude) * lVec;
+        return line1 + proj;
+    }
+
+    public static bool LineSegmentsIntersection(Vector2 p1, Vector2 p2, Vector2 p3, Vector2 p4, out Vector2 intersection, float epsilon)
+    {
+        intersection = Vector2.positiveInfinity;
+
+        var d = (p2.x - p1.x) * (p4.y - p3.y) - (p2.y - p1.y) * (p4.x - p3.x);
+
+        if (d == 0.0f)
+        {
+            return false;
+        }
+
+        var u = ((p3.x - p1.x) * (p4.y - p3.y) - (p3.y - p1.y) * (p4.x - p3.x)) / d;
+        var v = ((p3.x - p1.x) * (p2.y - p1.y) - (p3.y - p1.y) * (p2.x - p1.x)) / d;
+
+        if (u < 0.0f || u > 1.0f || v < 0.0f || v > 1.0f) {
+            Vector2 lineIntersection = p1 + u*(p2 - p1);
+            
+            Vector2 t1 = p1 + Mathf.Clamp01(u)*(p2 - p1);
+            Vector2 t2 = p3 + Mathf.Clamp01(v)*(p4 - p3);
+
+            Vector2 close1;
+            Vector2 close2;
+
+            if (IsObtuse(lineIntersection, t1, t2) || u >= 0 && u <= 1) {
+                close1 = ClosestPointOnLineSeg(p1, p2, t2);
+                close2 = t2;
+            } else if (IsObtuse(lineIntersection, t2, t1) || v >= 0 && v <= 1) {
+                close1 = t1;
+                close2 = ClosestPointOnLineSeg(p3, p4, t1);
+            } 
+            else {
+                close1 = t1;
+                close2 = t2;
+            }
+
+            intersection = (close1 + close2)/2;
+            return (close1 - close2).sqrMagnitude < epsilon*epsilon;
         }
 
         intersection.x = p1.x + u * (p2.x - p1.x);
