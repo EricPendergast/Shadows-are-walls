@@ -9,6 +9,7 @@ class PhysicsHelper {
     public static int freeObjectLayer = LayerMask.NameToLayer("FreeObject");
     public static int interactableLayer = LayerMask.NameToLayer("Interactable");
     public static int glassLayer = LayerMask.NameToLayer("Glass");
+    public static int triggerLoaderLayer = LayerMask.NameToLayer("TriggerLoader");
 
     public static int shadowEdgeLayerMask = 2 << shadowEdgeLayer - 1;
     public static int lightLayerMask = 2 << lightLayer - 1;
@@ -16,6 +17,7 @@ class PhysicsHelper {
     public static int freeObjectLayerMask = 2 << freeObjectLayer - 1;
     public static int interactableLayerMask = 2 << interactableLayer - 1;
     public static int glassLayerMask = 2 << glassLayer - 1;
+    public static int triggerLoaderLayerMask = 2 << triggerLoaderLayer - 1;
 
     // Truncates 'force' so that when applied to 'body', it will not go over
     // maxSpeed in the next tick

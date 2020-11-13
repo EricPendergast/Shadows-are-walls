@@ -1,14 +1,14 @@
 using UnityEditor;
 using UnityEngine;
 
-[CustomEditor(typeof(SceneTriggerLoader), true)]
-public class SceneTriggerLoaderEditor : Editor {
+[CustomEditor(typeof(SceneLoader), true)]
+public class SceneLoaderEditor : Editor {
     public override void OnInspectorGUI() {
         if (GUILayout.Button("Remove Scene")) {
-            (target as SceneTriggerLoader).EditorRemoveScene();
+            (target as SceneLoader).EditorRemoveScene();
         }
         if (GUILayout.Button("Open Scene")) {
-            (target as SceneTriggerLoader).EditorOpenScene();
+            (target as SceneLoader).EditorOpenScene();
         }
         base.OnInspectorGUI();
     }

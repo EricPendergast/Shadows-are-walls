@@ -26,4 +26,19 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Good Levels/Level 3.unity
     guid: 3580159ce5d98d06a9816b9a95e7d821
+  - enabled: 1
+    path: Assets/Scenes/Map Area 1/Room 1.unity
+    guid: 3d057f877545b980baabcf5941788b1d
+  - enabled: 1
+    path: Assets/Scenes/Map Area 1/1-2 Connector.unity
+    guid: 2abc526cb24a3ebfbbf7ae6f45aee900
+  - enabled: 1
+    path: Assets/Scenes/Map Area 1/Room 2.unity
+    guid: 3d3ddbaa5e9f491adbe9b6a90abd76a6
+  - enabled: 1
+    path: Assets/Scenes/Map Area 1/Room 3.unity
+    guid: f5c9360f54ae1f020b51dcf83b23c3c9
+  - enabled: 1
+    path: Assets/Scenes/Map Area 1/2-3 Connector.unity
+    guid: b14e4bf0e88baa39797145d07ed58f45
   m_configObjects: {}

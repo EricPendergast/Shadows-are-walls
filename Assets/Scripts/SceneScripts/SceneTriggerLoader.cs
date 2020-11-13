@@ -1,40 +1,58 @@
 using UnityEngine;
-using System.Collections;
+using System.Collections.Generic;
 
 [ExecuteAlways]
 public partial class SceneTriggerLoader : MonoBehaviour {
     [SerializeField]
-    SceneReference sceneToLoad;
+    List<SceneTriggerLoader> adjacent;
+    [SerializeField]
+    bool loadAdjacent = true;
 
-    SceneSemaphore sceneSemaphore;
-
+    private SceneLoader sceneLoader;
+    
     void Awake() {
-        if (Application.isPlaying) {
-            sceneSemaphore = SceneSemaphore.Create(sceneToLoad);
-        }
+        sceneLoader = GetComponent<SceneLoader>();
     }
 
     partial void EditorUpdate();
 
     void Update() {
-        if (!Application.isPlaying) {
+        if(!Application.isPlaying) {
             EditorUpdate();
         }
     }
-
-    IEnumerator OnTriggerEnter2D(Collider2D collider) {
+    
+    void OnTriggerEnter2D(Collider2D collider) {
         if (Application.isPlaying) {
             if (collider.TryGetComponent(out Player.Player _)) {
-                yield return sceneSemaphore.RequestLoad();
+                RequestLoad();
+                if (loadAdjacent) {
+                    foreach (var loader in adjacent) {
+                        loader.RequestLoad();
+                    }
+                }
             }
         }
     }
 
-    IEnumerator OnTriggerExit2D(Collider2D collider) {
+    void OnTriggerExit2D(Collider2D collider) {
         if (Application.isPlaying) {
             if (collider.TryGetComponent(out Player.Player _)) {
-                yield return sceneSemaphore.RequestUnload();
+                RequestUnload();
+                if (loadAdjacent) {
+                    foreach (var loader in adjacent) {
+                        loader.RequestUnload();
+                    }
+                }
             }
         }
+    }
+
+    void RequestUnload() {
+        sceneLoader.RequestUnload();
+    }
+
+    void RequestLoad() {
+        sceneLoader.RequestLoad();
     }
 }
