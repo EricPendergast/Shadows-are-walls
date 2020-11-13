@@ -32,7 +32,7 @@ public readonly struct LightViewTriangle {
 
     public LineSegment? CalculateFrontFace(Opaque opaque) {
         if (opaque.CrossSection(GetOrigin()) is LineSegment crossSec) {
-            return crossSec.Intersect(viewTriangle);
+            return crossSec.Intersect(viewTriangle, .0001f);
         }
         return null;
     }
@@ -472,8 +472,20 @@ class ShadowCalculator {
             }
         }
         sortedFrontFaces.Add(System.Tuple.Create(lightTriangle.FarEdge(), (Opaque)null));
-
-        MinimalUnion<Opaque>.CalculateAndSort(ref sortedFrontFaces, lightTriangle.GetOrigin(), lightTriangle.Angle);
+        //foreach (var pair in sortedFrontFaces) {
+        //    Debug.Log(pair.Item1 + ", " + pair.Item2);
+        //    Debug.Log(
+        //        lightTriangle.Angle(pair.Item1.p1) + ", " +
+        //        lightTriangle.Angle(pair.Item1.p2));
+        //}
+        //MinimalUnion<Opaque>.CalculateAndSort(ref sortedFrontFaces, lightTriangle.GetOrigin(), lightTriangle.Angle);
+        MinimalUnionImproved<Opaque>.SortedMinimalUnion(ref sortedFrontFaces, lightTriangle.GetOrigin(), lightTriangle.Angle);
+        //foreach (var pair in sortedFrontFaces) {
+        //    Debug.Log(pair.Item1 + ", " + pair.Item2);
+        //    Debug.Log(
+        //        lightTriangle.Angle(pair.Item1.p1) + ", " +
+        //        lightTriangle.Angle(pair.Item1.p2));
+        //}
     }
 
     private void CalculateShadowFaces(LightViewTriangle lightTriangle) {

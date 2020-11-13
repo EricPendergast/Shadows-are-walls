@@ -25,7 +25,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1973197721580949895}
-  m_LocalRotation: {x: 0, y: 0, z: -0.5920132, w: 0.8059283}
+  m_LocalRotation: {x: -0, y: -0, z: -0.44073874, w: 0.89763546}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -75,7 +75,7 @@ MonoBehaviour:
     unconstrained: 1
     lower: 0
     upper: 0
-    apertureAngle: 0
+    apertureAngle: 35
 --- !u!50 &1973197721580949901
 Rigidbody2D:
   serializedVersion: 4
@@ -149,7 +149,7 @@ MonoBehaviour:
     unconstrained: 1
     lower: 0
     upper: 0
-    apertureAngle: 0
+    apertureAngle: 35
   acceleration: 5
   rotatedThisFrame: 0
   controled: {fileID: 1973197721580949894}

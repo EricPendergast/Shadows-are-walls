@@ -16,20 +16,22 @@ public readonly struct LineSegment : IEnumerable<Vector2> {
         this.p2 = p2;
     }
 
-    public Vector2? Intersect(in LineSegment other) {
-        if (LineSegmentLib.LineSegmentsIntersection(p1, p2, other.p1, other.p2, out var intersection)) {
+    public Vector2? Intersect(in LineSegment other, float epsilon) {
+        if (LineSegmentLib.LineSegmentsIntersection(p1, p2, other.p1, other.p2, out var intersection, epsilon)) {
             return intersection;
         }
         return null;
     }
 
-    public LineSegment? Intersect(in Convex convex) {
+    // epsilon -- if two intersections are within epsilon of each other, they
+    // are considered one intersecion.
+    public LineSegment? Intersect(in Convex convex, float epsilon) {
 
-        convex.IntersectEdge(this, out Vector2? i1, out Vector2? i2);
+        convex.IntersectEdge(this, out Vector2? i1, out Vector2? i2, epsilon);
         
         // There are no intersections in this case
         if (i1 == null) {
-            if (convex.Contains(Midpoint())) {
+            if (convex.Contains(Midpoint(), epsilon)) {
                 return this;
             }
             return null;
@@ -37,11 +39,11 @@ public readonly struct LineSegment : IEnumerable<Vector2> {
         // There is one intersection in this case
         if (i2 == null) {
             LineSegment split1 = new LineSegment(p1, (Vector2)i1);
-            if (split1.p1 != split1.p2 && convex.Contains(split1.Midpoint())) {
+            if (!Math.ApproxEq(split1.p1, split1.p2, epsilon) && convex.Contains(split1.Midpoint(), epsilon)) {
                 return split1;
             }
             LineSegment split2 = new LineSegment((Vector2)i1, p2);
-            if (split2.p1 != split2.p2 && convex.Contains(split2.Midpoint())) {
+            if (!Math.ApproxEq(split2.p1, split2.p2, epsilon) && convex.Contains(split2.Midpoint(), epsilon)) {
                 return split2;
             }
             return null;
@@ -51,39 +53,73 @@ public readonly struct LineSegment : IEnumerable<Vector2> {
         // between the two intersection points
         return new LineSegment((Vector2)i1, (Vector2)i2);
     }
+    public void Subtract(in Convex convex, out LineSegment? seg1, out LineSegment? seg2, float epsilon) {
+        convex.IntersectEdge(this, out Vector2? i1, out Vector2? i2, epsilon);
 
-    public void Subtract(in Convex convex, out LineSegment? seg1, out LineSegment? seg2) {
-        seg1 = null;
-        seg2 = null;
-        if (Intersect(convex) is LineSegment intersection) {
-            // Make it so intersection.p1 is closest to this.p1
-            if ((p1 - intersection.p1).sqrMagnitude > (p1 - intersection.p2).sqrMagnitude) {
-                intersection = intersection.Swapped();
-            }
-            var part1 = new LineSegment(p1, intersection.p1);
-            var part2 = new LineSegment(intersection.p2, p2);
-
-            if (part1.p1 != part1.p2 && !convex.Contains(part1.Midpoint())) {
-                seg1 = part1;
-            }
-            if (part2.p1 != part2.p2 && !convex.Contains(part2.Midpoint())) {
-                seg2 = part2;
-            }
-            if (seg1 == null) {
-                seg1 = seg2;
-                seg2 = null;
-            }
-            return;
-        } else {
-            if (!convex.Contains(Midpoint())) {
+        if (    i1 != null && i2 != null &&
+                (p1 - i1)?.sqrMagnitude > (p1 - i2)?.sqrMagnitude) {
+            var tmp = i1;
+            i1 = i2;
+            i2 = tmp;
+        }
+        
+        // There are no intersections in this case
+        if (i1 == null) {
+            seg1 = null;
+            seg2 = null;
+            if (!convex.Contains(Midpoint(), epsilon)) {
                 seg1 = this;
             }
             return;
+
+        } else if (i2 == null) {
+            // There is one intersection in this case
+            bool containsP1 = convex.Contains(p1, epsilon);
+            bool containsP2 = convex.Contains(p2, epsilon);
+
+            if (containsP1 && containsP2) {
+                // One point is inside, one point is on the edge
+                seg1 = null;
+                seg2 = null;
+                return;
+            } else if (containsP1) {
+                // One point is inside, one point is outside
+                seg1 = new LineSegment((Vector2)i1, p2);
+                seg2 = null;
+                return;
+            } else if (containsP2) {
+                // One point is inside, one point is outside
+                seg1 = new LineSegment(p1, (Vector2)i1);
+                seg2 = null;
+                return;
+            } else {
+                // Both points are outside (intersecting a corner)
+                seg1 = this;
+                seg2 = null;
+                return;
+            }
+        } else {
+            // There are two intersections
+
+            seg1 = null;
+            seg2 = null;
+
+            if (!convex.Contains(p1, epsilon)) {
+                seg1 = new LineSegment(p1, (Vector2)i1);
+            }
+            if (!convex.Contains(p2, epsilon)) {
+                seg2 = new LineSegment((Vector2)i2, p2);
+            }
+
+            Util.SlideDown(ref seg1, ref seg2);
+            return;
         }
     }
-    public List<LineSegment> Subtract(in Convex convex, in List<LineSegment> output) {
+
+    // TODO: Remove automatic epsilon
+    public List<LineSegment> Subtract(in Convex convex, in List<LineSegment> output, float epsilon=.0001f) {
         output.Clear();
-        Subtract(convex, out var seg1, out var seg2);
+        Subtract(convex, out var seg1, out var seg2, epsilon);
         if (seg1 is LineSegment s1) {
             output.Add(s1);
         }
@@ -93,6 +129,7 @@ public readonly struct LineSegment : IEnumerable<Vector2> {
         return output;
     }
 
+    // TODO: Deprecate this
     public List<LineSegment> Split(in LineSegment other, in List<LineSegment> output) {
         output.Clear();
         if (LineSegmentLib.LineSegmentsIntersection(p1, p2, other.p1, other.p2, out var intersection)) {
@@ -123,6 +160,15 @@ public readonly struct LineSegment : IEnumerable<Vector2> {
 
     public bool OnRightSide(in Vector2 point) {
         return Math.OnRightSide(point, this);
+    }
+
+    public bool OnRightSideOrOn(in Vector2 point, float epsilon) {
+        return Math.OnRightSideOrOn(point, this, epsilon);
+    }
+
+    public float SignedDistance(in Vector2 point) {
+        return Math.SignedDistance(point, this);
+
     }
 
     public float Length() {
@@ -198,10 +244,11 @@ public readonly struct LineSegment : IEnumerable<Vector2> {
         return output;
     }
 
+    // TODO: Deprecate this
     List<Vector2> GetIntersections(IEnumerable<LineSegment> segs, in List<Vector2> output) {
         output.Clear();
         foreach (var seg in segs) {
-            if (this.Intersect(seg) is Vector2 intersec) {
+            if (this.Intersect(seg, .0001f) is Vector2 intersec) {
                 output.Add(intersec);
             }
         }
@@ -256,4 +303,13 @@ public readonly struct LineSegment : IEnumerable<Vector2> {
         var d = Vector3.Dot(v, lineDir);
         return p1 + lineDir * d;
     }
+
+    // TODO: This needs an epsilon parameter
+    public bool IsParallel(LineSegment other) {
+        Vector2 thisVector = p2 - p1;
+        Vector2 otherVector = other.p2 - other.p1;
+
+        return Mathf.Abs(Vector2.Dot(thisVector, otherVector)) == thisVector.sqrMagnitude * otherVector.sqrMagnitude;
+    }
+
 }

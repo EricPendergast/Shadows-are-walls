@@ -27,24 +27,27 @@ public readonly struct Triangle : Convex {
         yield return side2;
     }
 
-    public bool Contains(in Vector2 point) {
-        bool s1 = Math.OnRightSide(point, side0);
-        bool s2 = Math.OnRightSide(point, side1);
-        bool s3 = Math.OnRightSide(point, side2);
+    public bool Contains(in Vector2 point, float epsilon=.0001f) {
 
-        return s1 == s2 && s2 == s3;
+        float dist1 = side0.SignedDistance(point);
+        float dist2 = side1.SignedDistance(point);
+        float dist3 = side2.SignedDistance(point);
+
+        return 
+            (dist1 > -epsilon && dist2 > -epsilon && dist3 > -epsilon) ||
+            (dist1 < epsilon && dist2 < epsilon && dist3 < epsilon);
     }
 
     public List<Vector2> AsList() {
         return new List<Vector2>{p1, p2, p3};
     }
 
-    public void IntersectEdge(in LineSegment seg, out Vector2? i1_o, out Vector2? i2_o) {
-        Vector2? i1 = seg.Intersect(side0);
-        Vector2? i2 = seg.Intersect(side1);
-        Vector2? i3 = seg.Intersect(side2);
+    public void IntersectEdge(in LineSegment seg, out Vector2? i1_o, out Vector2? i2_o, float epsilon) {
+        Vector2? i1 = seg.Intersect(side0, epsilon/3);
+        Vector2? i2 = seg.Intersect(side1, epsilon/3);
+        Vector2? i3 = seg.Intersect(side2, epsilon/3);
 
-        Util.RemoveDuplicates(ref i1, ref i2, ref i3);
+        Util.RemoveDuplicates(ref i1, ref i2, ref i3, epsilon);
         Util.SlideDown(ref i1, ref i2, ref i3);
 
         Assert.IsTrue(i3 == null);

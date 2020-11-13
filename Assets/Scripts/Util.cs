@@ -45,6 +45,13 @@ public class Util {
         return go.AddComponent<T>();
     }
 
+    public static void SlideDown<T>(ref T? v1, ref T? v2) where T : struct {
+        if (v1 == null) {
+            v1 = v2;
+            v2 = null;
+        }
+    }
+
     public static void SlideDown<T>(ref T? v1, ref T? v2, ref T? v3) where T : struct {
         if (v2 == null) {
             v2 = v3;
@@ -57,11 +64,20 @@ public class Util {
         }
     }
 
-    public static void RemoveDuplicates(ref Vector2? v1, ref Vector2? v2, ref Vector2? v3) {
-        if (v1 == v2 || v1 == v3) {
+    public static void RemoveDuplicates(ref Vector2? v1, ref Vector2? v2, ref Vector2? v3, float epsilon) {
+        bool v1EqV2 = Math.ApproxEq(v1, v2, epsilon);
+        bool v1EqV3 = Math.ApproxEq(v1, v3, epsilon);
+        if (v1EqV2 || v1EqV3) {
             v1 = null;
+            // This handles transitivity. Specifically, if the points are lined
+            // up in a row, each spaced epsilon apart, they should all be
+            // considered the same point, even though the ends are 2*epsilon
+            // apart
+            if (v1EqV2 && v1EqV3) {
+                v2 = null;
+            }
         }
-        if (v2 == v3) {
+        if (Math.ApproxEq(v2, v3, epsilon)) {
             v2 = null;
         }
     }

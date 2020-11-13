@@ -3,10 +3,10 @@ using UnityEngine.Assertions;
 using System.Collections.Generic;
 
 public interface Convex {
-    bool Contains(in Vector2 point);
+    bool Contains(in Vector2 point, float epsilon);
     // Any convex shape will intersect a line segment at most twice
     // Output requirement: if i1 is null, i2 must also be null
-    void IntersectEdge(in LineSegment seg, out Vector2? i1, out Vector2? i2);
+    void IntersectEdge(in LineSegment seg, out Vector2? i1, out Vector2? i2, float epsilon);
 }
 // Represents a "cup" shape. Specifically, one line segment with a
 // ray attached to each of its endpoints, where the rays always lie
@@ -53,19 +53,24 @@ public readonly struct Cup : Convex {
         yield return Base();
     }
 
-    public bool Contains(in Vector2 point) {
-        bool side1 = new LineSegment(p1, convergencePoint).OnRightSide(point);
-        bool side2 = new LineSegment(p1, p2).OnRightSide(point);
-        bool side3 = new LineSegment(convergencePoint, p2).OnRightSide(point);
-        return side1 == side2 && side2 == side3;
+    public bool Contains(in Vector2 point, float epsilon) {
+        float dist1 = new LineSegment(p1, convergencePoint).SignedDistance(point);
+        float dist2 = new LineSegment(p1, p2).SignedDistance(point);
+        float dist3 = new LineSegment(convergencePoint, p2).SignedDistance(point);
+
+        return 
+            (dist1 > -epsilon && dist2 > -epsilon && dist3 > -epsilon) ||
+            (dist1 < epsilon && dist2 < epsilon && dist3 < epsilon);
     }
 
-    public void IntersectEdge(in LineSegment seg, out Vector2? i1_o, out Vector2? i2_o) {
-        Vector2? i1 = seg.Intersect(LeftRay());
-        Vector2? i2 = seg.Intersect(RightRay());
-        Vector2? i3 = seg.Intersect(Base());
+    // epsilon -- if two intersections are within epsilon of each other, they
+    // are considered one intersecion.
+    public void IntersectEdge(in LineSegment seg, out Vector2? i1_o, out Vector2? i2_o, float epsilon) {
+        Vector2? i1 = seg.Intersect(LeftRay(), epsilon/3);
+        Vector2? i2 = seg.Intersect(RightRay(), epsilon/3);
+        Vector2? i3 = seg.Intersect(Base(), epsilon/3);
 
-        Util.RemoveDuplicates(ref i1, ref i2, ref i3);
+        Util.RemoveDuplicates(ref i1, ref i2, ref i3, epsilon);
         Util.SlideDown(ref i1, ref i2, ref i3);
 
         Assert.IsTrue(i3 == null);
@@ -84,6 +89,24 @@ public readonly struct Cup : Convex {
             }
         }
         return output;
+    }
+
+    public void Subtract(in Cup other, out Cup? part1, out Cup? part2, float epsilon) {
+        Base().Subtract(other, out var seg1, out var seg2, epsilon);
+
+        part1 = null;
+        part2 = null;
+
+        if (seg1 is LineSegment s1) {
+            part1 = new Cup(s1, convergencePoint);
+        }
+        if (seg2 is LineSegment s2) {
+            part2 = new Cup(s2, convergencePoint);
+        }
+    }
+
+    public Cup Swapped() {
+        return new Cup(p2, p1, convergencePoint);
     }
 
     //public static List<Cup> GetDisjoint(Cup c1, Cup c2) {

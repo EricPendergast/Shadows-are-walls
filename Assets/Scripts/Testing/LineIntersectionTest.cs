@@ -42,8 +42,8 @@ public class LineIntersectionTest : MonoBehaviour {
 
         Gizmos.color = Color.green;
 
-        LineSegmentLib.LineSegmentsIntersection(p1, p2, p3, p4, out intersection, epsilon);
-        Gizmos.DrawSphere(intersection, drawRadius);
-
+        if (LineSegmentLib.LineSegmentsIntersection(p1, p2, p3, p4, out intersection, epsilon)) {
+            Gizmos.DrawSphere(intersection, drawRadius);
+        }
     }
 }

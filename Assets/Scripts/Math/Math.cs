@@ -6,8 +6,17 @@ public class Math {
         return v1.x*v2.y - v2.x*v1.y;
     }
 
+    // epsilon specifies how far from the line is considered to be on the line
+    public static bool OnRightSideOrOn(Vector2 point, LineSegment line, float epsilon) {
+        return Cross(line.p2 - line.p1, point - line.p1)/(line.Length()) > -epsilon;
+    }
+
     public static bool OnRightSide(Vector2 point, LineSegment line) {
         return Cross(line.p2 - line.p1, point - line.p1) > 0;
+    }
+
+    public static float SignedDistance(Vector2 point, LineSegment line) {
+        return Cross(line.p2 - line.p1, point - line.p1)/(line.Length());
     }
 
     //public static IEnumerable<LineSegment> GetTriangleSides(Vector2 p1, Vector2 p2, Vector2 p3) {
@@ -81,4 +90,42 @@ public class Math {
             return upper;
         }
     }
+
+    public static bool ApproxGeq(float a, float b, float epsilon) {
+        return a > (b-epsilon);
+    }
+
+    public static bool ApproxLeq(float a, float b, float epsilon) {
+        return a < (b+epsilon);
+    }
+
+    public static bool ApproxEq(float a, float b, float epsilon) {
+        return Mathf.Abs(a - b) < epsilon;
+    }
+
+    public static bool ApproxEq(Vector2 a, Vector2 b, float epsilon) {
+        return (a - b).sqrMagnitude < epsilon * epsilon;
+    }
+
+    public static bool ApproxEq(Vector2? a, Vector2? b, float epsilon) {
+        if (a == null && b == null) {
+            return true;
+        } else if (a != null && b != null) {
+            return ApproxEq((Vector2)a, (Vector2)b, epsilon);
+        } else {
+            return false;
+        }
+    }
+
+    // These are commented because I'm not sure what they ever would be used
+    // for. And how they should be implemented is ambiguous. For instance, if a
+    // == b, is b approximately greater than a, since its within an epsilon of
+    // being greater than a? Or does b need more than epsilon greater than a?
+    //public static bool ApproxGreater(float a, float b) {
+    //    return !Mathf.Approximately(a, b) && a > b;
+    //}
+    //
+    //public static bool ApproxLess(float a, float b) {
+    //    return !Mathf.Approximately(a, b) && a < b;
+    //}
 }

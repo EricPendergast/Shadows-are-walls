@@ -123,9 +123,8 @@ public static class LineSegmentLib
 
         var d = (p2.x - p1.x) * (p4.y - p3.y) - (p2.y - p1.y) * (p4.x - p3.x);
 
-        if (d == 0.0f)
-        {
-            return false;
+        if (d == 0.0f) {
+            d = .001f;
         }
 
         var u = ((p3.x - p1.x) * (p4.y - p3.y) - (p3.y - p1.y) * (p4.x - p3.x)) / d;
