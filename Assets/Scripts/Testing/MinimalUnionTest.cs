@@ -20,6 +20,8 @@ public class MinimalUnionTest : MonoBehaviour {
     }
     [SerializeField]
     public List<SegTupleClass> segs;
+    [SerializeField]
+    public List<SegTuple> segsCopy = new List<SegTuple>();
 
     public Vector2 lightPosition;
     public Vector2 metricStart;
@@ -28,6 +30,20 @@ public class MinimalUnionTest : MonoBehaviour {
     public bool drawCalculated = true;
 
     void Update() {
+        if (UnityEditor.Selection.activeGameObject == gameObject) {
+            segsCopy.Clear();
+            foreach (var item in segs) {
+                segsCopy.Add(item.ToTuple());
+            }
+
+            MinimalUnionImproved<string>.SortedMinimalUnion(
+                ref segsCopy,
+                lightPosition,
+                (Vector2 vec) => 
+                    Vector2.SignedAngle(metricStart, vec - lightPosition)
+            );
+        }
+
         if (!Input.GetMouseButton(0)) {
             return;
         }
@@ -64,18 +80,6 @@ public class MinimalUnionTest : MonoBehaviour {
     }
 
     void OnDrawGizmosSelected() {
-        var segsCopy = new List<SegTuple>();
-        foreach (var item in segs) {
-            segsCopy.Add(item.ToTuple());
-        }
-
-        MinimalUnionImproved<string>.SortedMinimalUnion(
-            ref segsCopy,
-            lightPosition,
-            (Vector2 vec) => 
-                Vector2.Angle(metricStart, vec - lightPosition)
-        );
-
 
         Gizmos.color = Color.white;
         foreach (var seg in segs) {

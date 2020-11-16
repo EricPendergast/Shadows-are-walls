@@ -11,10 +11,12 @@ public class Math {
         return Cross(line.p2 - line.p1, point - line.p1)/(line.Length()) > -epsilon;
     }
 
-    public static bool OnRightSide(Vector2 point, LineSegment line) {
+    public static bool OnRightSideOfLine(Vector2 point, LineSegment line) {
         return Cross(line.p2 - line.p1, point - line.p1) > 0;
     }
 
+    // Returns the distance from the point to the line, positive if the point
+    // is on the right side, negative otherwise
     public static float SignedDistance(Vector2 point, LineSegment line) {
         return Cross(line.p2 - line.p1, point - line.p1)/(line.Length());
     }
@@ -128,4 +130,9 @@ public class Math {
     //public static bool ApproxLess(float a, float b) {
     //    return !Mathf.Approximately(a, b) && a < b;
     //}
+    public static bool IsObtuse(Vector2 end1, Vector2 center, Vector2 end2) {
+        Vector2 v1 = end1-center;
+        Vector2 v2 = end2-center;
+        return v1.sqrMagnitude > .0001 && v2.sqrMagnitude > .0001 && Vector2.Dot(end1-center, end2-center) < 0;
+    }
 }

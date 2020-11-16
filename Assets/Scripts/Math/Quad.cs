@@ -38,8 +38,8 @@ public struct Quad {
         bool? prev = null;
         foreach (var side in GetSides()) {
             if (prev == null) {
-                prev = side.OnRightSide(point);
-            } else if (prev != side.OnRightSide(point)) {
+                prev = side.OnRightSideOfLine(point);
+            } else if (prev != side.OnRightSideOfLine(point)) {
                 return false;
             }
         }

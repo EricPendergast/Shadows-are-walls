@@ -54,18 +54,41 @@ public readonly struct Cup : Convex {
     }
 
     public bool Contains(in Vector2 point, float epsilon) {
+        var p1p2 = new LineSegment(p1, p2);
+
         float dist1 = new LineSegment(p1, convergencePoint).SignedDistance(point);
-        float dist2 = new LineSegment(p1, p2).SignedDistance(point);
+        float dist2 = p1p2.SignedDistance(point);
         float dist3 = new LineSegment(convergencePoint, p2).SignedDistance(point);
 
+        bool fullyInside = (dist1 > epsilon/2 && dist2 > epsilon/2 && dist3 > epsilon/2) ||
+                           (dist1 < -epsilon/2 && dist2 < -epsilon/2 && dist3 < -epsilon/2);
+
+        if (fullyInside && p1p2.OnRightSideOfLine(point) != p1p2.OnRightSideOfLine(convergencePoint)) {
+            return true;
+        }
+
+        bool fullyOutside = !(dist1 > -epsilon && dist2 > -epsilon && dist3 > -epsilon) &&
+                            !(dist1 < epsilon && dist2 < epsilon && dist3 < epsilon);
+                            
+        if (fullyOutside) {
+            return false;
+        }
+
+        return OnEdge(point, epsilon);
+    }
+
+    public bool OnEdge(Vector2 point, float epsilon) {
         return 
-            (dist1 > -epsilon && dist2 > -epsilon && dist3 > -epsilon) ||
-            (dist1 < epsilon && dist2 < epsilon && dist3 < epsilon);
+            (point - LineSegmentLib.ClosestPointOnRay(p1, p1 - convergencePoint, point)).sqrMagnitude < epsilon*epsilon ||
+            (point - LineSegmentLib.ClosestPointOnRay(p2, p2 - convergencePoint, point)).sqrMagnitude < epsilon*epsilon ||
+            (point - LineSegmentLib.ClosestPointOnLineSeg(p1, p2, point)).sqrMagnitude < epsilon*epsilon;
     }
 
     // epsilon -- if two intersections are within epsilon of each other, they
     // are considered one intersecion.
     public void IntersectEdge(in LineSegment seg, out Vector2? i1_o, out Vector2? i2_o, float epsilon) {
+        // TODO: I'm sure there are floating point issues with using rays.
+        // There should probably be a specialized ray intersect function.
         Vector2? i1 = seg.Intersect(LeftRay(), epsilon/3);
         Vector2? i2 = seg.Intersect(RightRay(), epsilon/3);
         Vector2? i3 = seg.Intersect(Base(), epsilon/3);
@@ -91,8 +114,8 @@ public readonly struct Cup : Convex {
         return output;
     }
 
-    public void Subtract(in Cup other, out Cup? part1, out Cup? part2, float epsilon) {
-        Base().Subtract(other, out var seg1, out var seg2, epsilon);
+    public bool Subtract(in Cup other, out Cup? part1, out Cup? part2, float epsilon) {
+        bool ret = Base().Subtract(other, out var seg1, out var seg2, epsilon);
 
         part1 = null;
         part2 = null;
@@ -103,6 +126,7 @@ public readonly struct Cup : Convex {
         if (seg2 is LineSegment s2) {
             part2 = new Cup(s2, convergencePoint);
         }
+        return ret;
     }
 
     public Cup Swapped() {

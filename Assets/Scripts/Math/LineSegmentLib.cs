@@ -24,60 +24,32 @@ using UnityEngine;
 
 public static class LineSegmentLib
 {
-    public static Vector2 ClosestPointOnLineSeg(Vector2 l1, Vector2 l2, Vector2 point) {
+
+    private static float GetParameterizedProjection(Vector2 l1, Vector2 l2, Vector2 point) {
         float segLenSq = (l2 - l1).sqrMagnitude;  // i.e. |w-v|^2 -  avoid a sqrt
         if (segLenSq == 0.0) {
-            return l1;
+            return 0;
         }
         // Consider the line extending the segment, parameterized as v + t (w - v).
         // We find projection of point p onto the line. 
         // It falls where t = [(p-v) . (w-v)] / |w-v|^2
-        // We clamp t from [0,1] to handle points outside the segment vw.
-        float t = Mathf.Clamp01(Vector2.Dot(point - l1, l2 - l1) / segLenSq);
-        Vector2 projection = l1 + t * (l2 - l1);  // Projection falls on the segment
+        float t = Vector2.Dot(point - l1, l2 - l1) / segLenSq;
+        return t;
+    }
+
+    public static Vector2 ClosestPointOnLineSeg(Vector2 l1, Vector2 l2, Vector2 point) {
+        float t = GetParameterizedProjection(l1, l2, point);
+        t = Mathf.Clamp01(t);
+        Vector2 projection = l1 + t * (l2 - l1);
         return projection;
     }
 
-    // This appears to be working
-    public static bool LineSegmentsIntersectionOld(Vector2 p1, Vector2 p2, Vector2 p3, Vector2 p4, out Vector2 intersection, float epsilon) {
-        if (LineSegmentsIntersection(p1, p2, p3, p4, out intersection)) {
-            return true;
-        }
-
-        intersection = Vector2.positiveInfinity;
-
-        bool Helper(Vector2 p, Vector2 pClose, ref Vector2 intersec) {
-            float pSqDist = (p - pClose).sqrMagnitude;
-            if ((p - pClose).sqrMagnitude < epsilon*epsilon) {
-                intersec = (p+pClose)/2;
-                return true;
-            }
-            return false;
-        }
-    
-        Vector2 p1Close = ClosestPointOnLineSeg(p3,p4, p1);
-        if (Helper(p1, p1Close, ref intersection)) {
-            return true;
-        }
-
-        Vector2 p2Close = ClosestPointOnLineSeg(p3,p4, p2);
-        if (Helper(p2, p2Close, ref intersection)) {
-            return true;
-        }
-
-        Vector2 p3Close = ClosestPointOnLineSeg(p1,p2, p3);
-        if (Helper(p3, p3Close, ref intersection)) {
-            return true;
-        }
-
-        Vector2 p4Close = ClosestPointOnLineSeg(p1,p2, p4);
-        if (Helper(p4, p4Close, ref intersection)) {
-            return true;
-        }
-
-        return false;
+    public static Vector2 ClosestPointOnRay(Vector2 rayStart, Vector2 rayDirection, Vector2 point) {
+        float t = GetParameterizedProjection(rayStart, rayStart + rayDirection, point);
+        t = Mathf.Clamp(t, 0, float.MaxValue);
+        Vector2 projection = rayStart + t*rayDirection;
+        return projection;
     }
-
 
     public static bool LineSegmentsIntersection(Vector2 p1, Vector2 p2, Vector2 p3, Vector2 p4, out Vector2 intersection)
     {
@@ -104,13 +76,8 @@ public static class LineSegmentLib
         return true;
     }
 
-    static bool IsObtuse(Vector2 end1, Vector2 center, Vector2 end2) {
-        Vector2 v1 = end1-center;
-        Vector2 v2 = end2-center;
-        return v1.sqrMagnitude > .0001 && v2.sqrMagnitude > .0001 && Vector2.Dot(end1-center, end2-center) < 0;
-    }
 
-    static Vector2 Project(Vector2 point, Vector2 line1, Vector2 line2) {
+    public static Vector2 Project(Vector2 point, Vector2 line1, Vector2 line2) {
         Vector2 pVec = point - line1;
         Vector2 lVec = line2 - line1;
         Vector2 proj = (Vector2.Dot(pVec, lVec)/lVec.sqrMagnitude) * lVec;
@@ -139,10 +106,10 @@ public static class LineSegmentLib
             Vector2 close1;
             Vector2 close2;
 
-            if (IsObtuse(lineIntersection, t1, t2) || u >= 0 && u <= 1) {
+            if (Math.IsObtuse(lineIntersection, t1, t2) || u >= 0 && u <= 1) {
                 close1 = ClosestPointOnLineSeg(p1, p2, t2);
                 close2 = t2;
-            } else if (IsObtuse(lineIntersection, t2, t1) || v >= 0 && v <= 1) {
+            } else if (Math.IsObtuse(lineIntersection, t2, t1) || v >= 0 && v <= 1) {
                 close1 = t1;
                 close2 = ClosestPointOnLineSeg(p3, p4, t1);
             } 

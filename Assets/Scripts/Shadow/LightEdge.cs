@@ -74,25 +74,25 @@ public class LightEdge : ShadowEdgeBase {
 
     // 'point' lies on the target
     // point+difference is the point on the actual light edge
-    public void MaxDifferenceFromTarget(out Vector2 point, out Vector2 difference) {
-        var contacts = new List<ContactPoint2D>();
-        rb.GetContacts(contacts);
-
-        point = Vector2.zero;
-        difference = Vector2.zero;
-
-        var actual = GetActual();
-
-        foreach (var contact in contacts) {
-            var targetClosest = target.Closest(contact.point);
-            var thisDifference = actual.Closest(contact.point) - targetClosest;
-            if (thisDifference.sqrMagnitude > difference.sqrMagnitude && (contact.point - rb.position).magnitude > 2) {
-                difference = thisDifference;
-                difference -= ((Vector2)Vector3.Project(contact.normal, difference).normalized)*contact.separation;
-                point = targetClosest;
-            }
-        }
-    }
+    //public void MaxDifferenceFromTarget(out Vector2 point, out Vector2 difference) {
+    //    var contacts = new List<ContactPoint2D>();
+    //    rb.GetContacts(contacts);
+    //
+    //    point = Vector2.zero;
+    //    difference = Vector2.zero;
+    //
+    //    var actual = GetActual();
+    //
+    //    foreach (var contact in contacts) {
+    //        var targetClosest = target.Closest(contact.point);
+    //        var thisDifference = actual.Closest(contact.point) - targetClosest;
+    //        if (thisDifference.sqrMagnitude > difference.sqrMagnitude && (contact.point - rb.position).magnitude > 2) {
+    //            difference = thisDifference;
+    //            difference -= ((Vector2)Vector3.Project(contact.normal, difference).normalized)*contact.separation;
+    //            point = targetClosest;
+    //        }
+    //    }
+    //}
 
     public float AngularDifferenceFromTarget() {
         if (target.isValid()) {
