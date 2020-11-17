@@ -56,19 +56,22 @@ public readonly struct Cup : Convex {
     public bool Contains(in Vector2 point, float epsilon) {
         var p1p2 = new LineSegment(p1, p2);
 
-        float dist1 = new LineSegment(p1, convergencePoint).SignedDistance(point);
-        float dist2 = p1p2.SignedDistance(point);
-        float dist3 = new LineSegment(convergencePoint, p2).SignedDistance(point);
+        var epsilonSq = epsilon*epsilon;
+        var halfEpsilonSq = (epsilon/2)*(epsilon/2);
 
-        bool fullyInside = (dist1 > epsilon/2 && dist2 > epsilon/2 && dist3 > epsilon/2) ||
-                           (dist1 < -epsilon/2 && dist2 < -epsilon/2 && dist3 < -epsilon/2);
+        float dist1 = new LineSegment(p1, convergencePoint).SignedDistanceSq(point);
+        float dist2 = p1p2.SignedDistanceSq(point);
+        float dist3 = new LineSegment(convergencePoint, p2).SignedDistanceSq(point);
+
+        bool fullyInside = (dist1 > halfEpsilonSq && dist2 > halfEpsilonSq && dist3 > halfEpsilonSq) ||
+                           (dist1 < -halfEpsilonSq && dist2 < -halfEpsilonSq && dist3 < -halfEpsilonSq);
 
         if (fullyInside && p1p2.OnRightSideOfLine(point) != p1p2.OnRightSideOfLine(convergencePoint)) {
             return true;
         }
 
-        bool fullyOutside = !(dist1 > -epsilon && dist2 > -epsilon && dist3 > -epsilon) &&
-                            !(dist1 < epsilon && dist2 < epsilon && dist3 < epsilon);
+        bool fullyOutside = !(dist1 > -epsilonSq && dist2 > -epsilonSq && dist3 > -epsilonSq) &&
+                            !(dist1 < epsilonSq && dist2 < epsilonSq && dist3 < epsilonSq);
                             
         if (fullyOutside) {
             return false;

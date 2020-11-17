@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine; 
-using UnityEngine.Assertions; 
 
 [System.Serializable]
 public readonly struct LineSegment : IEnumerable<Vector2> {
@@ -25,7 +24,7 @@ public readonly struct LineSegment : IEnumerable<Vector2> {
 
     // epsilon -- if two intersections are within epsilon of each other, they
     // are considered one intersecion.
-    public LineSegment? Intersect(in Convex convex, float epsilon) {
+    public LineSegment? Intersect<T>(in T convex, float epsilon) where T : Convex {
 
         convex.IntersectEdge(this, out Vector2? i1, out Vector2? i2, epsilon);
         
@@ -156,16 +155,21 @@ public readonly struct LineSegment : IEnumerable<Vector2> {
     }
 
     public bool OnRightSideOfLine(in Vector2 point) {
-        return Math.OnRightSideOfLine(point, this);
+        return Math.Cross(p2 - p1, point - p1) > 0;
     }
 
-    public bool Contains(Vector2 point, float epsilon) {
+    public bool Contains(in Vector2 point, float epsilon) {
         return (point - LineSegmentLib.ClosestPointOnLineSeg(p1, p2, point)).sqrMagnitude < epsilon*epsilon;
     }
 
     // Signed distance to this line segment extended to a line
     public float SignedDistance(in Vector2 point) {
-        return Math.SignedDistance(point, this);
+        return Math.Cross(p2 - p1, point - p1)/(Length());
+    }
+
+    public float SignedDistanceSq(in Vector2 point) {
+        var cross = Math.Cross(p2 - p1, point - p1);
+        return Mathf.Abs(cross)*cross/SqrLength();
     }
 
     public float Length() {
@@ -252,18 +256,18 @@ public readonly struct LineSegment : IEnumerable<Vector2> {
         return output;
     }
 
-    public static bool operator==(LineSegment lhs, LineSegment rhs) {
+    public static bool operator==(in LineSegment lhs, in LineSegment rhs) {
         return lhs.p1 == rhs.p1 && lhs.p2 == rhs.p2;
     }
 
-    public static bool operator!=(LineSegment lhs, LineSegment rhs) {
+    public static bool operator!=(in LineSegment lhs, in LineSegment rhs) {
         return !(lhs == rhs);
     }
 
-    public static LineSegment operator-(LineSegment lhs, Vector2 rhs) {
+    public static LineSegment operator-(in LineSegment lhs, in Vector2 rhs) {
         return new LineSegment(lhs.p1 - rhs, lhs.p2 - rhs);
     }
-    public static LineSegment operator+(LineSegment lhs, Vector2 rhs) {
+    public static LineSegment operator+(in LineSegment lhs, in Vector2 rhs) {
         return new LineSegment(lhs.p1 + rhs, lhs.p2 + rhs);
     }
 
@@ -275,7 +279,7 @@ public readonly struct LineSegment : IEnumerable<Vector2> {
         return new LineSegment(p1, p1 + (p2 - p1).normalized * newLength);
     }
 
-    public Vector2 PerpendicularComponent(Vector2 v) {
+    public Vector2 PerpendicularComponent(in Vector2 v) {
         return v - (Vector2)Vector3.Project(v, (p1 - p2));
     }
 
@@ -302,7 +306,7 @@ public readonly struct LineSegment : IEnumerable<Vector2> {
     }
 
     // TODO: This needs an epsilon parameter
-    public bool IsParallel(LineSegment other) {
+    public bool IsParallel(in LineSegment other) {
         Vector2 thisVector = p2 - p1;
         Vector2 otherVector = other.p2 - other.p1;
 

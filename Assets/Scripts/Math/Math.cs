@@ -2,23 +2,8 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Math {
-    public static float Cross(Vector2 v1, Vector2 v2) {
+    public static float Cross(in Vector2 v1, in Vector2 v2) {
         return v1.x*v2.y - v2.x*v1.y;
-    }
-
-    // epsilon specifies how far from the line is considered to be on the line
-    public static bool OnRightSideOrOn(Vector2 point, LineSegment line, float epsilon) {
-        return Cross(line.p2 - line.p1, point - line.p1)/(line.Length()) > -epsilon;
-    }
-
-    public static bool OnRightSideOfLine(Vector2 point, LineSegment line) {
-        return Cross(line.p2 - line.p1, point - line.p1) > 0;
-    }
-
-    // Returns the distance from the point to the line, positive if the point
-    // is on the right side, negative otherwise
-    public static float SignedDistance(Vector2 point, LineSegment line) {
-        return Cross(line.p2 - line.p1, point - line.p1)/(line.Length());
     }
 
     //public static IEnumerable<LineSegment> GetTriangleSides(Vector2 p1, Vector2 p2, Vector2 p3) {
