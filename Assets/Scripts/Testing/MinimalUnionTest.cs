@@ -30,7 +30,12 @@ public class MinimalUnionTest : MonoBehaviour {
     public bool drawCalculated = true;
 
     void Update() {
-        if (UnityEditor.Selection.activeGameObject == gameObject) {
+#if UNITY_EDITOR
+        bool selected = UnityEditor.Selection.activeGameObject == gameObject;
+#else
+        bool selected = true;
+#endif
+        if (selected) {
             segsCopy.Clear();
             foreach (var item in segs) {
                 segsCopy.Add(item.ToTuple());
