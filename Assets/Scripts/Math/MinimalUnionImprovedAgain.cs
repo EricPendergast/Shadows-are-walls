@@ -6,9 +6,11 @@ using ListExtensions;
 
 using AngleFunc = System.Func<UnityEngine.Vector2, float>;
 
-public static class MinimalUnionImproved<T> {
-    private static float epsilon = .0001f;
+public static class MinimalUnionImprovedAgain<T> {
+    private static float epsilon = 0;
     private static float angleEpsilon = .001f;
+
+    private static System.Func<Vector2, float> metric;
 
     private class CompareByMidpoint : Comparer<CupWrapper> {
         public override int Compare(CupWrapper a, CupWrapper b) {
@@ -25,10 +27,10 @@ public static class MinimalUnionImproved<T> {
         public Vector2 p1 {get => v.p1;}
         public Vector2 p2 {get => v.p2;}
 
-        public CupWrapper(Cup c, T obj, AngleFunc angleFunc) { 
+        public CupWrapper(Cup c, T obj) { 
             this.obj = obj;
-            var p1Angle = angleFunc(c.p1);
-            var p2Angle = angleFunc(c.p2);
+            var p1Angle = metric(c.p1);
+            var p2Angle = metric(c.p2);
             if (p1Angle <= p2Angle) {
                 this.p1Angle = p1Angle;
                 this.p2Angle = p2Angle;
@@ -74,6 +76,10 @@ public static class MinimalUnionImproved<T> {
             return (p1Angle + p2Angle)/2;
         }
 
+        public float AngleWidth() {
+            return p2Angle - p1Angle;
+        }
+
         public bool AngleOverlaps(in CupWrapper other) {
             if (p1Angle > other.p1Angle) {
                 return p1Angle < other.p2Angle;
@@ -95,6 +101,26 @@ public static class MinimalUnionImproved<T> {
         public override int GetHashCode() {
             return p1.GetHashCode() ^ p2.GetHashCode();
         }
+
+        public bool Subtract(in CupWrapper other, out CupWrapper? before, out CupWrapper? after, float epsilon) {
+            before = null;
+            after = null;
+
+            if (!AngleOverlaps(other)) {
+                before = this;
+                return false;
+            }
+
+            bool ret = v.Subtract(other, out Cup? bef, out Cup? aft, .0001f);
+            if (bef is Cup) {
+                before  = new CupWrapper((Cup)bef, obj);
+            }
+            if (aft is Cup) {
+                after = new CupWrapper((Cup)aft, obj);
+            }
+
+            return ret;
+        }
     }
 
     // A version of MinimalUnion which doesn't handle trimmings.
@@ -107,23 +133,25 @@ public static class MinimalUnionImproved<T> {
 
         // PRECONDITION: Every cup passed into this function must have a larger
         // p1Angle than the previous cup passed in.
-        public void Add(CupWrapper cupW, AngleFunc angleFunc, System.Action<CupWrapper> OnTrimmingCreated) {
+        public void Add(CupWrapper cupW, System.Action<CupWrapper> OnTrimmingCreated) {
+            Profiler.BeginSample("SimplifiedMinimalUnion.Add");
             if (!CupComesAfterExistingCups(cupW)) {
                 Debug.Assert(false, "Cup comes before existing cup");
+                Profiler.EndSample();
+                return;
             }
 
-            MoveCurrentNonOverlappingToResults(cupW, angleFunc);
+            MoveCurrentNonOverlappingToResults(cupW);
 
-            if (SubtractCurrentFrom(cupW, angleFunc, OnTrimmingCreated) is CupWrapper cup) {
-                CupWrapper trimmed = new CupWrapper(cup, cupW.obj, angleFunc);
-                if (trimmed.p1Angle > cupW.p1Angle) {
-                    OnTrimmingCreated(trimmed);
-                } else {
-                    MoveCurrentNonOverlappingToResults(trimmed, angleFunc);
-                    SubtractFromCurrent(trimmed, angleFunc, OnTrimmingCreated);
-                    currentCups.InsertSorted(trimmed);
-                }
+            if (SubtractCurrentFrom(cupW, OnTrimmingCreated) is CupWrapper trimmed) {
+                Debug.Assert(trimmed.p1Angle <= cupW.p1Angle);
+
+                // TODO: I don't think this is necessary
+                MoveCurrentNonOverlappingToResults(trimmed);
+                SubtractFromCurrent(trimmed, OnTrimmingCreated);
+                currentCups.InsertSorted(trimmed);
             }
+            Profiler.EndSample();
         }
 
         private bool CupComesAfterExistingCups(CupWrapper cupW) {
@@ -139,9 +167,9 @@ public static class MinimalUnionImproved<T> {
             }
             return true;
         }
-        private void MoveCurrentNonOverlappingToResults(CupWrapper? cupW, AngleFunc angleFunc) {
+        private void MoveCurrentNonOverlappingToResults(CupWrapper? cupW) {
             bool MoveToResultsIfNonOverlapping(CupWrapper currentCup) {
-                if (cupW == null || currentCup.FullyLeq(currentCup)) {
+                if (cupW == null || currentCup.FullyLeq((CupWrapper)cupW)) {
                     resultCups.Add(currentCup);
                     return true;
                 }
@@ -157,73 +185,72 @@ public static class MinimalUnionImproved<T> {
             //currentCups.RemoveAll(MoveToResultsIfNonOverlapping);
         }
 
-        private CupWrapper? SubtractCurrentFrom(CupWrapper subtractFromW, AngleFunc angleFunc, System.Action<CupWrapper> OnTrimmingCreated) {
+        private CupWrapper? SubtractCurrentFrom(CupWrapper? subtractFrom, System.Action<CupWrapper> OnTrimmingCreated) {
             Profiler.BeginSample("SubtractCurrentFrom");
-            Cup? subtractFrom = subtractFromW;
 
-
-            //foreach (var current in currentCups) {
-            //    Debug.Assert(current.AngleOverlaps(subtractFromW));
-            //}
+            float initialP1Angle = subtractFrom?.p1Angle ?? 0;
 
             foreach (CupWrapper dataCup in currentCups) {
-
-                if (dataCup.AngleOverlaps(subtractFromW) && ((Cup)subtractFrom).Subtract(dataCup, out Cup? before, out Cup? after, epsilon)) {
-                    
-                    subtractFrom = null;
-                    
-                    void HandleSubtractResult(Cup? subtractionResult) {
-                        if (subtractionResult is Cup c) {
-                            var resultW = new CupWrapper(c, subtractFromW.obj, angleFunc);
-                            // Only keep subtracting from subtractFrom if its
-                            // p1 angle remains unchanged. If its p1 angle changes, this class can't handle it any more, and it goes into the trimmings.
-                            if (resultW.p1Angle <= subtractFromW.p1Angle) {
-                                Debug.Assert(subtractFrom == null);
-                                subtractFrom = c;
-                            } else {
-                                OnTrimmingCreated(resultW);
-                            }
-                        }
-                    }
-                    
-                    HandleSubtractResult(before);
-                    HandleSubtractResult(after);
+                if (subtractFrom == null) {
+                    break;
                 }
 
-                if (subtractFrom == null) {
-                    Profiler.EndSample();
-                    return null;
+                if (((CupWrapper)subtractFrom).Subtract(dataCup, out CupWrapper? before, out CupWrapper? after, epsilon)) {
+
+                    subtractFrom = null;
+
+                    void HandleSubtractResult(CupWrapper result) {
+                        // Only keep subtracting from subtractFrom if its
+                        // p1 angle remains unchanged. If its p1 angle changes,
+                        // this class can't handle it any more, and it goes
+                        // into the trimmings.
+                        if (result.p1Angle <= initialP1Angle) {
+                            //if (subtractFrom != null) {
+                            //    if (subtractFrom?.AngleWidth() < result.AngleWidth()) {
+                            //        subtractFrom = result;
+                            //    }
+                            //} else {
+                                subtractFrom = result;
+                            //}
+                        } else {
+                            OnTrimmingCreated(result);
+                        }
+                    }
+
+                    if (before is CupWrapper bef) {
+                        HandleSubtractResult(bef);
+                    }
+                    if (after is CupWrapper aft) {
+                        HandleSubtractResult(aft);
+                    }
                 }
             }
             Profiler.EndSample();
-            return new CupWrapper((Cup)subtractFrom, subtractFromW.obj, angleFunc);
+            return subtractFrom;
         }
 
-        private void SubtractFromCurrent(CupWrapper toSubtract, AngleFunc angleFunc, System.Action<CupWrapper> OnTrimmingCreated) {
+        private void SubtractFromCurrent(CupWrapper toSubtract, System.Action<CupWrapper> OnTrimmingCreated) {
             Profiler.BeginSample("SubtractFromCurrent");
             Swap(ref dataTmp, ref currentCups);
             currentCups.Clear();
 
-            //foreach (var current in dataTmp) {
-            //    Debug.Assert(current.AngleOverlaps(toSubtract));
-            //}
-
             foreach (var current in dataTmp) {
-                if (current.AngleOverlaps(toSubtract) && current.v.Subtract(toSubtract, out Cup? beforeNullable, out Cup? afterNullable, epsilon)) {
+                if (current.Subtract(toSubtract, out CupWrapper? before, out CupWrapper? after, epsilon)) {
 
-                    void Do(Cup? subtractionResult) {
-                        if (subtractionResult is Cup c) {
-                            var result = new CupWrapper(c, current.obj, angleFunc);
-                            if (result.MidpointAngle() <= toSubtract.MidpointAngle()) {
-                                resultCups.InsertSorted(result);
-                            } else {
-                                OnTrimmingCreated(result);
-                            }
+                    void HandleSubtractResult(CupWrapper result) {
+                        if (result.MidpointAngle() <= toSubtract.MidpointAngle()) {
+                            resultCups.InsertSorted(result);
+                        } else {
+                            OnTrimmingCreated(result);
                         }
                     }
 
-                    Do(beforeNullable);
-                    Do(afterNullable);
+                    if (before is CupWrapper bef) {
+                        HandleSubtractResult(bef);
+                    }
+                    if (after is CupWrapper aft) {
+                        HandleSubtractResult(aft);
+                    }
                 } else {
                     currentCups.InsertSorted(current);
                 }
@@ -277,9 +304,9 @@ public static class MinimalUnionImproved<T> {
             b = tmp;
         }
 
-        public void Add(CupWrapper cupW, AngleFunc angleFunc) {
-            AddFutureCupsComingBefore(cupW, angleFunc);
-            simpleMinUnion.Add(cupW, angleFunc, AddTrimming);
+        public void Add(CupWrapper cupW) {
+            AddFutureCupsComingBefore(cupW);
+            simpleMinUnion.Add(cupW, AddTrimming);
         }
 
         private System.Action<CupWrapper> AddTrimming;
@@ -287,7 +314,7 @@ public static class MinimalUnionImproved<T> {
             futureCups.InsertSorted(cupW);
         }
 
-        private void AddFutureCupsComingBefore(CupWrapper? cupW, AngleFunc angleFunc) {
+        private void AddFutureCupsComingBefore(CupWrapper? cupW) {
             int loopLimiter = 100;
             while (futureCups.Count > 0) {
                 var min = futureCups[0];
@@ -297,7 +324,7 @@ public static class MinimalUnionImproved<T> {
                 }
 
                 futureCups.RemoveAt(0);
-                simpleMinUnion.Add(min, angleFunc, AddTrimming);
+                simpleMinUnion.Add(min, AddTrimming);
 
                 if (loopLimiter-- < 0) {
                     Debug.Assert(false, "Too many loops");
@@ -306,15 +333,15 @@ public static class MinimalUnionImproved<T> {
             }
         }
 
-        public IEnumerable<CupWrapper> GetFinalResults(AngleFunc angleFunc) {
-            int loopLimiter = 100;
+        public IEnumerable<CupWrapper> GetFinalResults() {
+            int loopLimiter = 5;
             while (futureCups.Count > 0) {
                 if (loopLimiter-- < 0) {
                     Debug.Assert(false, "Too many loops");
                     break;
                 }
 
-                AddFutureCupsComingBefore(null, angleFunc);
+                AddFutureCupsComingBefore(null);
             }
             return simpleMinUnion.GetFinalResults();
         }
@@ -350,28 +377,34 @@ public static class MinimalUnionImproved<T> {
             Vector2 convergencePoint,
             AngleFunc angleFunc) {
 
+        MinimalUnionImprovedAgain<T>.metric = angleFunc;
+
         Profiler.BeginSample("SortedMinimalUnion");
 
         minimalUnion.Reset();
         allShadows.Clear();
 
         foreach (var segmentTuple in shadowsIn) {
-            allShadows.Add(
+            var toAdd = 
                 new CupWrapper(
                     new Cup(segmentTuple.Item1, convergencePoint),
-                    segmentTuple.Item2,
-                    angleFunc
-                )
-            );
+                    segmentTuple.Item2
+                );
+
+            if (toAdd.p1 == convergencePoint || toAdd.p2 == convergencePoint) {
+                continue;
+            }
+
+            allShadows.Add(toAdd);
         }
 
         allShadows.Sort();
 
         foreach (var cupW in allShadows) {
-            minimalUnion.Add(cupW, angleFunc);
+            minimalUnion.Add(cupW);
         }
 
-        var finalResults = minimalUnion.GetFinalResults(angleFunc);
+        var finalResults = minimalUnion.GetFinalResults();
         AssertInvariants(finalResults);
         UnwrapInto(
             finalResults,
@@ -379,7 +412,6 @@ public static class MinimalUnionImproved<T> {
         );
 
         Profiler.EndSample();
-        //shadowsIn.Sort((s1, s2) => angleFunc(s1.Item1.Midpoint()).CompareTo(angleFunc(s2.Item1.Midpoint())));
     }
 
     private static void UnwrapInto(

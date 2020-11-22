@@ -92,8 +92,8 @@ public readonly struct Cup : Convex {
     public void IntersectEdge(in LineSegment seg, out Vector2? i1_o, out Vector2? i2_o, float epsilon) {
         // TODO: I'm sure there are floating point issues with using rays.
         // There should probably be a specialized ray intersect function.
-        Vector2? i1 = seg.Intersect(LeftRay(), epsilon/3);
-        Vector2? i2 = seg.Intersect(RightRay(), epsilon/3);
+        Vector2? i1 = seg.IntersectRay(p1, 2*p1 - convergencePoint, epsilon/3);
+        Vector2? i2 = seg.IntersectRay(p2, 2*p2 - convergencePoint, epsilon/3);
         Vector2? i3 = seg.Intersect(Base(), epsilon/3);
 
         Util.RemoveDuplicates(ref i1, ref i2, ref i3, epsilon);

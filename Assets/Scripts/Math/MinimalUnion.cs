@@ -1,25 +1,79 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
+using UnityEngine.Profiling;
 
 public static class MinimalUnion<T> {
-    public struct CupWrapper {
+
+    private static System.Func<Vector2, float> metric;
+    
+    private class CompareByMidpoint : Comparer<CupWrapper> {
+        public override int Compare(CupWrapper a, CupWrapper b) {
+            return ((a.p1Angle + a.p2Angle)/2).CompareTo((b.p1Angle + b.p2Angle)/2);
+        }
+    }
+
+    private class CompareByP1 : Comparer<CupWrapper> {
+        public override int Compare(CupWrapper a, CupWrapper b) {
+            return a.p1Angle.CompareTo(b.p1Angle);
+        }
+    }
+
+    public readonly struct CupWrapper {
         private static ListPool<Cup> pool = new ListPool<Cup>();
-        public Cup v;
-        public T obj;
+        public readonly Cup v;
+        public readonly T obj;
+        public readonly float p1Angle;
+        public readonly float p2Angle;
+
         public CupWrapper(Cup c, T obj) { 
             v = c;
             this.obj = obj;
-        }
-        public static implicit operator Cup(CupWrapper c) => c.v;
-        public List<CupWrapper> Subtract(Cup other, in List<CupWrapper> output) {
-            output.Clear();
-            using (var tmp = pool.TakeTemporary()) {
-                foreach (Cup c in v.Subtract(other, tmp.val)) {
-                    output.Add(new CupWrapper(c, obj));
-                }
+            var p1Angle = metric(c.p1);
+            var p2Angle = metric(c.p2);
+
+            if (p1Angle <= p2Angle) {
+                this.p1Angle = p1Angle;
+                this.p2Angle = p2Angle;
+                v = new Cup(c.p1, c.p2, c.convergencePoint);
+            } else {
+                this.p1Angle = p2Angle;
+                this.p2Angle = p1Angle;
+                v = new Cup(c.p2, c.p1, c.convergencePoint);
             }
+
+        }
+        public static implicit operator Cup(in CupWrapper c) => c.v;
+        public List<CupWrapper> Subtract(in CupWrapper other, in List<CupWrapper> output) {
+            Profiler.BeginSample("CupWrapper.Subtract");
+
+            output.Clear();
+            if (!AngleOverlaps(other)) {
+                output.Add(this);
+                Profiler.EndSample();
+                return output;
+            }
+
+
+            v.Subtract(other, out Cup? sub1, out Cup? sub2, .0001f);
+            if (sub1 is Cup) {
+                output.Add(new CupWrapper((Cup)sub1, obj));
+            }
+            if (sub2 is Cup) {
+                output.Add(new CupWrapper((Cup)sub2, obj));
+            }
+            Profiler.EndSample();
             return output;
+        }
+
+        private bool AngleOverlaps(in CupWrapper other) {
+            if (p1Angle > other.p1Angle) {
+                return p1Angle < other.p2Angle;
+            }
+            if (p1Angle < other.p1Angle) {
+                return p2Angle > other.p1Angle;
+            }
+            return p2Angle > other.p1Angle;
         }
     }
 
@@ -30,6 +84,7 @@ public static class MinimalUnion<T> {
 
     private static ListPool<CupWrapper> subtractListPool = new ListPool<CupWrapper>();
     public static Queue<CupWrapper> Subtract(CupWrapper takeFrom, IEnumerable<CupWrapper> cupsIn, in Queue<CupWrapper> cupsOut) {
+        Profiler.BeginSample("MinimalUnion.Subtract");
         cupsOut.Clear();
         using (var tmp = subtractListPool.TakeTemporary()) {
 
@@ -43,6 +98,7 @@ public static class MinimalUnion<T> {
                 }
             }
         }
+        Profiler.EndSample();
         return cupsOut;
     }
 
@@ -54,6 +110,7 @@ public static class MinimalUnion<T> {
     //private static Queue<CupWrapper> newSegParts = new Queue<CupWrapper>();
     //private static Queue<CupWrapper> tmp = new Queue<CupWrapper>();
     public static void CalculateSubProblem(ref Queue<CupWrapper> current, CupWrapper newSeg) {
+        Profiler.BeginSample("MinimalUnion.CalculateSubProblem");
         using (var newSegParts = calcSubProbQueuePool.TakeTemporary()) {
             using (var tmp = calcSubProbQueuePool.TakeTemporary()) {
                 Subtract(newSeg, current, newSegParts.val);
@@ -71,6 +128,7 @@ public static class MinimalUnion<T> {
                 }
             }
         }
+        Profiler.EndSample();
     }
 
     private static List<CupWrapper> allShadows = new List<CupWrapper>();
@@ -82,6 +140,8 @@ public static class MinimalUnion<T> {
     // Individual line segments are sorted by increasing angle as well. (i.e.
     // any line segment l has metric(l.p1) < metric(l.p2))
     public static void CalculateAndSort(ref List<System.Tuple<LineSegment, T>> shadowsIn, Vector2 convergencePoint, System.Func<Vector2, float> metric) {
+        MinimalUnion<T>.metric = metric;
+
         allShadows.Clear();
         minimalUnion.Clear();
         toTrim.Clear();
@@ -95,7 +155,7 @@ public static class MinimalUnion<T> {
             allShadows.Add(new CupWrapper(new Cup(seg, convergencePoint), obj));
         }
 
-        allShadows.Sort((s1, s2) => metric(s1.v.p1).CompareTo(metric(s2.v.p1)));
+        allShadows.Sort(new CompareByP1());
 
         toTrim.Enqueue(allShadows[0]);
         
@@ -119,13 +179,12 @@ public static class MinimalUnion<T> {
 
         shadowsIn.Clear();
 
+        minimalUnion.Sort(new CompareByMidpoint());
+
         foreach (CupWrapper cup in minimalUnion) {
             shadowsIn.Add(System.Tuple.Create(cup.v.Base(), cup.obj));
         }
-
-        shadowsIn.Sort((s1, s2) => metric(s1.Item1.Midpoint()).CompareTo(metric(s2.Item1.Midpoint())));
     }
-
 }
 
 

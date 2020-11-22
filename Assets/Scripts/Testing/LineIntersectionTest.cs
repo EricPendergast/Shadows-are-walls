@@ -29,7 +29,7 @@ public class LineIntersectionTest : MonoBehaviour {
         return false;
     }
 
-    void OnDrawGizmos() {
+    void OnDrawGizmosSelected() {
         Gizmos.color = Color.blue;
         Gizmos.DrawSphere(p1, drawRadius);
         Gizmos.DrawSphere(p2, drawRadius);

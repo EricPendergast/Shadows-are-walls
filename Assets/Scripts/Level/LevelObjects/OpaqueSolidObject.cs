@@ -5,21 +5,37 @@ public class OpaqueSolidObject : LevelObject {
     protected override void Awake() {
         base.Awake();
 
-        var opaque1 = gameObject.AddComponent<Opaque>();
-        opaque1.crossSectionCallback = (Vector2) => {
+        var upper = gameObject.AddComponent<Opaque>();
+        upper.crossSectionCallback = (Vector2) => {
             return new LineSegment(
-                    transform.TransformPoint(new Vector2(-.5f, -.5f)),
+                    transform.TransformPoint(new Vector2(-.5f, .5f)),
                     transform.TransformPoint(new Vector2(.5f, .5f)));
         };
-        opaque1.disableFrontFaceColliders = true;
+        upper.disableFrontFaceColliders = true;
 
-        var opaque2 = gameObject.AddComponent<Opaque>();
-        opaque2.crossSectionCallback = (Vector2) => {
+        var right = gameObject.AddComponent<Opaque>();
+        right.crossSectionCallback = (Vector2) => {
+            return new LineSegment(
+                    transform.TransformPoint(new Vector2(.5f, .5f)),
+                    transform.TransformPoint(new Vector2(.5f, -.5f)));
+        };
+        right.disableFrontFaceColliders = true;
+
+        var lower = gameObject.AddComponent<Opaque>();
+        lower.crossSectionCallback = (Vector2) => {
             return new LineSegment(
                     transform.TransformPoint(new Vector2(.5f, -.5f)),
+                    transform.TransformPoint(new Vector2(-.5f, -.5f)));
+        };
+        lower.disableFrontFaceColliders = true;
+
+        var left = gameObject.AddComponent<Opaque>();
+        left.crossSectionCallback = (Vector2) => {
+            return new LineSegment(
+                    transform.TransformPoint(new Vector2(-.5f, -.5f)),
                     transform.TransformPoint(new Vector2(-.5f, .5f)));
         };
-        opaque2.disableFrontFaceColliders = true;
+        left.disableFrontFaceColliders = true;
 
         gameObject.layer = PhysicsHelper.opaqueLayer;
     }

@@ -41,7 +41,7 @@ public class MinimalUnionTest : MonoBehaviour {
                 segsCopy.Add(item.ToTuple());
             }
 
-            MinimalUnionImproved<string>.SortedMinimalUnion(
+            MinimalUnionImprovedAgain<string>.SortedMinimalUnion(
                 ref segsCopy,
                 lightPosition,
                 (Vector2 vec) => 

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
+using UnityEngine.Profiling;
 
 // General idea: Light finds all opaque objects in the scene, calculates all
 // their shadows, tells all its shadow edges where they should be based on
@@ -265,6 +266,7 @@ public partial class RotatableLight : LightBase {
     }
 
     public override void DoFixedUpdate() {
+
         forceApplier.ApplyForces(body, rightShadowEdge, leftShadowEdge, constraints);
         CacheViewTriangles();
 
@@ -464,6 +466,7 @@ class ShadowCalculator {
     private void CalculateSortedFrontFaces(
             IEnumerable<Opaque> opaqueObjs, LightViewTriangle lightTriangle) {
 
+        Profiler.BeginSample("Calculate shadow front faces");
         sortedFrontFaces.Clear();
 
         foreach (Opaque opaque in opaqueObjs) {
@@ -472,6 +475,7 @@ class ShadowCalculator {
             }
         }
         sortedFrontFaces.Add(System.Tuple.Create(lightTriangle.FarEdge(), (Opaque)null));
+        Profiler.EndSample();
         //foreach (var pair in sortedFrontFaces) {
         //    Debug.Log(pair.Item1 + ", " + pair.Item2);
         //    Debug.Log(
@@ -479,7 +483,8 @@ class ShadowCalculator {
         //        lightTriangle.Angle(pair.Item1.p2));
         //}
         //MinimalUnion<Opaque>.CalculateAndSort(ref sortedFrontFaces, lightTriangle.GetOrigin(), lightTriangle.Angle);
-        MinimalUnionImproved<Opaque>.SortedMinimalUnion(ref sortedFrontFaces, lightTriangle.GetOrigin(), lightTriangle.Angle);
+        //MinimalUnionImproved<Opaque>.SortedMinimalUnion(ref sortedFrontFaces, lightTriangle.GetOrigin(), lightTriangle.Angle);
+        MinimalUnionImprovedAgain<Opaque>.SortedMinimalUnion(ref sortedFrontFaces, lightTriangle.GetOrigin(), lightTriangle.Angle);
         //foreach (var pair in sortedFrontFaces) {
         //    Debug.Log(pair.Item1 + ", " + pair.Item2);
         //    Debug.Log(

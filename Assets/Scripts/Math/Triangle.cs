@@ -27,15 +27,20 @@ public readonly struct Triangle : Convex {
         yield return side2;
     }
 
-    public bool Contains(in Vector2 point, float epsilon=.0001f) {
+    public bool Contains(in Vector2 point, float epsilon=0) {
 
-        float dist1 = side0.SignedDistance(point);
-        float dist2 = side1.SignedDistance(point);
-        float dist3 = side2.SignedDistance(point);
+        var epsilonSq = epsilon*epsilon;
+        float dist1 = side0.SignedDistanceSq(point);
+        float dist2 = side1.SignedDistanceSq(point);
+        float dist3 = side2.SignedDistanceSq(point);
 
-        return 
-            (dist1 > -epsilon && dist2 > -epsilon && dist3 > -epsilon) ||
-            (dist1 < epsilon && dist2 < epsilon && dist3 < epsilon);
+        if (epsilon > 0) {
+            return 
+                (dist1 > -epsilonSq && dist2 > -epsilonSq && dist3 > -epsilonSq) ||
+                (dist1 < epsilonSq && dist2 < epsilonSq && dist3 < epsilonSq);
+        } else {
+            return (dist1 >= 0) ==  (dist2 >= 0) && (dist2 >= 0) == (dist3 >= 0);
+        }
     }
 
     public List<Vector2> AsList() {

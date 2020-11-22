@@ -22,6 +22,20 @@ public readonly struct LineSegment : IEnumerable<Vector2> {
         return null;
     }
 
+    public Vector2? Intersect(in LineSegment other) {
+        if (LineSegmentLib.LineSegmentsIntersection(p1, p2, other.p1, other.p2, out var intersection)) {
+            return intersection;
+        }
+        return null;
+    }
+
+    public Vector2? IntersectRay(Vector2 rayP1, Vector2 rayP2, float epsilon) {
+        if (LineSegmentLib.LineSegmentsIntersection(p1, p2, rayP1, rayP2, out var intersection, epsilon, true)) {
+            return intersection;
+        }
+        return null;
+    }
+
     // epsilon -- if two intersections are within epsilon of each other, they
     // are considered one intersecion.
     public LineSegment? Intersect<T>(in T convex, float epsilon) where T : Convex {
